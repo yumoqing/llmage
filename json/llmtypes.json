@@ -1,0 +1,15 @@
+{
+    "tblname": "llmtypes",
+	"title":"大语言模型",
+    "params": {
+		"sortby":"name",
+        "browserfields": {
+            "exclouded": ["id", "llmid"],
+            "alters": {}
+        },
+        "editexclouded": [
+            "id", "llmid"
+        ]
+        "record_toolbar": null
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "tblname": "llmcatelog",
+	"title":"模型类目",
+    "params": {
+		"sortby":"name",
+        "browserfields": {
+            "exclouded": ["id"],
+            "alters": {}
+        },
+        "editexclouded": [
+            "id"
+        ],
+        "record_toolbar": null
+    }
+}

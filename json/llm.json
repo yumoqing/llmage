@@ -1,0 +1,22 @@
+{
+    "tblname": "llm",
+	"title":"大语言模型",
+    "params": {
+		"sortby":"name",
+        "browserfields": {
+            "exclouded": ["id"],
+            "alters": {}
+        },
+        "editexclouded": [
+            "id"
+        ],
+		"subtables":[
+			{
+				"field":"llmid",
+				"title":"模型类型",
+				"subtable":"llmtype"
+			}
+		],
+        "record_toolbar": null
+    }
+}
