@@ -1,6 +1,6 @@
 {
     "tblname": "llmtypes",
-	"title":"大语言模型",
+	"title":"大语言模型类型",
     "params": {
 		"sortby":"name",
         "browserfields": {
@@ -9,7 +9,7 @@
         },
         "editexclouded": [
             "id", "llmid"
-        ]
+        ],
         "record_toolbar": null
     }
 }
