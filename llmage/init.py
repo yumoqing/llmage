@@ -1,3 +1,11 @@
+from llmage.llmclient import get_llm, inference, get_llmcatelogs, \
+	get_llms_by_catelog
+from ahserver.serverenv import ServerEnv
 
 def load_llmage():
-	pass
+	env = ServerEnv()
+	env.get_llm = get_llm
+	env.inference = inference
+	env.get_llms_by_catelog = get_llms_by_catelog
+	eng.get_llmcatelogs = get_llmcatelogs
+

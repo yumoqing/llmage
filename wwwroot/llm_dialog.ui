@@ -1,0 +1,30 @@
+{% set llm = get_llm(params_kw.id) %}
+{% if llm %}
+{
+	"widgettype":"LlmIO",
+	"options":{
+		"width":"100%",
+		"height":"100%",
+		"list_models_url":"{{entire_url('list_mti_models.dspy')}}",
+		"estimate_url":"/estimate/model_estimate.dspy",
+		"input_fields":{{llm.input_fields}},
+		"input_view":{{llm.input_view}},
+		"models":[
+			{
+				"llmidid":"{{llm.id}}",
+				"modeltypeid":"{{llm.catelogid}}",
+				"output_view":{{llm.output_view}},
+				"input_from":"userinput",
+				"system_message_format":{{llm.system_message}},
+				"user_message_format":{{llm.user_message}},
+				"llm_message_format":{{llm.assisant_message}},
+				"icon":"{{entire_url('/appbase/get_icon.dspy')}}?id={{llm.iconid}}",
+				"url":"{{entire_url('/llmage/llminference.dspy')}}",
+				"model":"{{llm.model}}",
+				"modelname":"{{llm.name}}"
+			}
+		]
+	}
+}
+{% else %}
+{% endif %}

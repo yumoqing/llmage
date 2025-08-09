@@ -1,0 +1,76 @@
+{
+	"widgettype":"VBox",
+	"options":{
+		"width":"100%",
+		"height":"100%"
+	},
+	"subwidgets":[
+{% for cate in get_llmcatelogs() %}
+		{
+			"widgettype": "VBox",
+			"options":{
+				"width":"100%"
+			},
+			"subwidgets":[
+				{
+					"widgettype":"Title3",
+					"options":{
+						"text":"{{cate.name}}"
+					}
+				},
+				{
+					"widgettype":"DynamicColumn",
+					"options":{
+						"css":"filler",
+						"width":"100%"
+					},
+					"subwidgets":[
+{% for llm in get_llms_by_catelog(cate.id) %}
+						{
+							"widgettype":"VBox",
+							"options":{
+								"cwidth":16,
+								"cheight":8
+							},
+							"subwidgets":[
+								{
+									"widgettype":"Title5",
+									"options":{"text":"{{llm.name}}"
+								},
+								{
+									"widgettype":"Text",
+									"options":{
+										"text":"{{llm.description}}",
+										"wrap":true,
+										"halign":"left"
+									}
+								}
+							],
+							"binds":[
+								{
+									"wid":"self",
+									"event":"click",
+									"actiontype":"urlwidget",
+									"target":"PopupWindow",
+									"popup_options":{
+										"width":"90%",
+										"height":"90%"
+									},
+									"options":{
+										"params":{
+											"id":"{{llm.id}}"
+										},
+										"url":"{{entire_url('./llminference.dspy')}}"
+									}
+								}
+							]
+						}
+{% if not loop.last %}, {% endif %}
+{% endfor %}
+					]
+				}
+			]
+		}
+{% endfor %}
+	]
+}
