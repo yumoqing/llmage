@@ -2,7 +2,7 @@ from traceback import format_exc
 from sqlor.dbpools import DBPools
 from appPublic.log import debug, exception
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
-from ahserver.serverenv get_serverenv
+from ahserver.serverenv import get_serverenv
 
 async def get_llmcatelogs():
 	db = DBPools()
