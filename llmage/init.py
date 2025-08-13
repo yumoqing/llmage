@@ -7,5 +7,5 @@ def load_llmage():
 	env.get_llm = get_llm
 	env.inference = inference
 	env.get_llms_by_catelog = get_llms_by_catelog
-	eng.get_llmcatelogs = get_llmcatelogs
+	env.get_llmcatelogs = get_llmcatelogs
 
