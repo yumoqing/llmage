@@ -58,6 +58,7 @@ async def inference(request, env):
 			e = Exception(f'{llmid=} not found')
 			exception(f'{e}\n{format_exc()}')
 			raise e
+		llm = llms[0]
 		uapi = UAPI(request, env=env, sor=sor)
 		return env.stream_response(request, 
-			uapi.stream_linify(llms[0].
+			uapi.stream_linify(llm.upappid, llm.apiname, env.user))
