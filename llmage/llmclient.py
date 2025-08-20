@@ -26,11 +26,18 @@ async def get_llm(llmid):
 	dbname = get_serverenv('get_module_dbname')('llmage')
 	async with db.sqlorContext(dbname) as sor:
 		sql = """select a.*,
-b.input_view, b.output_view, b.system_message, 
-b.user_message,
-b.assisant_message from llm a, llmcatelog b
+d.input_fields,
+d.input_view, 
+d.output_view, 
+c.system_message, 
+c.user_message,
+c.assisant_message 
+from llm a, llmcatelog b 
+	left join historyformat c on b.hfid = c.id
+	left join uapiio on b.ioid = d.id
 where a.catelogid = b.id
-	and a.id = ${llmid}$"""
+	and a.id = ${llmid}$	
+"""
 		recs = await sor.sqlExe(sql, {'llmid': llmid})
 		if len(recs) > 0:
 			r = recs[0]
