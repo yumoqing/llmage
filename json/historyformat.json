@@ -1,14 +1,14 @@
 {
-    "tblname": "llmtypes",
-	"title":"大语言模型类型",
+    "tblname": "historyformat",
+	"title":"历史模版",
     "params": {
 		"sortby":"name",
         "browserfields": {
-            "exclouded": ["id", "llmid"],
+            "exclouded": ["id"],
             "alters": {}
         },
         "editexclouded": [
-            "id", "llmid"
+            "id"
         ],
         "record_toolbar": null
     }
