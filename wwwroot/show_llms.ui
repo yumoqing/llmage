@@ -35,7 +35,9 @@
 							"subwidgets":[
 								{
 									"widgettype":"Title5",
-									"options":{"text":"{{llm.name}}"
+									"options":{
+										"text":"{{llm.name}}"
+									}
 								},
 								{
 									"widgettype":"Text",
