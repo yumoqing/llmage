@@ -1,3 +1,4 @@
+from functools import partial
 from traceback import format_exc
 from sqlor.dbpools import DBPools
 from appPublic.log import debug, exception
@@ -84,5 +85,6 @@ async def inference(request, env):
 			raise e
 		llm = llms[0]
 		uapi = UAPI(request, env=env, sor=sor)
-		return await env.stream_response(request, 
-			uapi.stream_linify(llm.upappid, llm.apiname, env.user))
+		userid = await env.get_user()
+		f = partial(uapi.stream_linify, llm.upappid, llm.apiname, userid)
+		return await env.stream_response(request, f)
