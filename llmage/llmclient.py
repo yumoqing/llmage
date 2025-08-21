@@ -34,8 +34,8 @@ c.user_message,
 c.assisant_message 
 from llm a, llmcatelog b 
 	left join historyformat c on b.hfid = c.id
-	left join uapiio on b.ioid = d.id
-where a.catelogid = b.id
+	left join uapiio d on b.ioid = d.id
+where a.llmcatelogid = b.id
 	and a.id = ${llmid}$	
 """
 		recs = await sor.sqlExe(sql, {'llmid': llmid})
