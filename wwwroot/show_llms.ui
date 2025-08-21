@@ -62,7 +62,7 @@
 										"params":{
 											"id":"{{llm.id}}"
 										},
-										"url":"{{entire_url('./llminference.dspy')}}"
+										"url":"{{entire_url('./llm_dialog.ui')}}"
 									}
 								}
 							]

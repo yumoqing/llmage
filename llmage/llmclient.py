@@ -56,7 +56,7 @@ async def inference(request, env):
 	params = env.params_kw
 	llmid = params.id
 	prompt = params.prompt
-	stream = prompt.stream or True
+	stream = params.stream or True
 	dbname = env.get_module_dbname('llmage')
 	db = env.DBPools()
 	async with db.sqlorContext(dbname) as sor:
