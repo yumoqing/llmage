@@ -4,6 +4,24 @@ from appPublic.log import debug, exception
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv
 
+def default_sysmessage():
+	return """{
+		"role":"system",
+		"content":"{{content}}"
+	}"""
+
+def default_usrmessage():
+	return """{
+		"role":"user",
+		"content":"{{content}}"
+	}
+
+def default_llmmessage():
+	return """{
+		"role":"assisant",
+		"content":"{{content}}"
+	}"""
+
 async def get_llmcatelogs():
 	db = DBPools()
 	dbname = get_serverenv('get_module_dbname')('llmage')

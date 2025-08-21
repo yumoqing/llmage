@@ -1,5 +1,12 @@
-from llmage.llmclient import get_llm, inference, get_llmcatelogs, \
-	get_llms_by_catelog
+from llmage.llmclient import (
+	get_llm, 
+	inference, 
+	get_llmcatelogs,
+	get_llms_by_catelog,
+	default_sysmessage,
+	default_usrmessage,
+	default_llmmessage
+)
 from ahserver.serverenv import ServerEnv
 
 def load_llmage():
@@ -8,4 +15,7 @@ def load_llmage():
 	env.inference = inference
 	env.get_llms_by_catelog = get_llms_by_catelog
 	env.get_llmcatelogs = get_llmcatelogs
+	env.default_sysmessage = default_sysmessage
+	env.default_usrmessage = default_usrmessage
+	env.default_llmmessage = default_llmmessage
 
