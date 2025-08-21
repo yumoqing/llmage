@@ -41,13 +41,12 @@ where a.llmcatelogid = b.id
 		recs = await sor.sqlExe(sql, {'llmid': llmid})
 		if len(recs) > 0:
 			r = recs[0]
-			apis = await sor_get_uapi(sor, r.upappid, r.apiname)
-			if len(apis) == 0:
+			api = await sor_get_uapi(sor, r.upappid, r.apiname)
+			if api is None:
 				e = Exception(f'{r.upappid=},{r.apiname=} uapi not found')
 				exception(f'{e=}\n{format_exc()}')
 				raise e
-			api = apis[0]
-			r.inputfields = api.paramsdesc
+			r.inputfields = api.input_fields
 			return recs[0]
 	return None
 
