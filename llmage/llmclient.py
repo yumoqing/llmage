@@ -71,7 +71,7 @@ where a.llmcatelogid = b.id
 async def inference(request, env):
 	uapi = UAPI(request, env)
 	params = env.params_kw
-	llmid = params.id
+	llmid = params.llmid
 	prompt = params.prompt
 	stream = params.stream or True
 	dbname = env.get_module_dbname('llmage')

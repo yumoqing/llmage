@@ -1,2 +1,3 @@
+debug(f'{params_kw=}')
 env = DictObject(**globals())
 return await inference(request, env=env)
