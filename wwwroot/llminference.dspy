@@ -1,2 +1,2 @@
 env = DictObject(**globals())
-return inference(request, env=env)
+return await inference(request, env=env)
