@@ -14,7 +14,7 @@ def default_usrmessage():
 	return """{
 		"role":"user",
 		"content":"{{content}}"
-	}
+	}"""
 
 def default_llmmessage():
 	return """{
