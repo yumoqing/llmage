@@ -5,24 +5,6 @@ from appPublic.log import debug, exception
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv
 
-def default_sysmessage():
-	return """{
-		"role":"system",
-		"content":"{{content}}"
-	}"""
-
-def default_usrmessage():
-	return """{
-		"role":"user",
-		"content":"{{content}}"
-	}"""
-
-def default_llmmessage():
-	return """{
-		"role":"assisant",
-		"content":"{{content}}"
-	}"""
-
 async def get_llmcatelogs():
 	db = DBPools()
 	dbname = get_serverenv('get_module_dbname')('llmage')
@@ -78,12 +60,8 @@ async def inference(request, env):
 	dbname = env.get_module_dbname('llmage')
 	db = env.DBPools()
 	async with db.sqlorContext(dbname) as sor:
-		llms = await sor.R('llm', {'id':llmid})
-		if len(llms) == 0:
-			e = Exception(f'{llmid=} not found')
-			exception(f'{e}\n{format_exc()}')
-			raise e
-		llm = llms[0]
+		llm = await get_llm(llmid)
+		env.update(llm)
 		uapi = UAPI(request, env=env, sor=sor)
 		userid = await env.get_user()
 		f = partial(uapi.stream_linify, llm.upappid, llm.apiname, userid)
