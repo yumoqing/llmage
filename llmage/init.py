@@ -5,6 +5,7 @@ from llmage.llmclient import (
 	get_llms_by_catelog,
 )
 from llmage.messages import (
+	BaseMessages,
 	SessionMessages,
 	default_sysmessage,
 	default_usrmessage,
@@ -22,4 +23,5 @@ def load_llmage():
 	env.default_usrmessage = default_usrmessage
 	env.default_llmmessage = default_llmmessage
 	env.SessageMessages = SessionMessages
+	env.BaseMessages = BaseMessages
 
