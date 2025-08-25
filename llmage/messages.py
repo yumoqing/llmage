@@ -61,9 +61,9 @@ class SessionMessages(BaseMessages):
 		return msgs
 
 	async def set_messages(self, msgs):
-        env = self.request._run_ns
-        s = await env.get_session()
-        userid = await env.get_user()
-        mk = f'{self.llmid}_{userid}_msgs'
+		env = self.request._run_ns
+		s = await env.get_session()
+		userid = await env.get_user()
+		mk = f'{self.llmid}_{userid}_msgs'
 		s[mk] = msgs
 		
