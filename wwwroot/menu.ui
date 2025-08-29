@@ -1,0 +1,32 @@
+{
+	"widgettype": "Menu",
+	"options":{
+		"target": "PopupWindow",
+		"popup_options": {
+			"width": "60%",
+			"height":"75%"
+		},
+		"items":[
+			{
+				"name":"catelog",
+				"label":"历史格式",
+				"url":"{{entire_url('/llmage/historyformat')}}"
+			},
+			{
+				"name":"catelog",
+				"label":"模型类型",
+				"url":"{{entire_url('/llmage/llmcatelog')}}"
+			},
+			{
+				"name":"listllm",
+				"label": "模型列表",
+				"url":"{{entire_url('/llmage/show_llms.ui')}}"
+			},
+			{
+				"name":"llm",
+				"label":"模型",
+				"url":"{{entire_url('/llmage/llm')}}"
+			}
+		]
+	}
+}
