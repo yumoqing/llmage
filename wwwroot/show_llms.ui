@@ -55,7 +55,7 @@
 									"actiontype":"urlwidget",
 									"target":"PopupWindow",
 									"popup_options":{
-										"title":"{{llm.name}}"
+										"title":"{{llm.name}}",
 										"width":"90%",
 										"height":"90%"
 									},
