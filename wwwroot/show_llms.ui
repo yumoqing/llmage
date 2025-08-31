@@ -1,5 +1,5 @@
 {
-	"widgettype":"VBox",
+	"widgettype":"VScrollPanel",
 	"options":{
 		"width":"100%",
 		"height":"100%"
