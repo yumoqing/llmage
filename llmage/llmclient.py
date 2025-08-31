@@ -15,6 +15,7 @@ async def get_llmcatelogs():
 	return []
 
 async def get_llms_by_catelog(catelogid):
+	debug(f'{catelogid=}')
 	db = DBPools()
 	dbname = get_serverenv('get_module_dbname')('llmage')
 	async with db.sqlorContext(dbname) as sor:
