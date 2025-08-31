@@ -15,7 +15,6 @@
 				"llmid":"{{llm.id}}",
 				"llmcatelogid":"{{llm.llmcatelogid}}",
 				"output_view":{{llm.output_view}},
-				"input_from":"userinput",
 				"system_message_format":{{llm.system_message or default_sysmessage()}},
 				"user_message_format":{{llm.user_message or default_usrmessage()}},
 				"llm_message_format":{{llm.assisant_message or default_llmmessage()}},
