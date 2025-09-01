@@ -59,17 +59,17 @@ where x.id = ${llmid}$
 	return None
 
 async def inference(request, env):
-	uapi = UAPI(request, env)
 	params = env.params_kw
 	llmid = params.llmid
 	prompt = params.prompt
 	stream = params.stream or True
+	env.update(params_kw)
 	dbname = env.get_module_dbname('llmage')
 	db = env.DBPools()
 	async with db.sqlorContext(dbname) as sor:
 		llm = await get_llm(llmid)
 		env.update(llm)
-		uapi = UAPI(request, env=env, sor=sor)
+		uapi = UAPI(request, sor=sor)
 		userid = await env.get_user()
 		f = partial(uapi.stream_linify, llm.upappid, llm.apiname, userid)
 		return await env.stream_response(request, f)
