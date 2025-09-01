@@ -1,3 +1,4 @@
+from random import randint
 from functools import partial
 from traceback import format_exc
 from sqlor.dbpools import DBPools
@@ -57,13 +58,28 @@ where x.id = ${llmid}$
 			r.inputfields = api.input_fields
 			return recs[0]
 	return None
+async def get_owner_userid(sor, llm):
+	sql = '''select a.ownerid as userid from upappkey a, upapp b
+where a.upappid=b.id
+	and a.orgid = b.ownerid
+	and a.orgid = ${ownerid}$'''
+	recs = await sor.sqlExe(sql, {'ownerid': llm.ownerid})
+	i = randint(0, len(recs)-1)
+	return recs[i].userid
 
-async def inference(request, env):
+async def uapi_request(request, sor, caller_orgid, uapi, llm, params):
+	userid = await get_owner_userid(sor, llm)
+	async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, params=params):
+		yield l
+	
+	
+async def inference(request, *args, **kw):
+	env = request._run_ns
+	caller_orgid = await get_userorgid()
 	params = env.params_kw
 	llmid = params.llmid
 	prompt = params.prompt
 	stream = params.stream or True
-	env.update(env.params_kw)
 	dbname = env.get_module_dbname('llmage')
 	db = env.DBPools()
 	async with db.sqlorContext(dbname) as sor:
@@ -71,5 +87,5 @@ async def inference(request, env):
 		env.update(llm)
 		uapi = UAPI(request, sor=sor)
 		userid = await env.get_user()
-		f = partial(uapi.stream_linify, llm.upappid, llm.apiname, userid)
+		f = partial(uapi_request, request, sor, caller_orgid, llm, params=params)
 		return await env.stream_response(request, f)

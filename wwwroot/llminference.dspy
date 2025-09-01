@@ -1,3 +1,6 @@
 debug(f'{params_kw=}')
+userid = await get_user()
+if userid is None:
+	return UiError(title='llm inference', message='Please login first')
 env = DictObject(**globals())
 return await inference(request, env=env)

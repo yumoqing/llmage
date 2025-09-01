@@ -3,12 +3,13 @@
 	"title":"大语言模型",
     "params": {
 		"sortby":"name",
+		"logined_userorgid": "ownerid",
         "browserfields": {
-            "exclouded": ["id"],
+            "exclouded": ["id", "ownerid"],
             "alters": {}
         },
         "editexclouded": [
-            "id"
+            "id", "ownerid"
         ],
 		"subtables":[
 			{
