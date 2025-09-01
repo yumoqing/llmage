@@ -24,4 +24,11 @@
 	}
 }
 {% else %}
+{
+	"widgettype":"Text",
+	"options":{
+		"otype": "没找到模型",
+		"i18n":true
+	}
+}
 {% endif %}

@@ -57,6 +57,8 @@ where x.id = ${llmid}$
 				raise e
 			r.inputfields = api.input_fields
 			return recs[0]
+		else:
+			debug(f'{llmid=} not found')
 	return None
 async def get_owner_userid(sor, llm):
 	sql = '''select a.ownerid as userid from upappkey a, upapp b
