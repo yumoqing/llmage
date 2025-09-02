@@ -84,6 +84,7 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 async def inference(request, *args, **kw):
 	env = request._run_ns
 	caller_orgid = await env.get_userorgid()
+	callerid = await env.get_user()
 	params = env.params_kw
 	llmid = params.llmid
 	prompt = params.prompt
@@ -95,5 +96,5 @@ async def inference(request, *args, **kw):
 		env.update(llm)
 		uapi = UAPI(request, sor=sor)
 		userid = await env.get_user()
-		f = partial(uapi_request, request, sor, caller_orgid, llm, params=params)
+		f = partial(uapi_request, request, sor, caller_orgid, callerid, uapi, llm, params=params)
 		return await env.stream_response(request, f)
