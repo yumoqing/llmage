@@ -71,15 +71,16 @@ where a.upappid=b.id
 	i = randint(0, len(recs)-1)
 	return recs[i].userid
 
-async def uapi_request(request, sor, caller_orgid, uapi, llm, params):
+async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 	userid = await get_owner_userid(sor, llm)
+	txt = 
 	async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, params=params):
 		yield l
 	
 	
 async def inference(request, *args, **kw):
 	env = request._run_ns
-	caller_orgid = await get_userorgid()
+	caller_orgid = await env.get_userorgid()
 	params = env.params_kw
 	llmid = params.llmid
 	prompt = params.prompt
