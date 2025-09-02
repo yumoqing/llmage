@@ -76,7 +76,7 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 	userid = await get_owner_userid(sor, llm)
 	txt = ''
 	async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, params=params):
-		if l != '[DONE]':
+		if l and l != '[DONE]':
 			d = json.loads(l)
 			txt = txt + d['content']
 			yield l
