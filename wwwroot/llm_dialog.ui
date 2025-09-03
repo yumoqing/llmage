@@ -14,6 +14,7 @@
 			{
 				"llmid":"{{llm.id}}",
 				"llmcatelogid":"{{llm.llmcatelogid}}",
+				"response_mode": "{{'stream' if llm.stream=='1' else 'sync'}}",
 				"output_view":{{llm.output_view}},
 				"icon":"{{entire_url('/appbase/get_icon.dspy')}}?id={{llm.iconid}}",
 				"url":"{{entire_url('/llmage/llminference.dspy')}}",
