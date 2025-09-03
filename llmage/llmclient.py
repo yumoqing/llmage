@@ -78,8 +78,9 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 	async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, params=params):
 		if l and l != '[DONE]':
 			d = json.loads(l)
-			txt = txt + d['content']
-			yield l
+			if d['content'] != '':
+				txt = txt + d['content']
+				yield l
 	debug(f'{d=}, {txt=}')
 	
 async def inference(request, *args, **kw):
