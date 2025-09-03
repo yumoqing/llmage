@@ -37,7 +37,7 @@ y.system_message,
 y.user_message,
 y.assisant_message 
 from (
-select a.*, b.hfid, e.ioid
+select a.*, b.hfid, e.ioid, e.stream
 from llm a, llmcatelog b,upapp c, uapiset d, uapi e
 where a.llmcatelogid = b.id
     and a.upappid = c.id
