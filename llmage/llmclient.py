@@ -4,8 +4,11 @@ from functools import partial
 from traceback import format_exc
 from sqlor.dbpools import DBPools
 from appPublic.log import debug, exception
+from appPublic.uniqueID import getID
+from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv
+from ahserver.filestorage import FileStorage
 
 async def get_llmcatelogs():
 	db = DBPools()
@@ -93,16 +96,19 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 				yield l
 	debug(f'{d=}, {txt=}')
 	
-def b64media(mediafile):
+def b64media2url(request, mediafile):
+	env = request._run_ns
 	if mediafile.startswith('data:'):
-		return mediafile
+		fs = FileStorage()
+		fname = getFilenameFromBase64(mediafile)
+		fpath = fs._name2path(fname)
+		base64_to_file(mediafile, fpath)
+		path = fs.webpath(fpath)
+		return env.entire_url('/idfile?path=') + env.quota(path)
 	if mediafile.startswith('http://') or mediafile.startswith('https://'):
 		return mediafile
-	fs = FileStorage()
-	fn = fs.realPath(mediafile)
-	with open(fn, 'rb') as f:
-		b = f.read()
-		return base64.b64encode(b).decode('iso-8859-1')
+	url = env.entire_url('/idfile?path=') + env.quota(mediafile)
+	return url
 
 async def inference(request, *args, **kw):
 	env = request._run_ns
