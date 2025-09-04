@@ -101,13 +101,17 @@ def b64media2url(request, mediafile):
 	entire_url = env.entire_url
 	debug(f'{request=}{type(request)}, {len(mediafile)=}, {entire_url=}')
 	if mediafile.startswith('data:'):
-		fs = FileStorage()
-		fname = getFilenameFromBase64(mediafile)
-		fpath = fs._name2path(fname)
-		debug(f'{env.keys()=},{fpath=},{fname=}')
-		base64_to_file(mediafile, fpath)
-		path = fs.webpath(fpath)
-		return entire_url('/idfile?path=') + env.quota(path)
+		try:
+			fs = FileStorage()
+			fname = getFilenameFromBase64(mediafile)
+			fpath = fs._name2path(fname)
+			debug(f'{env.keys()=},{fpath=},{fname=}')
+			base64_to_file(mediafile, fpath)
+			path = fs.webpath(fpath)
+			return entire_url('/idfile?path=') + env.quota(path)
+		except Exception as e:
+			exception(f'{e}\n{format_exc()}')
+			return ' '
 	if mediafile.startswith('http://') or mediafile.startswith('https://'):
 		return mediafile
 	url = entire_url('/idfile?path=') + env.quota(mediafile)
