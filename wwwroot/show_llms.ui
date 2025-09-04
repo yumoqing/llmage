@@ -43,7 +43,7 @@
 								{
 									"widgettype":"Text",
 									"options":{
-										"text":"{{llm.description}}",
+										"text":{{json.dumps(llm.description, ensure_ascii=False)}},
 										"wrap":true,
 										"halign":"left"
 									}
