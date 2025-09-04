@@ -83,11 +83,13 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 				yield l
 	debug(f'{d=}, {txt=}')
 	
-def b64media(meidafile):
-	if meidafile.startswith('data:'):
-		return meidafile
+def b64media(mediafile):
+	if mediafile.startswith('data:'):
+		return mediafile
+	if mediafile.startswith('http://') or mediafile.startswith('https://'):
+		return mediafile
 	fs = FileStorage()
-	fn = fs.realPath(meidafile)
+	fn = fs.realPath(mediafile)
 	with open(fn, 'rb') as f:
 		b = f.read()
 		return base64.b64encode(b).decode('iso-8859-1')
