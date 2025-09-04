@@ -98,7 +98,8 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 	
 def b64media2url(request, mediafile):
 	env = request._run_ns
-	debug(f'{request=}{type(request)}, {len(mediafile)=}')
+	entire_url = env.entire_url
+	debug(f'{request=}{type(request)}, {len(mediafile)=}, {entire_url=}')
 	if mediafile.startswith('data:'):
 		fs = FileStorage()
 		fname = getFilenameFromBase64(mediafile)
@@ -106,10 +107,10 @@ def b64media2url(request, mediafile):
 		debug(f'{env.keys()=},{fpath=},{fname=}')
 		base64_to_file(mediafile, fpath)
 		path = fs.webpath(fpath)
-		return env.entire_url('/idfile?path=') + env.quota(path)
+		return entire_url('/idfile?path=') + env.quota(path)
 	if mediafile.startswith('http://') or mediafile.startswith('https://'):
 		return mediafile
-	url = env.entire_url('/idfile?path=') + env.quota(mediafile)
+	url = entire_url('/idfile?path=') + env.quota(mediafile)
 	return url
 
 async def inference(request, *args, **kw):
