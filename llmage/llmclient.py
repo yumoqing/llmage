@@ -77,9 +77,15 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 	txt = ''
 	async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, params=params):
 		if l and l != '[DONE]':
+			yiled_it = False
 			d = json.loads(l)
-			if d['content'] != '':
+			if d.get('reasoning_content'):
+				txt += d.get('reasoning_content')
+				yield_it = True
+			if d.get('content'):
 				txt = txt + d['content']
+				yield_it = True
+			if yield_it:
 				yield l
 	debug(f'{d=}, {txt=}')
 	
