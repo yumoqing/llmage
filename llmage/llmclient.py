@@ -80,7 +80,7 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 			yield_it = False
 			try:
 				d = json.loads(l)
-			except Exception e:
+			except Exception as e:
 				debug(f'json.loads({l}) error({e})')
 				continue
 			if d.get('reasoning_content'):
