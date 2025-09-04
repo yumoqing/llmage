@@ -8,6 +8,34 @@
             "exclouded": ["id", "ownerid"],
             "alters": {}
         },
+		"toolbar": {
+			"tools":[
+				{
+					"name":"test",
+					"label":"体验",
+					"selected_row":true
+				}
+			]
+		},
+		"binds":[
+			{
+				"wid":"self",
+				"event":"test",
+				"actiontype":"urlwidget",
+				"target":"PopupWindow",
+				"popup_options":{
+					"title":"model Test",
+					"cwidth":22,
+					"height":"75%"
+				},
+				"options":{
+					"url":"{{entire_url('./llm_dialog.ui')}}",
+					"params":{
+						"id":"${id}"
+					}
+				}
+			}
+		],
         "editexclouded": [
             "id", "ownerid"
         ],

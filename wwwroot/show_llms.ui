@@ -27,10 +27,11 @@
 					"subwidgets":[
 {% for llm in get_llms_by_catelog(cate.id) %}
 						{
-							"widgettype":"VBox",
+							"widgettype":"VScrollPanel",
 							"options":{
+								"css":"card",
 								"cwidth":16,
-								"cheight":8
+								"cheight":14
 							},
 							"subwidgets":[
 								{
