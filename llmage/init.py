@@ -1,5 +1,5 @@
 from llmage.llmclient import (
-	b64media.
+	b64media,
 	get_llm, 
 	inference, 
 	get_llmcatelogs,
