@@ -83,6 +83,15 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 				yield l
 	debug(f'{d=}, {txt=}')
 	
+def b64media(meidafile):
+	if meidafile.startswith('data:'):
+		return meidafile
+	fs = FileStorage()
+	fn = fs.realPath(meidafile)
+	with open(fn, 'rb') as f:
+		b = f.read()
+		return base64.b64encode(b).decode('iso-8859-1')
+
 async def inference(request, *args, **kw):
 	env = request._run_ns
 	caller_orgid = await env.get_userorgid()
