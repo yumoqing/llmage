@@ -30,6 +30,7 @@
 							"widgettype":"VScrollPanel",
 							"options":{
 								"css":"card",
+								"bgcolor": "#def0f0",
 								"cwidth":16,
 								"cheight":14
 							},

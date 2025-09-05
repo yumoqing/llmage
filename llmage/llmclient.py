@@ -99,13 +99,11 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 def b64media2url(request, mediafile):
 	env = request._run_ns
 	entire_url = env.entire_url
-	debug(f'{request=}{type(request)}, {len(mediafile)=}, {entire_url=}')
 	if mediafile.startswith('data:'):
 		try:
 			fs = FileStorage()
 			fname = getFilenameFromBase64(mediafile)
 			fpath = fs._name2path(fname)
-			debug(f'{env.keys()=},{fpath=},{fname=}')
 			base64_to_file(mediafile, fpath)
 			path = fs.webpath(fpath)
 			return entire_url('/idfile?path=') + env.quote(path)
