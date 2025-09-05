@@ -108,13 +108,13 @@ def b64media2url(request, mediafile):
 			debug(f'{env.keys()=},{fpath=},{fname=}')
 			base64_to_file(mediafile, fpath)
 			path = fs.webpath(fpath)
-			return entire_url('/idfile?path=') + env.quota(path)
+			return entire_url('/idfile?path=') + env.quote(path)
 		except Exception as e:
 			exception(f'{e}\n{format_exc()}')
 			return ' '
 	if mediafile.startswith('http://') or mediafile.startswith('https://'):
 		return mediafile
-	url = entire_url('/idfile?path=') + env.quota(mediafile)
+	url = entire_url('/idfile?path=') + env.quote(mediafile)
 	return url
 
 async def inference(request, *args, **kw):
