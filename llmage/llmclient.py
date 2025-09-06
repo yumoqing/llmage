@@ -94,7 +94,7 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 				yield_it = True
 			if yield_it:
 				yield l
-	debug(f'{d=}, {txt=}')
+	debug(f'{l=}, {txt=}')
 	
 def b64media2url(request, mediafile):
 	env = request._run_ns
