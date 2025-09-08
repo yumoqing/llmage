@@ -78,6 +78,8 @@ where a.upappid=b.id
 
 async def uapi_request(request, llm, sor):
 	env = request._run_ns.copy()
+	caller_orgid = await env.get_userorgid()
+	callerid = await env.get_user()
 	uapi = UAPI(request, sor=sor)
 	userid = await get_owner_userid(sor, llm)
 	txt = ''
@@ -105,6 +107,8 @@ async def uapi_request(request, llm, sor):
 	
 async def async_uapi_request(request, llm, sor):
 	env = request._run_ns.copy()
+	caller_orgid = await env.get_userorgid()
+	callerid = await env.get_user()
 	uapi = UAPI(request, sor=sor)
 	userid = await get_owner_userid(sor, llm)
 	b = await uapi.call(llm.upappid, llm.apiname, userid, params=env.params_kw)
@@ -155,12 +159,7 @@ def b64media2url(request, mediafile):
 
 async def inference(request, *args, **kw):
 	env = request._run_ns.copy()
-	caller_orgid = await env.get_userorgid()
-	callerid = await env.get_user()
-	params = env.params_kw
-	llmid = params.llmid
-	prompt = params.prompt
-	stream = params.stream or True
+	llmid = env.params_kw.llmid
 	dbname = env.get_module_dbname('llmage')
 	db = env.DBPools()
 	async with db.sqlorContext(dbname) as sor:
@@ -168,10 +167,8 @@ async def inference(request, *args, **kw):
 		if llm.query_apiname:
 			f = partial(async_uapi_request, request, llm, sor)
 			return await env.stream_response(request, f)
-		else:
 
 		env.update(llm)
 		uapi = UAPI(request, sor=sor)
-		userid = await env.get_user()
-		f = partial(uapi_request, request, sor, caller_orgid, callerid, uapi, llm, params=params)
+		f = partial(uapi_request, request, llm, sor)
 		return await env.stream_response(request, f)
