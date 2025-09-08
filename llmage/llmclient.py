@@ -114,6 +114,7 @@ async def async_uapi_request(request, llm, sor):
 	b = await uapi.call(llm.upappid, llm.apiname, userid, params=env.params_kw)
 	if isinstance(b, bytes):
 		b = b.decode('utf-8')
+	debug(f'task sumbited:{b}')
 	d = json.loads(b)
 	if not d.get('taskid'):
 		debug(f'{b} error')
