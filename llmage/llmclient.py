@@ -130,6 +130,7 @@ async def async_uapi_request(request, llm, sor):
 		)
 		if isinstance(b, bytes):
 			b = b.decode('utf-8')
+		b = ''.join(b.split('\n'))
 		rzt = DictObject(**json.loads(b))
 		yield b + '\n'
 		if not rzt.status or rzt.status == 'FAILED':
