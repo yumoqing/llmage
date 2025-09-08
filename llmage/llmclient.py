@@ -1,4 +1,5 @@
 import json
+import asyncio
 from random import randint
 from functools import partial
 from traceback import format_exc
@@ -130,7 +131,8 @@ async def async_uapi_request(request, llm, sor):
 			return
 		if rzt.url:
 			return
-		asyncio.sleep(30)
+		period = llm.query_period or 30
+		asyncio.sleep(period)
 
 def b64media2url(request, mediafile):
 	env = request._run_ns
