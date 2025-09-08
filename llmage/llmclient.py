@@ -6,6 +6,7 @@ from traceback import format_exc
 from sqlor.dbpools import DBPools
 from appPublic.log import debug, exception
 from appPublic.uniqueID import getID
+from appPublic.dictObject import DictObject
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv
