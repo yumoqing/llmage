@@ -75,12 +75,16 @@ where a.upappid=b.id
 	i = randint(0, len(recs)-1)
 	return recs[i].userid
 
-async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
+async def uapi_request(request, llm, sor):
+	env = request._run_ns.copy()
+	uapi = UAPI(request, sor=sor)
 	userid = await get_owner_userid(sor, llm)
 	txt = ''
-	async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, params=params):
+	async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, 
+				params=env.params_kw):
 		if l and l != '[DONE]':
 			yield_it = False
+			d = {}
 			try:
 				d = json.loads(l)
 			except Exception as e:
@@ -94,8 +98,40 @@ async def uapi_request(request, sor, caller_orgid, callerid, uapi, llm, params):
 				yield_it = True
 			if yield_it:
 				yield l
+			else:
+				debug(f'{l} not yield')
 	debug(f'{l=}, {txt=}')
 	
+async def async_uapi_request(request, llm, sor):
+	env = request._run_ns.copy()
+	uapi = UAPI(request, sor=sor)
+	userid = await get_owner_userid(sor, llm)
+	b = await uapi.call(llm.upappid, llm.apiname, userid, params=env.params_kw)
+	if isinstance(b, bytes):
+		b = b.decode('utf-8')
+	d = json.loads(b)
+	if not d.get('taskid'):
+		debug(f'{b} error')
+		yield '{"content":"server return no taskid"}\n'
+		return
+	uapi = UAPI(request. sor=sor)
+	while True:
+		b = await uapi.call(llm.upappid, llm.query_apiname, userid, 
+				params={
+					"taskid": d.get('taskid')
+				}
+		)
+		if isinstance(b, bytes):
+			b = b.decode('utf-8')
+		rzt = DictObject(**json.loads(b))
+		yield b + '\n'
+		if not rzt.taskid:
+			debug(f'{b=} return error')
+			return
+		if rzt.url:
+			return
+		asyncio.sleep(30)
+
 def b64media2url(request, mediafile):
 	env = request._run_ns
 	entire_url = env.entire_url
@@ -116,7 +152,7 @@ def b64media2url(request, mediafile):
 	return url
 
 async def inference(request, *args, **kw):
-	env = request._run_ns
+	env = request._run_ns.copy()
 	caller_orgid = await env.get_userorgid()
 	callerid = await env.get_user()
 	params = env.params_kw
@@ -127,6 +163,11 @@ async def inference(request, *args, **kw):
 	db = env.DBPools()
 	async with db.sqlorContext(dbname) as sor:
 		llm = await get_llm(llmid)
+		if llm.query_apiname:
+			f = partial(async_uapi_request, request, llm, sor)
+			return await env.stream_response(request, f)
+		else:
+
 		env.update(llm)
 		uapi = UAPI(request, sor=sor)
 		userid = await env.get_user()
