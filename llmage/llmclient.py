@@ -132,7 +132,7 @@ async def async_uapi_request(request, llm, sor):
 			b = b.decode('utf-8')
 		rzt = DictObject(**json.loads(b))
 		yield b + '\n'
-		if not rzt.taskid:
+		if not rzt.status:
 			debug(f'{b=} return error')
 			return
 		if rzt.url:
