@@ -119,7 +119,7 @@ async def async_uapi_request(request, llm, sor):
 		debug(f'{b} error')
 		yield '{"content":"server return no taskid"}\n'
 		return
-	uapi = UAPI(request. sor=sor)
+	uapi = UAPI(request, sor=sor)
 	while True:
 		b = await uapi.call(llm.upappid, llm.query_apiname, userid, 
 				params={
