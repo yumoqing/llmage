@@ -36,9 +36,10 @@
 {% endif %}
 {% else %}
 {
-	"widgettype":"urlwidget",
+	"widgettype":"Text",
 	"options":{
-		"url":"{{entire_url('/rbac/user/login.ui')}}"
+		"otext":"You need login to use llm",
+		"i18n":true
 	}
 }
 {% endif %}
