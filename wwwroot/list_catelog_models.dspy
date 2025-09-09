@@ -1,0 +1,8 @@
+dbname = get_module_dbname('llmage')
+db = DBPools()
+async with db.sqlorContext(dbname) as sor:
+	sql = """select * from llm where llmcatelogid = ${llmcatelogid}$ and id != ${llmid}$"""
+	ns = params_kw.copy()
+	recs = await sor.sqlExe(sql, ns)
+	return recs
+return []

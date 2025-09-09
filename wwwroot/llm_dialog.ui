@@ -6,8 +6,8 @@
 		"width":"100%",
 		"height":"100%",
 		"title":"{{llm.name}}",
-		"list_models_url":"{{entire_url('list_mti_models.dspy')}}",
-		"estimate_url":"/estimate/model_estimate.dspy",
+		"list_models_url":"{{entire_url('list_catelog_models.dspy')}}",
+		"estimate_url":"{{entire_url('model_estimate.dspy')}}",
 		"input_fields":{{llm.input_fields}},
 		"input_view":{{llm.input_view}},
 		"models":[
