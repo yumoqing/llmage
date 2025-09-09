@@ -1,3 +1,4 @@
+{% if get_user() %}
 {% set llm = get_llm(params_kw.id) %}
 {% if llm %}
 {
@@ -30,6 +31,14 @@
 	"options":{
 		"otext": "没找到模型",
 		"i18n":true
+	}
+}
+{% endif %}
+{% else %}
+{
+	"widgettype":"urlwidget",
+	"options":{
+		"url":"{{entire_url('/rbac/user/login.ui')}}"
 	}
 }
 {% endif %}
