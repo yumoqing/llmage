@@ -131,12 +131,13 @@ async def async_uapi_request(request, llm, sor):
 		if isinstance(b, bytes):
 			b = b.decode('utf-8')
 		b = ''.join(b.split('\n'))
+		debug(f'response line = {b}')
 		rzt = DictObject(**json.loads(b))
 		yield b + '\n'
 		if not rzt.status or rzt.status == 'FAILED':
 			debug(f'{b=} return error')
 			return
-		if rzt.status == 'SUCCESSED':
+		if rzt.status == 'SUCCEEDED':
 			debug(f'{b=} return successed')
 			return
 		period = llm.query_period or 30
