@@ -136,7 +136,8 @@ async def async_uapi_request(request, llm, sor):
 		if not rzt.status or rzt.status == 'FAILED':
 			debug(f'{b=} return error')
 			return
-		if rzt.url:
+		if rzt.status == 'SUCCESSED':
+			debug(f'{b=} return successed')
 			return
 		period = llm.query_period or 30
 		asyncio.sleep(period)
