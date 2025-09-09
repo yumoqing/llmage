@@ -140,7 +140,7 @@ async def async_uapi_request(request, llm, sor):
 			debug(f'{b=} return successed')
 			return
 		period = llm.query_period or 30
-		asyncio.sleep(period)
+		await asyncio.sleep(period)
 
 def b64media2url(request, mediafile):
 	env = request._run_ns
