@@ -139,6 +139,7 @@ async def async_uapi_request(request, llm, sor):
 			return
 		if rzt.status == 'SUCCEEDED':
 			debug(f'{b=} return successed')
+			await asyncio.sleep(1)
 			return
 		period = llm.query_period or 30
 		await asyncio.sleep(period)
