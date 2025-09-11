@@ -36,10 +36,25 @@
 							},
 							"subwidgets":[
 								{
-									"widgettype":"Title5",
+									"widgettype":"HBox",
 									"options":{
-										"text":"{{llm.name}}"
-									}
+										"cheight":2
+									},
+									"subwidgets":[
+										{
+											"widgettype":"Svg",
+											"options":{
+												"rate":1.5,
+												"url":"{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}"
+											}
+										},
+										{
+											"widgettype":"Title6",
+											"options":{
+												"text":"{{llm.name}}"
+											}
+										}
+									]
 								},
 								{
 									"widgettype":"Text",
