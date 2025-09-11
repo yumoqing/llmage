@@ -1,0 +1,71 @@
+{
+	"widgettype":"DynamicColumn",
+	"options":{
+		"css":"filler",
+		"width":"100%"
+	},
+	"subwidgets":[
+{% for llm in [ llm for llm in get_llms_by_catelog(params_kw.llmcatelogid) if llm.id != params_kw.llmid ] %}
+		{
+			"widgettype":"VScrollPanel",
+			"options":{
+				"css":"card",
+				"bgcolor": "#def0f0",
+				"cwidth":20,
+				"cheight":12
+			},
+			"subwidgets":[
+				{
+					"widgettype":"HBox",
+					"options":{
+						"cheight":2
+					},
+					"subwidgets":[
+						{
+							"widgettype":"Svg",
+							"options":{
+								"rate":1.5,
+								"url":"{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}"
+							}
+						},
+						{
+							"widgettype":"Title6",
+							"options":{
+								"text":"{{llm.name}}"
+							}
+						}
+					]
+				},
+				{
+					"widgettype":"Text",
+					"options":{
+						"text":{{json.dumps(llm.description, ensure_ascii=False)}},
+						"wrap":true,
+						"halign":"left"
+					}
+				}
+			],
+			"binds":[
+				{
+					"wid":"self",
+					"event":"click",
+					"actiontype":"urlwidget",
+					"target":"PopupWindow",
+					"popup_options":{
+						"title":"{{llm.name}}",
+						"cwidth":24,
+						"height":"80%"
+					},
+					"options":{
+						"params":{
+							"id":"{{llm.id}}"
+						},
+						"url":"{{entire_url('./llm_dialog.ui')}}"
+					}
+				}
+			]
+		}
+{% if not loop.last %}, {% endif %}
+{% endfor %}
+	]
+}
