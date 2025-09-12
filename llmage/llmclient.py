@@ -104,7 +104,7 @@ async def uapi_request(request, llm, sor):
 				yield l
 			else:
 				debug(f'{l} not yield')
-	debug(f'{l=}, {txt=}')
+	debug(f'{txt=}')
 	
 async def async_uapi_request(request, llm, sor):
 	env = request._run_ns.copy()
