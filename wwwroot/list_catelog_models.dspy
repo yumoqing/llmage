@@ -4,5 +4,7 @@ async with db.sqlorContext(dbname) as sor:
 	sql = """select * from llm where llmcatelogid = ${llmcatelogid}$ and id != ${llmid}$"""
 	ns = params_kw.copy()
 	recs = await sor.sqlExe(sql, ns)
+	for r in recs.get('rows', []):
+		r.description = json.dumps(r.description)
 	return recs
 return []
