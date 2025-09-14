@@ -17,7 +17,7 @@ where llmcatelogid = ${llmcatelogid}$
 	for r in recs.get('rows', []):
 		r.llmid = r.id
 		r.modelname = r.name
-		r.icon = entire_url('/appbase/show_icon.dspy') + f'?id=r.iconid'
+		r.icon = entire_url('/appbase/show_icon.dspy') + f'?id={r.iconid}'
 		r.url = entire_url('/llmage/llminference.dspy')
 	return recs
 return {}
