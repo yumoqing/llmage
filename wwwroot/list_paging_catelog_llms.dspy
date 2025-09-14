@@ -10,6 +10,6 @@ async with db.sqlorContext(dbname) as sor:
 	ns = params_kw.copy()
 	ns.page = page
 	ns.pagerows = pagerows
-	recs = await sor.sqlExe(sql, ns)
+	recs = await sor.sqlPaging(sql, ns)
 	return recs
 return {}
