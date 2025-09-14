@@ -1,0 +1,15 @@
+if int(params_kw._is_mobile) == 1:
+	pagerows = 80
+else:
+	pagerows = 260
+page = int(params_kw.get(page, 1))
+dbname = get_module_dbname('llmage')
+db = DBPools()
+async with db.sqlorContext(dbname) as sor:
+	sql = """select * from llm where llmcatelogid = ${llmcatelogid}$ and id != ${llmid}$"""
+	ns = params_kw.copy()
+	ns.page = page
+	ns.pagerows = pagerows
+	recs = await sor.sqlExe(sql, ns)
+	return recs
+return {}
