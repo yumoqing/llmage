@@ -6,10 +6,26 @@ page = int(params_kw.get('page', 1))
 dbname = get_module_dbname('llmage')
 db = DBPools()
 async with db.sqlorContext(dbname) as sor:
-	sql = """select * 
-from llm 
-where llmcatelogid = ${llmcatelogid}$ 
-	and id != ${llmid}$"""
+	sql = """select x.*,
+z.input_fields,
+z.input_view,
+z.output_view,
+y.system_message,
+y.user_message,
+y.assisant_message
+from (
+select a.*, b.hfid, e.ioid, e.stream
+from llm a, llmcatelog b,upapp c, uapiset d, uapi e
+where a.llmcatelogid = b.id
+    and a.upappid = c.id
+    and c.apisetid = d.id
+    and e.apisetid = d.id
+    and a.apiname = e.name
+) x left join historyformat y on x.hfid = y.id
+    left join uapiio z on x.ioid = z.id
+where llmcatelogid = ${llmcatelogid}$
+	and id != ${llmid}$
+"""
 	ns = params_kw.copy()
 	ns.page = page
 	ns.pagerows = pagerows
@@ -17,6 +33,7 @@ where llmcatelogid = ${llmcatelogid}$
 	for r in recs.get('rows', []):
 		r.llmid = r.id
 		r.modelname = r.name
+		r.description = ''.join(''.join(r.description.split('\n')).split('\r'))
 		r.response_mode = r.stream
 		r.icon = entire_url('/appbase/show_icon.dspy') + f'?id={r.iconid}'
 		r.url = entire_url('/llmage/llminference.dspy')
