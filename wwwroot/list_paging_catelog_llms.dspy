@@ -14,7 +14,7 @@ where llmcatelogid = ${llmcatelogid}$
 	ns.page = page
 	ns.pagerows = pagerows
 	recs = await sor.sqlPaging(sql, ns)
-	for r in recs.rows:
+	for r in recs.get('rows', []):
 		r.llmid = r.id
 		r.modelname = r.name
 		r.icon = entire_url('/appbase/show_icon.dspy') + f'?id=r.iconid'
