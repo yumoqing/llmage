@@ -6,10 +6,18 @@ page = int(params_kw.get('page', 1))
 dbname = get_module_dbname('llmage')
 db = DBPools()
 async with db.sqlorContext(dbname) as sor:
-	sql = """select * from llm where llmcatelogid = ${llmcatelogid}$ and id != ${llmid}$"""
+	sql = """select * 
+from llm 
+where llmcatelogid = ${llmcatelogid}$ 
+	and id != ${llmid}$"""
 	ns = params_kw.copy()
 	ns.page = page
 	ns.pagerows = pagerows
 	recs = await sor.sqlPaging(sql, ns)
+	for r in recs.rows:
+		r.llmid = r.id
+		r.modelname = r.name
+		r.icon = entire_url('/appbase/show_icon.dspy') + f'?id=r.iconid'
+		r.url = entire_url('/llmage/llminference.dspy')
 	return recs
 return {}
