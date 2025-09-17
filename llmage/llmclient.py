@@ -7,6 +7,7 @@ from sqlor.dbpools import DBPools
 from appPublic.log import debug, exception
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
+from appPublic.timeUtils import curDateString
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv
@@ -26,7 +27,13 @@ async def get_llms_by_catelog(catelogid):
 	db = DBPools()
 	dbname = get_serverenv('get_module_dbname')('llmage')
 	async with db.sqlorContext(dbname) as sor:
-		recs = await sor.R('llm', {'llmcatelogid': catelogid})
+		today = curDateTimeString()
+		sql = """select * from llm 
+where llmcatelogid = ${llmcatelogid}$
+	enabled_date <= ${today}$
+	expired_date > ${today}$
+	"""
+		recs = await sor.sqlExe(sql, {'llmcatelogid': catelogid, 'today': today})
 		return recs
 	return []
 	
@@ -34,6 +41,7 @@ async def get_llm(llmid):
 	db = DBPools()
 	dbname = get_serverenv('get_module_dbname')('llmage')
 	async with db.sqlorContext(dbname) as sor:
+		today = curDateTimeString()
 		sql = """select x.*,
 z.input_fields,
 z.input_view, 
@@ -49,11 +57,13 @@ where a.llmcatelogid = b.id
     and c.apisetid = d.id
     and e.apisetid = d.id
     and a.apiname = e.name
+	and a.expired_date > ${today}$
+	and a.enabled_date <= ${today}$
 ) x left join historyformat y on x.hfid = y.id
 	left join uapiio z on x.ioid = z.id
 where x.id = ${llmid}$	
 """
-		recs = await sor.sqlExe(sql, {'llmid': llmid})
+		recs = await sor.sqlExe(sql, {'llmid': llmid, 'today': today})
 		if len(recs) > 0:
 			r = recs[0]
 			api = await sor_get_uapi(sor, r.upappid, r.apiname)
@@ -68,6 +78,7 @@ where x.id = ${llmid}$
 			return None
 	exception(f'{db.e_except}\n{format_exc()}')
 	return None
+
 async def get_owner_userid(sor, llm):
 	sql = '''select a.ownerid as userid from upappkey a, upapp b
 where a.upappid=b.id
