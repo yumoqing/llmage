@@ -27,7 +27,7 @@ async def get_llms_by_catelog(catelogid):
 	db = DBPools()
 	dbname = get_serverenv('get_module_dbname')('llmage')
 	async with db.sqlorContext(dbname) as sor:
-		today = curDateTimeString()
+		today = curDateString()
 		sql = """select * from llm 
 where llmcatelogid = ${llmcatelogid}$
 	enabled_date <= ${today}$
@@ -41,7 +41,7 @@ async def get_llm(llmid):
 	db = DBPools()
 	dbname = get_serverenv('get_module_dbname')('llmage')
 	async with db.sqlorContext(dbname) as sor:
-		today = curDateTimeString()
+		today = curDateString()
 		sql = """select x.*,
 z.input_fields,
 z.input_view, 
