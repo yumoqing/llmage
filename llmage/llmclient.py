@@ -30,8 +30,8 @@ async def get_llms_by_catelog(catelogid):
 		today = curDateString()
 		sql = """select * from llm 
 where llmcatelogid = ${llmcatelogid}$
-	enabled_date <= ${today}$
-	expired_date > ${today}$
+	and enabled_date <= ${today}$
+	and expired_date > ${today}$
 	"""
 		recs = await sor.sqlExe(sql, {'llmcatelogid': catelogid, 'today': today})
 		return recs
