@@ -16,7 +16,6 @@
 				"llmid":"{{llm.id}}",
 				"llmcatelogid":"{{llm.llmcatelogid}}",
 				"response_mode": "{{llm.stream}}",
-				"output_view":{{llm.output_view}},
 				"icon":"{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}",
 				"url":"{{entire_url('/llmage/llminference.dspy')}}",
 				"model":"{{llm.model}}",
