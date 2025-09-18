@@ -95,26 +95,32 @@ async def uapi_request(request, llm, sor):
 	uapi = UAPI(request, sor=sor)
 	userid = await get_owner_userid(sor, llm)
 	txt = ''
-	async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, 
-				params=env.params_kw):
-		if l and l != '[DONE]':
-			yield_it = False
-			d = {}
-			try:
-				d = json.loads(l)
-			except Exception as e:
-				debug(f'json.loads({l}) error({e})')
-				continue
-			if d.get('reasoning_content'):
-				txt += d.get('reasoning_content')
-				yield_it = True
-			if d.get('content'):
-				txt = txt + d['content']
-				yield_it = True
-			if yield_it:
-				yield l
-			else:
-				debug(f'{l} not yield')
+	try:
+		async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, 
+					params=env.params_kw):
+			if l and l != '[DONE]':
+				yield_it = False
+				d = {}
+				try:
+					d = json.loads(l)
+				except Exception as e:
+					debug(f'json.loads({l}) error({e})')
+					continue
+				if d.get('reasoning_content'):
+					txt += d.get('reasoning_content')
+					yield_it = True
+				if d.get('content'):
+					txt = txt + d['content']
+					yield_it = True
+				if yield_it:
+					yield l
+				else:
+					debug(f'{l} not yield')
+	except Exception as e:
+		exception(f'{e=},{format_exc()}')
+		yield f'{{"content": f"ERROR:{e=}"}}\n'
+		return
+
 	debug(f'{txt=}')
 	
 async def async_uapi_request(request, llm, sor):
@@ -123,7 +129,13 @@ async def async_uapi_request(request, llm, sor):
 	callerid = await env.get_user()
 	uapi = UAPI(request, sor=sor)
 	userid = await get_owner_userid(sor, llm)
-	b = await uapi.call(llm.upappid, llm.apiname, userid, params=env.params_kw)
+	b = None
+	try:
+		b = await uapi.call(llm.upappid, llm.apiname, userid, params=env.params_kw)
+	except Exception as e:
+		exception(f'{e=},{format_exc()}')
+		yield f'{{"content": f"ERROR:{e=}"}}\n'
+		return
 	if isinstance(b, bytes):
 		b = b.decode('utf-8')
 	debug(f'task sumbited:{b}')
@@ -134,11 +146,18 @@ async def async_uapi_request(request, llm, sor):
 		return
 	uapi = UAPI(request, sor=sor)
 	while True:
-		b = await uapi.call(llm.upappid, llm.query_apiname, userid, 
-				params={
-					"taskid": d.get('taskid')
-				}
-		)
+		b = None
+		try:
+			b = await uapi.call(llm.upappid, llm.query_apiname, userid, 
+					params={
+						"taskid": d.get('taskid')
+					}
+			)
+		except Exception as e:
+			exception(f'{e=},{format_exc()}')
+			yield f'{{"content": f"ERROR:{e=}"}}\n'
+			return
+
 		if isinstance(b, bytes):
 			b = b.decode('utf-8')
 		b = ''.join(b.split('\n'))
