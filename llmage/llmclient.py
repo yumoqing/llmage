@@ -118,10 +118,7 @@ async def uapi_request(request, llm, sor):
 				if d.get('content'):
 					txt = txt + d['content']
 					yield_it = True
-				if yield_it:
-					yield l
-				else:
-					debug(f'{l} not yield')
+				yield l
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		yield f'{{"content": f"ERROR:{e=}"}}\n'
