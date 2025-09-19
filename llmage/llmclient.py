@@ -142,40 +142,39 @@ async def async_uapi_request(request, llm, sor):
 	if isinstance(b, bytes):
 		b = b.decode('utf-8')
 	debug(f'task sumbited:{b}')
-	d = json.loads(b)
-	if not d.get('taskid'):
+	d = DictObject(**json.loads(b))
+	if not d.get('context'):
 		debug(f'{b} error')
 		yield '{"content":"server return no taskid"}\n'
 		return
 	uapi = UAPI(request, sor=sor)
-	while True:
-		b = None
-		try:
-			b = await uapi.call(llm.upappid, llm.query_apiname, userid, 
-					params={
-						"taskid": d.get('taskid')
-					}
-			)
-		except Exception as e:
-			exception(f'{e=},{format_exc()}')
-			yield f'{{"content": f"ERROR:{e=}"}}\n'
-			return
+	apinames = [ name.strip() for name in llm.query_apiname.split(',') ]
+	for apiname in apinames:
+		while True:
+			b = None
+			try:
+				b = await uapi.call(llm.upappid, llm.query_apiname, userid, params=d.context)
+			except Exception as e:
+				exception(f'{e=},{format_exc()}')
+				yield f'{{"content": f"ERROR:{e=}"}}\n'
+				break
 
-		if isinstance(b, bytes):
-			b = b.decode('utf-8')
-		b = ''.join(b.split('\n'))
-		debug(f'response line = {b}')
-		rzt = DictObject(**json.loads(b))
-		yield b + '\n'
-		if not rzt.status or rzt.status == 'FAILED':
-			debug(f'{b=} return error')
-			return
-		if rzt.status == 'SUCCEEDED':
-			debug(f'{b=} return successed')
-			await asyncio.sleep(1)
-			return
-		period = llm.query_period or 30
-		await asyncio.sleep(period)
+			if isinstance(b, bytes):
+				b = b.decode('utf-8')
+			b = ''.join(b.split('\n'))
+			debug(f'response line = {b}')
+			rzt = DictObject(**json.loads(b))
+			yield b + '\n'
+			if not rzt.status or rzt.status == 'FAILED':
+				debug(f'{b=} return error')
+				return
+			if rzt.status == 'SUCCEEDED':
+				debug(f'{b=} return successed')
+				await asyncio.sleep(1)
+				d = rzt
+				break
+			period = llm.query_period or 30
+			await asyncio.sleep(period)
 
 def b64media2url(request, mediafile):
 	env = request._run_ns
