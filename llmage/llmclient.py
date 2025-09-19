@@ -153,7 +153,7 @@ async def async_uapi_request(request, llm, sor):
 		while True:
 			b = None
 			try:
-				b = await uapi.call(llm.upappid, llm.query_apiname, userid, params=d.context)
+				b = await uapi.call(llm.upappid, apiname, userid, params=d.context)
 			except Exception as e:
 				exception(f'{e=},{format_exc()}')
 				yield f'{{"content": f"ERROR:{e=}"}}\n'
