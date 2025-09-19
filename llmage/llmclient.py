@@ -98,6 +98,8 @@ async def uapi_request(request, llm, sor):
 	try:
 		async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, 
 					params=env.params_kw):
+			if isinstance(l, bytes):
+				l = l.decode('utf-8')
 			if l and l != '[DONE]':
 				yield_it = False
 				d = {}
