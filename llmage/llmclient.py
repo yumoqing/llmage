@@ -100,6 +100,8 @@ async def uapi_request(request, llm, sor):
 					params=env.params_kw):
 			if isinstance(l, bytes):
 				l = l.decode('utf-8')
+			debug(f'stream response line={l},{type(l)}')
+			l = ''.join(l.split('\n'))
 			if l and l != '[DONE]':
 				yield_it = False
 				d = {}
