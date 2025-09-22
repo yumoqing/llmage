@@ -167,6 +167,7 @@ async def async_uapi_request(request, llm, sor):
 			yield b + '\n'
 			if not rzt.status or rzt.status == 'FAILED':
 				debug(f'{b=} return error')
+				yield f'{{"content": f"ERROR:{e=}"}}\n'
 				return
 			if rzt.status == 'SUCCEEDED':
 				debug(f'{b=} return successed')

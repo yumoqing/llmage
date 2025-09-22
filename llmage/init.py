@@ -1,3 +1,4 @@
+from base64_to_file import hex2base64
 from llmage.llmclient import (
 	b64media2url,
 	get_llm, 
@@ -18,6 +19,7 @@ def load_llmage():
 	env = ServerEnv()
 	env.get_llm = get_llm
 	env.b64media2url = b64media2url
+	env.hex2base64 = hex2base64
 	env.inference = inference
 	env.get_llms_by_catelog = get_llms_by_catelog
 	env.get_llmcatelogs = get_llmcatelogs
