@@ -1,4 +1,4 @@
-from base64_to_file import hex2base64
+from appPublic.base64_to_file import hex2base64
 from llmage.llmclient import (
 	b64media2url,
 	get_llm, 
