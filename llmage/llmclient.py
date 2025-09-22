@@ -44,8 +44,6 @@ async def get_llm(llmid):
 		today = curDateString()
 		sql = """select x.*,
 z.input_fields,
-z.input_view, 
-z.output_view, 
 y.system_message, 
 y.user_message,
 y.assisant_message 

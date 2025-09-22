@@ -10,7 +10,6 @@
 		"list_models_url":"{{entire_url('list_paging_catelog_llms.dspy')}}",
 		"estimate_url":"{{entire_url('model_estimate.dspy')}}",
 		"input_fields":{{llm.input_fields}},
-		"input_view":{{llm.input_view}},
 		"models":[
 			{
 				"llmid":"{{llm.id}}",

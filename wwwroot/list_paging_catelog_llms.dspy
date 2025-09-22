@@ -8,8 +8,6 @@ db = DBPools()
 async with db.sqlorContext(dbname) as sor:
 	sql = """select x.*,
 z.input_fields,
-z.input_view,
-z.output_view,
 y.system_message,
 y.user_message,
 y.assisant_message
