@@ -124,6 +124,24 @@ async def uapi_request(request, llm, sor):
 
 	debug(f'{txt=}')
 	
+async def sync_uapi_request(request, llm, sor):
+	env = request._run_ns.copy()
+	caller_orgid = await env.get_userorgid()
+	callerid = await env.get_user()
+	uapi = UAPI(request, sor=sor)
+	userid = await get_owner_userid(sor, llm)
+	b = None
+	try:
+		b = await uapi.call(llm.upappid, llm.apiname, userid, params=env.params_kw)
+	except Exception as e:
+		exception(f'{e=},{format_exc()}')
+		yield f'{{"content": f"ERROR:{e=}"}}\n'
+		return
+	if isinstance(b, bytes):
+		b = b.decode('utf-8')
+	debug(f'task sumbited:{b}')
+	yield b
+
 async def async_uapi_request(request, llm, sor):
 	env = request._run_ns.copy()
 	caller_orgid = await env.get_userorgid()
@@ -201,11 +219,13 @@ async def inference(request, *args, **kw):
 	db = env.DBPools()
 	async with db.sqlorContext(dbname) as sor:
 		llm = await get_llm(llmid)
-		if llm.query_apiname:
+		if llm.stream == 'async'
 			f = partial(async_uapi_request, request, llm, sor)
 			return await env.stream_response(request, f)
-
-		env.update(llm)
+		if llm.stream == 'sync':
+			f = partial(sync_uapi_request, request, llm, sor)
+			return await env.stream_response(request, f)
+		# env.update(llm)
 		uapi = UAPI(request, sor=sor)
 		f = partial(uapi_request, request, llm, sor)
 		return await env.stream_response(request, f)
