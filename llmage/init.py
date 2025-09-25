@@ -1,6 +1,7 @@
 from appPublic.base64_to_file import hex2base64
 from appPublic.registerfunction import RegisterFunction
 from llmage.jimeng import jimeng_auth_headers
+from llmage.keling import keling_token
 
 from llmage.llmclient import (
 	b64media2url,
@@ -31,6 +32,7 @@ def load_llmage():
 	env.default_llmmessage = default_llmmessage
 	env.SessageMessages = SessionMessages
 	env.BaseMessages = BaseMessages
+	env.keling_token = keling_token
 	
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
