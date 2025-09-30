@@ -119,7 +119,7 @@ async def uapi_request(request, llm, sor):
 				yield json.dumps(d) + '\n'
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
-		yield f'{{"content": f"ERROR:{e=}"}}\n'
+		yield f'{{"error": f"ERROR:{e=}"}}\n'
 		return
 
 	debug(f'{txt=}')
@@ -135,11 +135,11 @@ async def sync_uapi_request(request, llm, sor):
 		b = await uapi.call(llm.upappid, llm.apiname, userid, params=env.params_kw)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
-		yield f'{{"content": f"ERROR:{e=}"}}\n'
+		yield f'{{"error": f"ERROR:{e=}"}}\n'
 		return
 	if isinstance(b, bytes):
 		b = b.decode('utf-8')
-	debug(f'task sumbited:{b}')
+	debug(f'finished:{b}')
 	yield b
 
 async def async_uapi_request(request, llm, sor):
@@ -153,7 +153,7 @@ async def async_uapi_request(request, llm, sor):
 		b = await uapi.call(llm.upappid, llm.apiname, userid, params=env.params_kw)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
-		yield f'{{"content": f"ERROR:{e=}"}}\n'
+		yield f'{{"error": f"ERROR:{e=}"}}\n'
 		return
 	if isinstance(b, bytes):
 		b = b.decode('utf-8')
@@ -161,7 +161,7 @@ async def async_uapi_request(request, llm, sor):
 	d = DictObject(**json.loads(b))
 	if not d.get('context'):
 		debug(f'{b} error')
-		yield '{"content":"server return no taskid"}\n'
+		yield '{"error":"server return no taskid"}\n'
 		return
 	uapi = UAPI(request, sor=sor)
 	apinames = [ name.strip() for name in llm.query_apiname.split(',') ]
@@ -172,7 +172,7 @@ async def async_uapi_request(request, llm, sor):
 				b = await uapi.call(llm.upappid, apiname, userid, params=d.context)
 			except Exception as e:
 				exception(f'{e=},{format_exc()}')
-				yield f'{{"content": f"ERROR:{e=}"}}\n'
+				yield f'{{"error": f"ERROR:{e=}"}}\n'
 				break
 
 			if isinstance(b, bytes):
@@ -183,7 +183,7 @@ async def async_uapi_request(request, llm, sor):
 			yield b + '\n'
 			if not rzt.status or rzt.status == 'FAILED':
 				debug(f'{b=} return error')
-				yield f'{{"content": f"ERROR:{e=}"}}\n'
+				yield f'{{"error": f"ERROR:{e=}"}}\n'
 				return
 			if rzt.status == 'SUCCEEDED':
 				debug(f'{b=} return successed')
