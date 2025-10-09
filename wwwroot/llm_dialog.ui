@@ -1,5 +1,6 @@
 {% if get_user() %}
 {% set llm = get_llm(params_kw.id) %}
+{% set kdbs = get_user_kdbs(request) %}
 {% if llm %}
 {
 	"widgettype":"LlmIO",
@@ -7,6 +8,11 @@
 		"width":"100%",
 		"height":"100%",
 		"title":"{{llm.name}}",
+{% if len(kdbs) > 0 %}
+		"enabled_kdb": true,
+		"kdb_setting":{},
+		"get_kdb_url": "{{entire_url('/rag/get_my_kdbs.dspy')}}",
+{% endif %}
 		"list_models_url":"{{entire_url('list_paging_catelog_llms.dspy')}}",
 		"estimate_url":"{{entire_url('model_estimate.dspy')}}",
 		"input_fields":{{llm.input_fields}},

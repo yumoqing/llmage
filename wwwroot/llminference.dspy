@@ -2,5 +2,12 @@ debug(f'{params_kw=}')
 userid = await get_user()
 if userid is None:
 	return UiError(title='llm inference', message='Please login first')
+kdbids = params_kw.kdbids
+if kdbids:
+	ret = await fused_search(params_kw.prompt,
+					userid=userid,
+					knowledge_base_ids = kdbids,
+					limit=params.recall_cnt or 5)
+	params_kw.prompt = templrenders(prompt_tmpl, ret)
 env = DictObject(**globals())
 return await inference(request, env=env)
