@@ -7,7 +7,9 @@ if kdbids:
 	ret = await fused_search(params_kw.prompt,
 					userid=userid,
 					knowledge_base_ids = kdbids,
-					limit=params.recall_cnt or 5)
-	params_kw.prompt = templrenders(prompt_tmpl, ret)
+					limit=params_kw.recall_cnt or 5)
+	ret['prompt'] = params_kw.prompt
+	params_kw.prompt = str_tmpl_render(params_kw.prompt_tmpl, ret)
+	debug(f'rag return {ret}, {params_kw.prompt=}')
 env = DictObject(**globals())
 return await inference(request, env=env)
