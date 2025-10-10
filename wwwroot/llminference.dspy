@@ -7,11 +7,16 @@ if kdbids:
 	data = {
 		'prompt': params_kw.prompt
 	}
+	params = {
+		'query': params_kw.prompt,
+		'fiids': params_kw.kdbids,
+		'limit': params_kw.recall_cnt
+	}
 	tmpl = params_kw.prompt_tmpl
-	ret = await rfexe('fusedsearch', request, params_kw)
+	ret = await rfexe('fusedsearch', request, params)
 	data.update(ret)
 	params_kw.prompt = str_tmpl_render(tmpl, data)
-	debug(f'rag return {data}, {params_kw.prompt=}')
+	debug(f'{params=}rag return {data}, {params_kw.prompt=}')
 
 env = DictObject(**globals())
 return await inference(request, env=env)
