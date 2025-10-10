@@ -4,12 +4,17 @@ if userid is None:
 	return UiError(title='llm inference', message='Please login first')
 kdbids = params_kw.kdbids
 if kdbids:
-	ret = await fused_search(params_kw.prompt,
+	f = RegisterFunction().get('fusedsearch')
+	if f:
+		ret = await fusedsearch(params_kw.prompt,
 					userid=userid,
 					knowledge_base_ids = kdbids,
 					limit=params_kw.recall_cnt or 5)
-	ret['prompt'] = params_kw.prompt
-	params_kw.prompt = str_tmpl_render(params_kw.prompt_tmpl, ret)
-	debug(f'rag return {ret}, {params_kw.prompt=}')
+		ret['prompt'] = params_kw.prompt
+		params_kw.prompt = str_tmpl_render(params_kw.prompt_tmpl, ret)
+		debug(f'rag return {ret}, {params_kw.prompt=}')
+	else:
+		debug(f'"fusedsearch" function not registed')
+
 env = DictObject(**globals())
 return await inference(request, env=env)
