@@ -15,7 +15,7 @@ if kdbids:
 	tmpl = params_kw.prompt_tmpl
 	ret = await rfexe('fusedsearch', request, params)
 	data.update(ret)
-	params_kw.prompt = str_tmpl_render(tmpl, data)
+	params_kw.prompt = await tmpl_engine.renders(tmpl, data)
 	debug(f'{params=}rag return {data}, {params_kw.prompt=}')
 
 env = DictObject(**globals())
