@@ -119,7 +119,7 @@ async def uapi_request(request, llm, sor):
 				yield json.dumps(d) + '\n'
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
-		yield f'{{"error": f"ERROR:{e=}"}}\n'
+		yield f'{{"error": "ERROR:{e=}"}}\n'
 		return
 
 	debug(f'{txt=}')
@@ -135,7 +135,7 @@ async def sync_uapi_request(request, llm, sor):
 		b = await uapi.call(llm.upappid, llm.apiname, userid, params=env.params_kw)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
-		yield f'{{"error": f"ERROR:{e=}"}}\n'
+		yield f'{{"error": "ERROR:{e=}"}}\n'
 		return
 	if isinstance(b, bytes):
 		b = b.decode('utf-8')
@@ -153,7 +153,7 @@ async def async_uapi_request(request, llm, sor):
 		b = await uapi.call(llm.upappid, llm.apiname, userid, params=env.params_kw)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
-		yield f'{{"error": f"ERROR:{e=}"}}\n'
+		yield f'{{"error": "ERROR:{e=}"}}\n'
 		return
 	if isinstance(b, bytes):
 		b = b.decode('utf-8')
@@ -172,7 +172,7 @@ async def async_uapi_request(request, llm, sor):
 				b = await uapi.call(llm.upappid, apiname, userid, params=d.context)
 			except Exception as e:
 				exception(f'{e=},{format_exc()}')
-				yield f'{{"error": f"ERROR:{e=}"}}\n'
+				yield f'{{"error": "ERROR:{e=}"}}\n'
 				break
 
 			if isinstance(b, bytes):
@@ -183,7 +183,7 @@ async def async_uapi_request(request, llm, sor):
 			yield b + '\n'
 			if not rzt.status or rzt.status == 'FAILED':
 				debug(f'{b=} return error')
-				yield f'{{"error": f"ERROR:{e=}"}}\n'
+				yield f'{{"error": "ERROR:{e=}"}}\n'
 				return
 			if rzt.status == 'SUCCEEDED':
 				debug(f'{b=} return successed')
