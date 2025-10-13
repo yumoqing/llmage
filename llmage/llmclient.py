@@ -16,6 +16,9 @@ from ahserver.filestorage import FileStorage
 def erase_apikey(e):
 	e = str(e)
 	ss = e.split('Bearer ')
+	if len(ss) < 2:
+		return e
+
 	for i, c in enumerate(ss[1]):
 		if c in ['"', "'"]:
 			newb = "XXXXXXXX" + ss[1][i:]
