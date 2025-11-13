@@ -107,13 +107,15 @@ async def write_llmusage(llm, userid, usage, params_kw, outdata, sor):
 		"use_time": timestampstr(),
 		"userid": userid,
 		"transno": params_kw.transno,
+		"evalvalue": 0,
 		"useages": usages,
 		"ioinfo": json.dumps({
 			"input": params_kw,
 			"output": outdata
-		})
+		}, ensure_ascii=False)
 	}
 	await sor.C('llmusage', d)
+	return d
 
 async def uapi_request(request, llm, sor, params_kw=None):
 	env = request._run_ns.copy()
@@ -125,6 +127,7 @@ async def uapi_request(request, llm, sor, params_kw=None):
 	userid = await get_owner_userid(sor, llm)
 	outlines = []
 	txt = ''
+	luid = getID()
 	try:
 		t1 = time.time()
 		t2 = t1
@@ -155,6 +158,7 @@ async def uapi_request(request, llm, sor, params_kw=None):
 				if d.get('content'):
 					txt = txt + d['content']
 					yield_it = True
+				d['llmusageid'] = luid
 				outlines.append(d)
 				yield json.dumps(d) + '\n'
 		usage = outlines[-1].get('usage',{})
@@ -170,17 +174,16 @@ async def uapi_request(request, llm, sor, params_kw=None):
 			if params_kw.negitive_prompt:
 				cnt += len(params_kw.negitive_promot)
 			usage['input_tokens'] = len
-		await write_llmusage(llm, callerid, usage, params_kw, outlines, sor)
+		u = await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
-		outlines.append({"error": "ERROR:{estr}", "status": "FAILED" })
-		yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED" }}\n'
-		await write_llmusage(llm, callerid, None, params_kw, outlines, sor)
+
+		outlines.append({f"error": "ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid})
+		yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED" ,"llmusageid": luid}}\n'
+		await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 
-	debug(f'{txt=}')
-	
 async def sync_uapi_request(request, llm, sor, params_kw=None):
 	env = request._run_ns.copy()
 	if not params_kw:
@@ -193,6 +196,7 @@ async def sync_uapi_request(request, llm, sor, params_kw=None):
 	b = None
 	d = None
 	t1 = t2 = t3 = time.time()
+	luid = getID()
 	try:
 		
 		b = await uapi.call(llm.upappid, llm.apiname, userid, params=params_kw)
@@ -202,17 +206,18 @@ async def sync_uapi_request(request, llm, sor, params_kw=None):
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
-		yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED" }}\n'
-		outlines.append({"error": "ERROR:{estr}", "status": "FAILED" })
-		await write_llmusage(llm, callerid, None, params_kw, outlines, sor)
+		yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED", "llmusageid": luid }}\n'
+		outlines.append({"error": "ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid})
+		await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
+	d['llmusageid'] = luid
 	outlines.append(d)
 	t2 = t3 = time.time()
 	usage = d.get('usage', {})
 	usage['response_time'] = t2 - t1
 	usage['finish_time'] = t3 - t1
-	await write_llmusage(llm, callerid, usage, params_kw, outlines, sor)
-	debug(f'finished:{b}')
+	await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
+	b = json.dumps(d, ensure_ascii=False)
 	yield b
 
 async def async_uapi_request(request, llm, sor, params_kw=None):
@@ -226,14 +231,15 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 	outlines = []
 	b = None
 	t1 = t2 = t3 = time.time()
+	luid = getID()
 	try:
 		b = await uapi.call(llm.upappid, llm.apiname, userid, params=params_kw)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
-		yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED" }}\n'
-		outlines.append({"error": "ERROR:{estr}", "status": "FAILED" })
-		await write_llmusage(llm, callerid, None, params_kw, outlines, sor)
+		yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED" ,"llmusageid": luid}}\n'
+		outlines.append({"error": "ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid})
+		await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 	if isinstance(b, bytes):
 		b = b.decode('utf-8')
@@ -251,25 +257,27 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 			except Exception as e:
 				exception(f'{e=},{format_exc()}')
 				estr = erase_apikey(e)
-				yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED" }}\n'
-				outlines.append({"error": "ERROR:{estr}", "status": "FAILED" })
-				await write_llmusage(llm, callerid, None, params_kw, outlines, sor)
+				yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED" ,"llmusageid": luid}}\n'
+				outlines.append({"error": "ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid})
+				await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 				return
 
 			if isinstance(b, bytes):
 				b = b.decode('utf-8')
+			d = json.loads(b)
+			rzt = DictObject(**json.loads(b))
+			rzt['llmusageid'] = luid
+			b = json.dumps(rzt, ensure_ascii=False)
 			b = ''.join(b.split('\n'))
 			debug(f'response line = {b}')
-			rzt = DictObject(**json.loads(b))
 			yield b + '\n'
 			if not rzt.status or rzt.status == 'FAILED':
 				debug(f'{b=} return error')
-				yield f'{{"error": "ERROR:upapp return failed", "status": "SUCCEEDED" }}\n'
-				outlines.append({"error": "ERROR:{estr}", "status": "FAILED" })
-				await write_llmusage(llm, callerid, None, params_kw, outlines, sor)
+				yield f'{{"error": "ERROR:upapp return failed", "status": "SUCCEEDED" ,"llmusageid": luid}}\n'
+				outlines.append({"error": "ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid})
+				await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 				return
 			if rzt.status == 'SUCCEEDED':
-				debug(f'{b=} return successed')
 				await asyncio.sleep(1)
 				d = rzt
 				outlines.append(d)
@@ -277,7 +285,7 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 				t3 = time.time()
 				usage['response_time'] = t2 - t1
 				usage['finish_time'] = t3 -t1
-				await write_llmusage(llm, callerid, usage, params_kw, outlines, sor)
+				await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
 				break
 			period = llm.query_period or 30
 			await asyncio.sleep(period)
