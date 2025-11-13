@@ -182,7 +182,7 @@ async def uapi_request(request, llm, sor, params_kw=None):
 		s = json.dumps(ed)
 		s = ''.join(s.split('\n'))
 		outlines.append(ed)
-		yield f'{s}\n')
+		yield f'{s}\n'
 		await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 
@@ -212,7 +212,7 @@ async def sync_uapi_request(request, llm, sor, params_kw=None):
 		s = json.dumps(ed)
 		s = ''.join(s.split('\n'))
 		outlines.append(ed)
-		yield f'{s}\n')
+		yield f'{s}\n'
 		await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 	d['llmusageid'] = luid
@@ -246,7 +246,7 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 		s = json.dumps(ed)
 		s = ''.join(s.split('\n'))
 		outlines.append(ed)
-		yield f'{s}\n')
+		yield f'{s}\n'
 		await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 	if isinstance(b, bytes):
@@ -269,7 +269,7 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 				s = json.dumps(ed)
 				s = ''.join(s.split('\n'))
 				outlines.append(ed)
-				yield f'{s}\n')
+				yield f'{s}\n'
 				await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 				return
 
@@ -288,7 +288,7 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 				s = json.dumps(ed)
 				s = ''.join(s.split('\n'))
 				outlines.append(ed)
-				yield f'{s}\n')
+				yield f'{s}\n'
 				await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 				return
 			if rzt.status == 'SUCCEEDED':
