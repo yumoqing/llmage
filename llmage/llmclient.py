@@ -165,15 +165,15 @@ async def uapi_request(request, llm, sor, params_kw=None):
 		t3 = time.time()
 		usage['response_time'] = t2 - t1
 		usage['finish_time'] = t3 - t1
-		if not usage.get('completions_tokens'):
-			usage['completions_tokens'] = len(txt)
-		if not usage.get('input_tokens'):
+		if not usage.get('completion_tokens'):
+			usage['completion_tokens'] = len(txt)
+		if not usage.get('prompt_tokens'):
 			cnt = 0
 			if params_kw.prompt:
 				cnt += len(params_kw.prompt)
 			if params_kw.negitive_prompt:
 				cnt += len(params_kw.negitive_promot)
-			usage['input_tokens'] = len
+			usage['prompt_tokens'] = cnt
 		u = await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
