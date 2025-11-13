@@ -108,7 +108,7 @@ async def write_llmusage(id, llm, userid, usage, params_kw, outdata, sor):
 		"userid": userid,
 		"transno": params_kw.transno,
 		"evalvalue": 0,
-		"useages": usages,
+		"usages": usage,
 		"ioinfo": json.dumps({
 			"input": params_kw,
 			"output": outdata
