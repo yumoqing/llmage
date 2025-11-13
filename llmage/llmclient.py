@@ -106,6 +106,7 @@ async def write_llmusage(llm, userid, usage, params_kw, outdata, sor):
 		"use_date": curDateString(),
 		"use_time": timestampstr(),
 		"userid": userid,
+		"transno": params_kw.transno,
 		"useages": usages,
 		"ioinfo": json.dumps({
 			"input": params_kw,
@@ -304,6 +305,8 @@ async def inference(request, *args, params_kw=None, **kw):
 	env = request._run_ns.copy()
 	if not params_kw:
 		params_kw = env.params_kw
+	if not params_kw.transno:
+		params_kw.transno = getID()
 	llmid = params_kw.llmid
 	dbname = env.get_module_dbname('llmage')
 	db = env.DBPools()
