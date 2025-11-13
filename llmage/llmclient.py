@@ -99,9 +99,9 @@ where a.upappid=b.id
 	i = randint(0, len(recs)-1)
 	return recs[i].userid
 
-async def write_llmusage(llm, userid, usage, params_kw, outdata, sor):
+async def write_llmusage(id, llm, userid, usage, params_kw, outdata, sor):
 	d = {
-		"id": getID(),
+		"id": id,
 		"llmid": llm.id,
 		"use_date": curDateString(),
 		"use_time": timestampstr(),
@@ -115,7 +115,6 @@ async def write_llmusage(llm, userid, usage, params_kw, outdata, sor):
 		}, ensure_ascii=False)
 	}
 	await sor.C('llmusage', d)
-	return d
 
 async def uapi_request(request, llm, sor, params_kw=None):
 	env = request._run_ns.copy()
