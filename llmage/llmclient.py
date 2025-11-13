@@ -100,6 +100,7 @@ where a.upappid=b.id
 	return recs[i].userid
 
 async def write_llmusage(id, llm, userid, usage, params_kw, outdata, sor):
+	debug(f'{params_kw=}, {outdata=}')
 	d = {
 		"id": id,
 		"llmid": llm.id,
