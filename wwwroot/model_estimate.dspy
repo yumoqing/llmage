@@ -1,0 +1,13 @@
+
+debug(f'model_estimate.dspy:{params_kw=}')
+db = DBPools()
+dbname = get_module_dbname('llmage')
+async with db.sqlorContext(dbname) as sor:
+	ns = {
+		'id': params_kw.id,
+		'evalvalue': params_kw.value
+	}
+	await sor.U('llmusage', ns)
+	return UiMessage(title='evalution', message='evalution finished')
+
+return UiError(title='evalution', message=f'evalution failed {db.e_except}')
