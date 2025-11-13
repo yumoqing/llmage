@@ -178,9 +178,11 @@ async def uapi_request(request, llm, sor, params_kw=None):
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
-
-		outlines.append({f"error": "ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid})
-		yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED" ,"llmusageid": luid}}\n'
+		ed = {"error": f"ERROR:{estr}:{format_exc()}", "status": "FAILED" ,"llmusageid": luid}
+		s = json.dumps(ed)
+		s = ''.join(s.split('\n'))
+		outlines.append(ed)
+		yield f'{s}\n')
 		await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 
@@ -206,8 +208,11 @@ async def sync_uapi_request(request, llm, sor, params_kw=None):
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
-		yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED", "llmusageid": luid }}\n'
-		outlines.append({"error": "ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid})
+		ed = {"error": f"ERROR:{estr}:{format_exc()}", "status": "FAILED" ,"llmusageid": luid}
+		s = json.dumps(ed)
+		s = ''.join(s.split('\n'))
+		outlines.append(ed)
+		yield f'{s}\n')
 		await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 	d['llmusageid'] = luid
@@ -237,8 +242,11 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
-		yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED" ,"llmusageid": luid}}\n'
-		outlines.append({"error": "ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid})
+		ed = {"error": f"ERROR:{estr}:{format_exc()}", "status": "FAILED" ,"llmusageid": luid}
+		s = json.dumps(ed)
+		s = ''.join(s.split('\n'))
+		outlines.append(ed)
+		yield f'{s}\n')
 		await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 	if isinstance(b, bytes):
@@ -257,8 +265,11 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 			except Exception as e:
 				exception(f'{e=},{format_exc()}')
 				estr = erase_apikey(e)
-				yield f'{{"error": "ERROR:{estr}", "status": "SUCCEEDED" ,"llmusageid": luid}}\n'
-				outlines.append({"error": "ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid})
+				ed = {"error": f"ERROR:{estr}:{format_exc()}", "status": "FAILED" ,"llmusageid": luid}
+				s = json.dumps(ed)
+				s = ''.join(s.split('\n'))
+				outlines.append(ed)
+				yield f'{s}\n')
 				await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 				return
 
@@ -273,8 +284,11 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 			yield b + '\n'
 			if not rzt.status or rzt.status == 'FAILED':
 				debug(f'{b=} return error')
-				yield f'{{"error": "ERROR:upapp return failed", "status": "SUCCEEDED" ,"llmusageid": luid}}\n'
-				outlines.append({"error": "ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid})
+				ed = {"error": f"ERROR:{estr}:{format_exc()}", "status": "FAILED" ,"llmusageid": luid}
+				s = json.dumps(ed)
+				s = ''.join(s.split('\n'))
+				outlines.append(ed)
+				yield f'{s}\n')
 				await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 				return
 			if rzt.status == 'SUCCEEDED':
