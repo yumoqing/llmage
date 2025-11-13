@@ -284,22 +284,18 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 			yield b + '\n'
 			if not rzt.status or rzt.status == 'FAILED':
 				debug(f'{b=} return error')
-				ed = {"error": f"ERROR:{estr}:{format_exc()}", "status": "FAILED" ,"llmusageid": luid}
-				s = json.dumps(ed)
-				s = ''.join(s.split('\n'))
-				outlines.append(ed)
-				yield f'{s}\n'
+				outlines.append(rzt)
 				await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 				return
 			if rzt.status == 'SUCCEEDED':
 				await asyncio.sleep(1)
-				d = rzt
-				outlines.append(d)
-				usage = d.get('usage', {})
+				outlines.append(rzt)
+				usage = rzt.get('usage', {})
 				t3 = time.time()
 				usage['response_time'] = t2 - t1
 				usage['finish_time'] = t3 -t1
 				await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
+				d = rzt
 				break
 			period = llm.query_period or 30
 			await asyncio.sleep(period)
