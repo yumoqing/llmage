@@ -1,0 +1,14 @@
+{
+    "tblname": "llmusage",
+	"title":"模型使用",
+    "params": {
+		"sortby":"use_time desc",
+        "browserfields": {
+            "exclouded": ["id"],
+            "alters": {}
+        },
+        "editexclouded": [
+            "id"
+        ]
+    }
+}
