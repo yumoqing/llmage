@@ -8,8 +8,7 @@ from llmage.llmclient import (
 	get_llm, 
 	inference, 
 	get_llmcatelogs,
-	get_llms_by_catelog,
-	downloadurl
+	get_llms_by_catelog
 )
 from llmage.messages import (
 	BaseMessages,
