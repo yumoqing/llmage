@@ -33,7 +33,6 @@ def load_llmage():
 	env.SessageMessages = SessionMessages
 	env.BaseMessages = BaseMessages
 	env.keling_token = keling_token
-	env.downloadurl = downloadurl
 	
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
