@@ -8,9 +8,9 @@
 		},
 		"items":[
 			{
-				"name":"catelog",
-				"label":"历史格式",
-				"url":"{{entire_url('/llmage/historyformat')}}"
+				"name":"llmusage",
+				"label":"模型用量",
+				"url":"{{entire_url('/llmage/llmusage')}}"
 			},
 			{
 				"name":"catelog",
