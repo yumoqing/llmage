@@ -6,7 +6,13 @@
 		"logined_userorgid": "ownerid",
         "browserfields": {
             "exclouded": ["id", "ownerid"],
-            "alters": {}
+            "alters": {
+				"ppid":{
+					"data_url":"{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
+					"textField": "name",
+                    "valueField": "id"
+				}
+			}
         },
 		"toolbar": {
 			"tools":[
