@@ -8,7 +8,7 @@
             "exclouded": ["id", "ownerid"],
             "alters": {
 				"ppid":{
-					"data_url":"{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
+					"dataurl":"{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
 					"textField": "name",
                     "valueField": "id"
 				}
