@@ -7,7 +7,7 @@ if not ns.use_date:
 	ns.use_date = curDateString()
 
 async with get_sor_context(request._run_ns, 'llmage') as sor:
-	sql = """select a.id, a.llmid, a.usages, b.name, b.model, b.ppid 
+	sql = """select a.id, a.llmid, a.use_date, a.usages, b.name, b.model, b.ppid 
 from llmusage a, llm b 
 where a.llmid = b.id
 	and use_date=${use_date}$
