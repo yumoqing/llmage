@@ -7,7 +7,7 @@ if not ns.use_date:
 	ns.use_date = curDateString()
 
 async with get_sor_context(request._run_ns, 'llmage') as sor:
-	sql = """select a.id, a.llmid, a.usage, b.name, b.model, b.ppid 
+	sql = """select a.id, a.llmid, a.usages, b.name, b.model, b.ppid 
 from llmusage a, llm b 
 where a.llmid = b.id
 	and use_date=${use_date}$
@@ -15,6 +15,6 @@ where a.llmid = b.id
 	d = await sor.sqlExe(sql, ns)
 	for r in d['rows']:
 		if r.ppid:
-			r.amount = await pricing_program_charging(sor, r.ppid, r.usage)
+			r.amount = await pricing_program_charging(sor, r.ppid, r.usages)
 	return d
 return None
