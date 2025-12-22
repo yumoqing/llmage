@@ -1,0 +1,20 @@
+debug(f'{params_kw=}')
+ns = params_kw.copy()
+if not ns.page:
+	ns.page = 1
+ns.sort = "use_date desc"
+if not ns.use_date:
+	ns.use_date = curDateString()
+
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+	sql = """select a.id, a.llmid, a.usage, b.name, b.ppid 
+from llmusage a, llm b 
+where a.llmid = b.id
+	and use_date=${use_date}$
+"""
+	d = await sor.R('llmusage', ns)
+	for r in d['rows']:
+		if r.ppid:
+			r.amount = await pricing_program_charging(sor, r.ppid, r.usage)
+	return d
+return None
