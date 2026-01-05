@@ -19,7 +19,7 @@ async def llm_accounting(request, llmid,
 			e = Exception(f'llm ({llmid}) donot has a pricing_program')
 			exception(f'{e}')
 			raise e
-		resellerid = rec[0].ownerid
+		resellerid = recs[0].ownerid
 		providerid = recs[0].providerid
 		charges = await pricing_program_charging(sor, recs[0].ppid, usage)
 		trans_amount = trans_cost = 0
