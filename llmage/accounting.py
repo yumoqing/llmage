@@ -5,7 +5,7 @@ from sqlor.dbpools import get_sor_context
 from pricing.pricing import pricing_program_charging
 from accounting.consume import consume_accounting
 
-async def build_accounting_config(request, llmid, 
+async def llm_accounting(request, llmid, 
 			usage, customerid, userid, orderid=None):
 	env = request._run_ns
 	async with get_sor_context(request._run_ns, 'llmage') as sor:

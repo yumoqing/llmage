@@ -13,6 +13,7 @@ from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv
 from ahserver.filestorage import FileStorage
+from llmage.accounting import llm_accounting
 
 def erase_apikey(e):
 	e = str(e)
@@ -175,6 +176,7 @@ async def uapi_request(request, llm, sor, params_kw=None):
 				cnt += len(params_kw.negitive_promot)
 			usage['prompt_tokens'] = cnt
 		u = await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
+		await llm_accounting(request, llm.id, usage, llm.ownerid, callerid)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
@@ -221,9 +223,10 @@ async def sync_uapi_request(request, llm, sor, params_kw=None):
 	usage = d.get('usage', {})
 	usage['response_time'] = t2 - t1
 	usage['finish_time'] = t3 - t1
-	await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
 	b = json.dumps(d, ensure_ascii=False)
 	yield b
+	await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
+	await llm_accounting(request, llm.id, usage, llm.ownerid, callerid)
 
 async def async_uapi_request(request, llm, sor, params_kw=None):
 	env = request._run_ns.copy()
@@ -295,6 +298,7 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 				usage['response_time'] = t2 - t1
 				usage['finish_time'] = t3 -t1
 				await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
+				await llm_accounting(request, llm.id, usage, llm.ownerid, callerid)
 				d = rzt
 				break
 			period = llm.query_period or 30
