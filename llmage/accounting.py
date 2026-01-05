@@ -41,7 +41,7 @@ async def llm_accounting(request, llmid,
 				"userid": userid,
 				"productid": llmid
 			}
-			await sor.C('biz_order', ns)
+			await sor.C('biz_order', order)
 		orderdetail = {
 			"id": getID(),
 			"orderid": orderid,
@@ -49,6 +49,7 @@ async def llm_accounting(request, llmid,
 			"product_cnt": 1,
 			"trans_amount": trans_amount
 		}
+		await sor.C('biz_orderdetail', orderdetail)
 		ai0 = DictObject()
 		ai0.action = 'PAY'
 		ai0.customerid = customerid
