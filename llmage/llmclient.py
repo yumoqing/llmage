@@ -39,16 +39,16 @@ group by a.providerid, a.iconid, b.orgname"""
 
 async def get_llms_by_provider(pid):
 	env = ServerEnv()
-    async with get_sor_context(env, 'llmage') as sor:
-		today = curDateString()         
-        sql = """select * from llm  
+	async with get_sor_context(env, 'llmage') as sor:
+		today = curDateString()		 
+		sql = """select * from llm  
 where providerid = ${pid}$
-    and enabled_date <= ${today}$       
-    and expired_date > ${today}$            
-    """                                     
-        recs = await sor.sqlExe(sql, {'pid': pid, 'today': today})
-        return recs                             
-    return []
+	and enabled_date <= ${today}$	   
+	and expired_date > ${today}$			
+	"""									 
+		recs = await sor.sqlExe(sql, {'pid': pid, 'today': today})
+		return recs							 
+	return []
 
 async def get_llmcatelogs():
 	db = DBPools()
@@ -88,10 +88,10 @@ from (
 select a.*, b.hfid, e.ioid, e.stream
 from llm a, llmcatelog b,upapp c, uapiset d, uapi e
 where a.llmcatelogid = b.id
-    and a.upappid = c.id
-    and c.apisetid = d.id
-    and e.apisetid = d.id
-    and a.apiname = e.name
+	and a.upappid = c.id
+	and c.apisetid = d.id
+	and e.apisetid = d.id
+	and a.apiname = e.name
 	and a.expired_date > ${today}$
 	and a.enabled_date <= ${today}$
 ) x left join historyformat y on x.hfid = y.id
