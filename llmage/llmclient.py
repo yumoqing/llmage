@@ -4,14 +4,14 @@ import asyncio
 from random import randint
 from functools import partial
 from traceback import format_exc
-from sqlor.dbpools import DBPools
+from sqlor.dbpools import DBPools, get_sor_context
 from appPublic.log import debug, exception
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from appPublic.timeUtils import curDateString, timestampstr
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
-from ahserver.serverenv import get_serverenv
+from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 from llmage.accounting import llm_accounting
 
@@ -26,6 +26,29 @@ def erase_apikey(e):
 			newb = "XXXXXXXX" + ss[1][i:]
 			break
 	return ss[0] + 'Bearer ' + newb
+
+async def get_llmproviders():
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		sql = """select a.providerid, a.iconid, b.orgname 
+from llm a, organization b
+where a.providerid = b.id
+group by a.providerid, a.iconid, b.orgname"""
+		return await sor.sqlExe(sql, {})
+	return []
+
+async def get_llms_by_provider(pid):
+	env = ServerEnv()
+    async with get_sor_context(env, 'llmage') as sor:
+		today = curDateString()         
+        sql = """select * from llm  
+where providerid = ${pid}$
+    and enabled_date <= ${today}$       
+    and expired_date > ${today}$            
+    """                                     
+        recs = await sor.sqlExe(sql, {'pid': pid, 'today': today})
+        return recs                             
+    return []
 
 async def get_llmcatelogs():
 	db = DBPools()

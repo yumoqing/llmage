@@ -1,0 +1,109 @@
+{% set userorgid = get_userorgid() %}
+{
+	"widgettype":"VScrollPanel",
+	"options":{
+		"width":"100%",
+		"height":"100%"
+	},
+	"subwidgets":[
+{% for p in get_llmproviders() %}
+		{
+			"widgettype": "VBox",
+			"options":{
+				"width":"100%"
+			},
+			"subwidgets":[
+				{
+					"widgettype":"Title3",
+					"options":{
+						"wrap":true,
+						"halign": "left",
+						"text":"{{p.orgname}}"
+					}
+				},
+				{
+					"widgettype":"DynamicColumn",
+					"options":{
+						"css":"filler",
+						"width":"100%"
+					},
+					"subwidgets":[
+{% for llm in get_llms_by_provider(p.providerid) %}
+{% set can_use = checkCustomerBalance(llm.id, userorgid) %}
+							{
+							"widgettype":"VScrollPanel",
+							"options":{
+								"css":"card",
+{% if not can_use %}
+								"disabled":true,
+{% endif %}
+								"bgcolor": "#def0f0",
+								"cwidth":20,
+								"cheight":12
+							},
+							"subwidgets":[
+								{
+									"widgettype":"HBox",
+									"options":{
+										"cheight":2
+									},
+									"subwidgets":[
+										{
+											"widgettype":"Svg",
+											"options":{
+												"rate":1.5,
+												"url":"{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}"
+											}
+										},
+										{
+											"widgettype":"Title6",
+											"options":{
+												"text":"{{llm.name}}"
+											}
+										}
+									]
+								},
+								{
+									"widgettype":"Text",
+									"options":{
+										"text":{{json.dumps(llm.description, ensure_ascii=False)}},
+										"wrap":true,
+										"halign":"left"
+									}
+								}
+							],
+							"binds":[
+								{
+									"wid":"self",
+									"event":"click",
+									"actiontype":"urlwidget",
+									"target":"PopupWindow",
+									"popup_options":{
+										"title":"{{llm.name}}",
+{% if int(params_kw._is_mobile) %}
+										"width": "100%",
+										"height": "100%"
+{% else %}
+										"width": "40%",
+										"height":"85%"
+{% endif %}
+									},
+									"options":{
+										"params":{
+											"id":"{{llm.id}}"
+										},
+										"url":"{{entire_url('./llm_dialog.ui')}}"
+									}
+								}
+							]
+						}
+{% if not loop.last %}, {% endif %}
+{% endfor %}
+					]
+				}
+			]
+		}
+{% if not loop.last %}, {% endif %}
+{% endfor %}
+	]
+}

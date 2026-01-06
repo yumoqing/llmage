@@ -7,7 +7,9 @@ from llmage.llmclient import (
 	b64media2url,
 	get_llm, 
 	inference, 
+	get_llmproviders,
 	get_llmcatelogs,
+	get_llms_by_provider,
 	get_llms_by_catelog
 )
 from llmage.accounting import checkCustomerBalance
@@ -22,6 +24,8 @@ def load_llmage():
 	env.get_llms_by_catelog = get_llms_by_catelog
 	env.get_llmcatelogs = get_llmcatelogs
 	env.checkCustomerBalance = checkCustomerBalance
+	env.get_llmproviders = get_llmproviders
+	env.get_llms_by_provider = get_llms_by_provider
 	env.keling_token = keling_token
 	
 	rf = RegisterFunction()
