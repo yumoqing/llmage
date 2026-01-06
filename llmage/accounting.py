@@ -15,15 +15,16 @@ async def checkCustomerBalance(llmid, userorgid):
 			e = Exception(f'llm({llmid}) not exists')
 			exception(f'{e}')
 			raise e
-		llm = llms[0]
+		llm = llms[0].copy()
 		if llm.ownerid == userorgid:
 			return True
 		balance = await getCustomerBalance(sor, userorgid)
-		if balance is None: 
-			balance = 0.00
+		bal = 0 if balance is None else balance
 		if llm.min_balance is None:
 			llm.min_balance = 0.00
-		return llm.ppid and llm.min_balance < balance
+		ret = llm.ppid and llm.min_balance < bal
+		debug(f'{llms=},{userorgid=},{balance=},{ret=}')
+		return ret
 	return False
 
 async def llm_accounting(request, llmid, 
