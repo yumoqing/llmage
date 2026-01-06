@@ -37,6 +37,34 @@ group by a.providerid, a.iconid, b.orgname"""
 		return await sor.sqlExe(sql, {})
 	return []
 
+async def get_llms_sort_by_provider():
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		today = curDateString()		 
+		sql = """select a.*, b.orgname from llm, organization b
+where a.enabled_date <= ${today}$
+	and a.expired_date > ${today}$
+	and a.providerid = b.id
+	order by a.providerid, a.id
+	"""									 
+		recs = await sor.sqlExe(sql, {'today': today})
+		d = []
+		x = None
+		oldpid = '-111'
+		for l in recs:
+			if l.providerid != oldpid:
+				x = {
+					'id': l.providerid,
+					'orgname': l.orgname,
+					'llms': [l]
+				}
+				d.append(x)
+				oldpid = l.providerid
+			else:
+				x['llms'].append(l)
+		return d
+	return []
+
 async def get_llms_by_provider(pid):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:

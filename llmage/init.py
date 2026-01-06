@@ -8,6 +8,7 @@ from llmage.llmclient import (
 	get_llm, 
 	inference, 
 	get_llmproviders,
+	get_llms_sort_by_provider,
 	get_llmcatelogs,
 	get_llms_by_provider,
 	get_llms_by_catelog
@@ -26,6 +27,7 @@ def load_llmage():
 	env.checkCustomerBalance = checkCustomerBalance
 	env.get_llmproviders = get_llmproviders
 	env.get_llms_by_provider = get_llms_by_provider
+	env.get_llms_sort_by_provider = get_llms_sort_by_provider
 	env.keling_token = keling_token
 	
 	rf = RegisterFunction()
