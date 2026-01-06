@@ -18,7 +18,7 @@ async def checkCustomerBalance(llmid, userorgid):
 		if llms[0].ownerid == userorgid:
 			return True
 		balance = await getCustomerBalance(sor, userorgid)
-		return llms[0].min_balance < balance
+		return llms[0].ppid and llms[0].min_balance < balance
 	return False
 
 async def llm_accounting(request, llmid, 
