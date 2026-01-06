@@ -18,6 +18,11 @@
 				"url":"{{entire_url('/llmage/llmcatelog')}}"
 			},
 			{
+				"name":"listllmprovider",
+				"label": "供应商模型列表",
+				"url":"{{entire_url('/llmage/show_llms_by_providers.ui')}}"
+			},
+			{
 				"name":"listllm",
 				"label": "模型列表",
 				"url":"{{entire_url('/llmage/show_llms.ui')}}"
