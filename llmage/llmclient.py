@@ -109,9 +109,6 @@ async def get_llm(llmid):
 		today = curDateString()
 		sql = """select x.*,
 z.input_fields,
-y.system_message, 
-y.user_message,
-y.assisant_message 
 from (
 select a.*, e.ioid, e.stream
 from llm a, upapp c, uapiset d, uapi e
