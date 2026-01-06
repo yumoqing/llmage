@@ -90,12 +90,12 @@ where a.llmcatelogid = b.id
 		for r in recs:
 			if cid != r.catelogid:
 				x = {
-					'catelogid': r.catelogid,
+					'catelogid': r.llmcatelogid,
 					'catelogname': r.catelogname,
 					'llms': [r]
 				}
 				d.append(x)
-				cid = r.catelogid
+				cid = r.llmcatelogid
 			else:
 				x['llms'].append(r)
 		return d
