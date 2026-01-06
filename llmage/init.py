@@ -10,6 +10,7 @@ from llmage.llmclient import (
 	get_llmcatelogs,
 	get_llms_by_catelog
 )
+from llmage.accounting import checkCustomerBalance
 from llmage.messages import (
 	BaseMessages,
 	SessionMessages,
@@ -33,6 +34,7 @@ def load_llmage():
 	env.SessageMessages = SessionMessages
 	env.BaseMessages = BaseMessages
 	env.keling_token = keling_token
+	env.checkCustomerBalance = checkCustomerBalance
 	
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)

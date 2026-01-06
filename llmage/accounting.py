@@ -2,8 +2,24 @@ from appPublic.log import exception, debug
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from sqlor.dbpools import get_sor_context
+from ahserver.serverenv import ServerEnv
 from pricing.pricing import pricing_program_charging
 from accounting.consume import consume_accounting
+from accounting.getaccount import getCustomerBalance
+
+async def checkCustomerBalance(llmid, userorgid):
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		llms = await sor.R('llm', { 'id': llmid})
+		if len(llms) < 1:
+			e = Exception(f'llm({llmid}) not exists')
+			exception(f'{e}')
+			raise e
+		if llms[0].ownerid == userorgid:
+			return True
+		balance = await getCustomerBalance(sor, userorgid)
+		return llms[0].min_balance < balance
+	return False
 
 async def llm_accounting(request, llmid, 
 			usage, customerid, userid, orderid=None):

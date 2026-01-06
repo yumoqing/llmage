@@ -177,6 +177,7 @@ async def uapi_request(request, llm, sor, params_kw=None):
 			usage['prompt_tokens'] = cnt
 		u = await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
 		if llm.ppid and callerorgid != llm.ownerid:
+			debug(f'{usage=},{llm.ownerid=},{callerorgid=}')
 			await llm_accounting(request, llm.id, usage, callerorgid, callerid)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
@@ -228,6 +229,7 @@ async def sync_uapi_request(request, llm, sor, params_kw=None):
 	yield b
 	await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
 	if llm.ppid and callerorgid != llm.ownerid:
+		debug(f'{usage=},{llm.ownerid=},{callerorgid=}')
 		await llm_accounting(request, llm.id, usage, callerorgid, callerid)
 
 async def async_uapi_request(request, llm, sor, params_kw=None):
@@ -301,6 +303,7 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 				usage['finish_time'] = t3 -t1
 				await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
 				if llm.ppid and callerorgid != llm.ownerid:
+					debug(f'{usage=},{llm.ownerid=},{callerorgid=}')
 					await llm_accounting(request, llm.id, usage, callerorgid, callerid)
 				
 				d = rzt

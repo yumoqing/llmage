@@ -1,3 +1,4 @@
+{% set userorgid = get_userorgid %}
 {
 	"widgettype":"VScrollPanel",
 	"options":{
@@ -28,10 +29,14 @@
 					},
 					"subwidgets":[
 {% for llm in get_llms_by_catelog(cate.id) %}
-						{
+{% set can_use = checkCustomerBalance(llm.id, userorgid) %}
+							{
 							"widgettype":"VScrollPanel",
 							"options":{
 								"css":"card",
+{% if not can_use %}
+								"disabled":true,
+{% endif %}
 								"bgcolor": "#def0f0",
 								"cwidth":20,
 								"cheight":12
