@@ -76,7 +76,7 @@ async def get_llmcatelogs():
 
 async def get_llms_by_catelog():
 	env = ServerEnv()
-    async with get_sor_context(env, 'llmage') as sor:
+	async with get_sor_context(env, 'llmage') as sor:
 		today = curDateString()
 		sql = """select a.*, b.name as catelogname from llm a, llmcatelog b
 where a.llmcatelogid = b.id
