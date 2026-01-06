@@ -92,12 +92,12 @@ where a.llmcatelogid = b.id
 				x = {
 					'catelogid': r.catelogid,
 					'catelogname': r.catelogname,
-					'llms': [l]
+					'llms': [r]
 				}
 				d.append(x)
 				cid = r.catelogid
 			else:
-				x['llms'].append(l)
+				x['llms'].append(r)
 		return d
 	return []
 	
