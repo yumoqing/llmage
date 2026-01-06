@@ -48,6 +48,7 @@
 		"i18n":true
 	}
 }
+{% endif %}
 {% else %}
 {
 	"widgettype":"Text",

@@ -65,19 +65,6 @@ where a.enabled_date <= ${today}$
 		return d
 	return []
 
-async def get_llms_by_provider(pid):
-	env = ServerEnv()
-	async with get_sor_context(env, 'llmage') as sor:
-		today = curDateString()		 
-		sql = """select * from llm  
-where providerid = ${pid}$
-	and enabled_date <= ${today}$	   
-	and expired_date > ${today}$			
-	"""									 
-		recs = await sor.sqlExe(sql, {'pid': pid, 'today': today})
-		return recs							 
-	return []
-
 async def get_llmcatelogs():
 	db = DBPools()
 	dbname = get_serverenv('get_module_dbname')('llmage')
@@ -87,19 +74,31 @@ async def get_llmcatelogs():
 
 	return []
 
-async def get_llms_by_catelog(catelogid):
-	debug(f'{catelogid=}')
-	db = DBPools()
-	dbname = get_serverenv('get_module_dbname')('llmage')
-	async with db.sqlorContext(dbname) as sor:
+async def get_llms_by_catelog():
+	env = ServerEnv()
+    async with get_sor_context(env, 'llmage') as sor:
 		today = curDateString()
-		sql = """select * from llm 
-where llmcatelogid = ${llmcatelogid}$
+		sql = """select a.*, b.name as catelogname from llm a, llmcatelog b
+where a.llmcatelogid = b.id
 	and enabled_date <= ${today}$
 	and expired_date > ${today}$
 	"""
-		recs = await sor.sqlExe(sql, {'llmcatelogid': catelogid, 'today': today})
-		return recs
+		recs = await sor.sqlExe(sql, {'today': today})
+		d = []
+		cid = ''
+		x = None
+		for r in recs:
+			if cid != r.catelogid:
+				x = {
+					'catelogid': r.catelogid,
+					'catelogname': r.catelogname,
+					'llms': [l]
+				}
+				d.append(x)
+				cid = r.catelogid
+			else:
+				x['llms'].append(l)
+		return d
 	return []
 	
 async def get_llm(llmid):
@@ -113,10 +112,9 @@ y.system_message,
 y.user_message,
 y.assisant_message 
 from (
-select a.*, b.hfid, e.ioid, e.stream
-from llm a, llmcatelog b,upapp c, uapiset d, uapi e
-where a.llmcatelogid = b.id
-	and a.upappid = c.id
+select a.*, e.ioid, e.stream
+from llm a, upapp c, uapiset d, uapi e
+where a.upappid = c.id
 	and c.apisetid = d.id
 	and e.apisetid = d.id
 	and a.apiname = e.name

@@ -6,7 +6,7 @@
 		"height":"100%"
 	},
 	"subwidgets":[
-{% for cate in get_llmcatelogs() %}
+{% for cate in get_llms_by_catelog() %}
 		{
 			"widgettype": "VBox",
 			"options":{
@@ -18,7 +18,7 @@
 					"options":{
 						"wrap":true,
 						"halign": "left",
-						"text":"{{cate.name}}"
+						"text":"{{cate.catelogname}}"
 					}
 				},
 				{
@@ -28,15 +28,11 @@
 						"width":"100%"
 					},
 					"subwidgets":[
-{% for llm in get_llms_by_catelog(cate.id) %}
-{% set can_use = checkCustomerBalance(llm.id, userorgid) %}
+{% for llm in cate.llms %}
 							{
 							"widgettype":"VScrollPanel",
 							"options":{
 								"css":"card",
-{% if not can_use %}
-								"disabled":true,
-{% endif %}
 								"bgcolor": "#def0f0",
 								"cwidth":20,
 								"cheight":12

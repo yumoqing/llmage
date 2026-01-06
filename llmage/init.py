@@ -10,7 +10,6 @@ from llmage.llmclient import (
 	get_llmproviders,
 	get_llms_sort_by_provider,
 	get_llmcatelogs,
-	get_llms_by_provider,
 	get_llms_by_catelog
 )
 from llmage.accounting import checkCustomerBalance
@@ -26,7 +25,6 @@ def load_llmage():
 	env.get_llmcatelogs = get_llmcatelogs
 	env.checkCustomerBalance = checkCustomerBalance
 	env.get_llmproviders = get_llmproviders
-	env.get_llms_by_provider = get_llms_by_provider
 	env.get_llms_sort_by_provider = get_llms_sort_by_provider
 	env.keling_token = keling_token
 	
