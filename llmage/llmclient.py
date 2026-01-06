@@ -108,7 +108,7 @@ async def get_llm(llmid):
 	async with db.sqlorContext(dbname) as sor:
 		today = curDateString()
 		sql = """select x.*,
-z.input_fields,
+z.input_fields
 from (
 select a.*, e.ioid, e.stream
 from llm a, upapp c, uapiset d, uapi e
