@@ -88,7 +88,7 @@ where a.llmcatelogid = b.id
 		cid = ''
 		x = None
 		for r in recs:
-			if cid != r.catelogid:
+			if cid != r.llmcatelogid:
 				x = {
 					'catelogid': r.llmcatelogid,
 					'catelogname': r.catelogname,
