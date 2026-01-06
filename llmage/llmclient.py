@@ -82,6 +82,7 @@ async def get_llms_by_catelog():
 where a.llmcatelogid = b.id
 	and enabled_date <= ${today}$
 	and expired_date > ${today}$
+	sort by a.llmcatelogid, a.id
 	"""
 		recs = await sor.sqlExe(sql, {'today': today})
 		d = []
