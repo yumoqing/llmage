@@ -121,8 +121,7 @@ where a.upappid = c.id
 	and a.apiname = e.name
 	and a.expired_date > ${today}$
 	and a.enabled_date <= ${today}$
-) x left join historyformat y on x.hfid = y.id
-	left join uapiio z on x.ioid = z.id
+) x left join uapiio z on x.ioid = z.id
 where x.id = ${llmid}$	
 """
 		recs = await sor.sqlExe(sql, {'llmid': llmid, 'today': today})
