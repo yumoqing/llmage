@@ -41,7 +41,7 @@ async def get_llms_sort_by_provider():
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
 		today = curDateString()		 
-		sql = """select a.*, b.orgname from llm, organization b
+		sql = """select a.*, b.orgname from llm a, organization b
 where a.enabled_date <= ${today}$
 	and a.expired_date > ${today}$
 	and a.providerid = b.id
