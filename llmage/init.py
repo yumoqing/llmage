@@ -11,13 +11,6 @@ from llmage.llmclient import (
 	get_llms_by_catelog
 )
 from llmage.accounting import checkCustomerBalance
-from llmage.messages import (
-	BaseMessages,
-	SessionMessages,
-	default_sysmessage,
-	default_usrmessage,
-	default_llmmessage
-)
 from ahserver.serverenv import ServerEnv
 
 def load_llmage():
@@ -28,13 +21,8 @@ def load_llmage():
 	env.inference = inference
 	env.get_llms_by_catelog = get_llms_by_catelog
 	env.get_llmcatelogs = get_llmcatelogs
-	env.default_sysmessage = default_sysmessage
-	env.default_usrmessage = default_usrmessage
-	env.default_llmmessage = default_llmmessage
-	env.SessageMessages = SessionMessages
-	env.BaseMessages = BaseMessages
-	env.keling_token = keling_token
 	env.checkCustomerBalance = checkCustomerBalance
+	env.keling_token = keling_token
 	
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)

@@ -1,4 +1,4 @@
-{% set userorgid = get_userorgid %}
+{% set userorgid = get_userorgid() %}
 {
 	"widgettype":"VScrollPanel",
 	"options":{
