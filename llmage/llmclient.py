@@ -121,7 +121,8 @@ where a.upappid = c.id
 ) x left join uapiio z on x.ioid = z.id
 where x.id = ${llmid}$	
 """
-		recs = await sor.sqlExe(sql, {'llmid': llmid, 'today': today})
+		ns = {'llmid': llmid, 'today': today}
+		recs = await sor.sqlExe(sql, ns.copy())
 		if len(recs) > 0:
 			r = recs[0]
 			api = await sor_get_uapi(sor, r.upappid, r.apiname)
@@ -132,7 +133,7 @@ where x.id = ${llmid}$
 			r.inputfields = api.input_fields
 			return recs[0]
 		else:
-			debug(f'{llmid=} not found')
+			debug(f'{llmid=} not found, {ns=}, {sql=}')
 			return None
 	exception(f'{db.e_except}\n{format_exc()}')
 	return None
@@ -329,14 +330,14 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 			if isinstance(b, bytes):
 				b = b.decode('utf-8')
 			d = json.loads(b)
-			rzt = DictObject(**json.loads(b))
+			rzt = DictObject(**d)
 			rzt['llmusageid'] = luid
 			b = json.dumps(rzt, ensure_ascii=False)
 			b = ''.join(b.split('\n'))
 			debug(f'response line = {b}')
 			yield b + '\n'
 			if not rzt.status or rzt.status == 'FAILED':
-				debug(f'{b=} return error')
+				debug(f'{b=} {rzt=} has not status, return error')
 				outlines.append(rzt)
 				await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 				return
