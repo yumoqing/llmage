@@ -388,6 +388,8 @@ async def inference(request, *args, params_kw=None, **kw):
 	db = env.DBPools()
 	async with db.sqlorContext(dbname) as sor:
 		llm = await get_llm(llmid)
+		if params_kw.nostream and llm.stream == 'stream':
+			llm.stream = 'sync'
 		if llm.stream == 'async':
 			f = partial(async_uapi_request, request, llm, sor, params_kw=params_kw)
 			return await env.stream_response(request, f)
