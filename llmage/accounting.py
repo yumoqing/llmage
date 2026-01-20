@@ -48,6 +48,8 @@ async def llm_accounting(request, llmid,
 		for c in charges:
 			trans_amount += c.amount
 			trans_cost += c.cost
+		if trans_amount < 0.00001:
+			return
 		biz_date = await env.get_business_date(sor)
 		timestamp = env.timestampstr()
 		if orderid is None:
@@ -72,19 +74,22 @@ async def llm_accounting(request, llmid,
 			"trans_amount": trans_amount
 		}
 		await sor.C('biz_orderdetail', orderdetail)
-		ai0 = DictObject()
-		ai0.action = 'PAY'
-		ai0.customerid = customerid
-		ai0.resellerid = resellerid
-		ai0.providerid = providerid
-		ai0.biz_date = biz_date
-		ai0.timestamp = timestamp
-		ai0.productid = llmid
-		ai0.transamt = trans_amount
-		ai0.variable = {
-			"交易金额": trans_amount,
-			"交易手续费": 0
-		}
+		ais = []
+		if customerid != resellerid:
+			ai0 = DictObject()
+			ai0.action = 'PAY'
+			ai0.customerid = customerid
+			ai0.resellerid = resellerid
+			ai0.providerid = providerid
+			ai0.biz_date = biz_date
+			ai0.timestamp = timestamp
+			ai0.productid = llmid
+			ai0.transamt = trans_amount
+			ai0.variable = {
+				"交易金额": trans_amount,
+				"交易手续费": 0
+			}
+			ais.append(ai0)
 		ai1 = DictObject()
 		ai1.action = 'PAY*'
 		ai1.customerid = customerid
@@ -98,8 +103,6 @@ async def llm_accounting(request, llmid,
 		ai1.variable = {
 			"采购成本": trans_cost
 		}
-		ais = [
-			ai0, ai1	
-		]
+		ais.append(ai1)
 		await consume_accounting(sor, orderid, ais)
 
