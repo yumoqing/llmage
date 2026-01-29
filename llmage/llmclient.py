@@ -256,6 +256,9 @@ async def sync_uapi_request(request, llm, sor, params_kw=None):
 		if isinstance(b, bytes):
 			b = b.decode('utf-8')
 		d = json.loads(b)
+		status = g.get('status')
+		if status and status != 'SUCCEEDED':
+			raise Exception(d['error'])
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
