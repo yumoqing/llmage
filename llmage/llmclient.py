@@ -380,7 +380,7 @@ def b64media2url(request, mediafile):
 	url = entire_url('/idfile?path=') + env.quote(mediafile)
 	return url
 
-async def inference(request, *args, params_kw=None, **kw):
+async def inference_generator(request, *args, params_kw=None, **kw):
 	env = request._run_ns.copy()
 	if not params_kw:
 		params_kw = env.params_kw
@@ -390,6 +390,7 @@ async def inference(request, *args, params_kw=None, **kw):
 	dbname = env.get_module_dbname('llmage')
 	db = env.DBPools()
 	async with db.sqlorContext(dbname) as sor:
+		f == None
 		llm = await get_llm(llmid)
 		if not params_kw.model:
 			params_kw.model = llm.model
@@ -397,11 +398,17 @@ async def inference(request, *args, params_kw=None, **kw):
 			llm.stream = 'sync'
 		if llm.stream == 'async':
 			f = partial(async_uapi_request, request, llm, sor, params_kw=params_kw)
-			return await env.stream_response(request, f)
-		if llm.stream == 'sync':
+		elif llm.stream == 'sync':
 			f = partial(sync_uapi_request, request, llm, sor, params_kw=params_kw)
-			return await env.stream_response(request, f)
 		# env.update(llm)
-		uapi = UAPI(request, sor=sor)
-		f = partial(uapi_request, request, llm, sor, params_kw=params_kw)
-		return await env.stream_response(request, f)
+		else:
+			uapi = UAPI(request, sor=sor)
+			f = partial(uapi_request, request, llm, sor, params_kw=params_kw)
+		async for d in f():
+			yield d
+
+async def inference(request, *args, params_kw=None, **kw):
+	env = request._run_ns.copy()
+	f = partial(inference_generator, *args, params_kw=params_kw, **kw)
+	return await env.stream_response(request, f)
+	

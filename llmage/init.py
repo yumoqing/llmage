@@ -6,6 +6,7 @@ from llmage.keling import keling_token
 from llmage.llmclient import (
 	b64media2url,
 	get_llm, 
+	inference_generator,
 	inference, 
 	get_llmproviders,
 	get_llms_sort_by_provider,
@@ -21,6 +22,7 @@ def load_llmage():
 	env.b64media2url = b64media2url
 	env.hex2base64 = hex2base64
 	env.inference = inference
+	env.inference_generator = inference_generator
 	env.get_llms_by_catelog = get_llms_by_catelog
 	env.get_llmcatelogs = get_llmcatelogs
 	env.checkCustomerBalance = checkCustomerBalance
