@@ -148,7 +148,6 @@ where a.upappid=b.id
 	return recs[i].userid
 
 async def write_llmusage(id, llm, userid, usage, params_kw, outdata, sor):
-	debug(f'{params_kw=}, {outdata=}')
 	d = {
 		"id": id,
 		"llmid": llm.id,
@@ -409,6 +408,6 @@ async def inference_generator(request, *args, params_kw=None, **kw):
 
 async def inference(request, *args, params_kw=None, **kw):
 	env = request._run_ns.copy()
-	f = partial(inference_generator, *args, params_kw=params_kw, **kw)
+	f = partial(inference_generator, request, *args, params_kw=params_kw, **kw)
 	return await env.stream_response(request, f)
 	
