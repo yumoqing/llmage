@@ -390,7 +390,7 @@ async def inference_generator(request, *args, params_kw=None, **kw):
 	dbname = env.get_module_dbname('llmage')
 	db = env.DBPools()
 	async with db.sqlorContext(dbname) as sor:
-		f == None
+		f = None
 		llm = await get_llm(llmid)
 		if not params_kw.model:
 			params_kw.model = llm.model
