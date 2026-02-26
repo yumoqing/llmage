@@ -15,7 +15,7 @@ where a.id=${llmid}$
 	and a.upappid = b.id
 	and a.enabled_date <= ${today}$ 
 	and a.expired_date > ${today}$"""
-	recs = awaut sor.sqlExe(sql, ns.copy())
+	recs = await sor.sqlExe(sql, ns.copy())
 	if recs:
 		msgs.append('llm join upapp read ok')
 	else:
@@ -27,7 +27,7 @@ where a.id=${llmid}$
 	and b.apisetid = c.id
     and a.enabled_date <= ${today}$ 
     and a.expired_date > ${today}$"""
-    recs = awaut sor.sqlExe(sql, ns.copy())
+    recs = await sor.sqlExe(sql, ns.copy())
     if recs:
         msgs.append('llm join upapp read ok')
     else:
@@ -43,7 +43,7 @@ where a.upappid = c.id
 	and a.id=${llmid}$
     and a.expired_date > ${today}$
     and a.enabled_date <= ${today}$"""
-	recs = awaut sor.sqlExe(sql, ns.copy())
+	recs = await sor.sqlExe(sql, ns.copy())
     if recs:
         msgs.append('llm join upapp join uapi read ok')
     else:
@@ -60,7 +60,7 @@ where a.upappid = c.id
     and a.id=${llmid}$
     and a.expired_date > ${today}$
     and a.enabled_date <= ${today}$"""
-    recs = awaut sor.sqlExe(sql, ns.copy())
+    recs = await sor.sqlExe(sql, ns.copy())
     if recs:
         msgs.append('llm join upapp join uapi join uapiio read ok')
     else:
