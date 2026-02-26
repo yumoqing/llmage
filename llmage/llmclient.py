@@ -228,7 +228,7 @@ async def uapi_request(request, llm, sor, params_kw=None):
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
-		ed = {"error": f"ERROR:{estr}:{format_exc()}", "status": "FAILED" ,"llmusageid": luid}
+		ed = {"error": f"ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid}
 		s = json.dumps(ed)
 		s = ''.join(s.split('\n'))
 		outlines.append(ed)
@@ -261,7 +261,7 @@ async def sync_uapi_request(request, llm, sor, params_kw=None):
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
-		ed = {"error": f"ERROR:{estr}:{format_exc()}", "status": "FAILED" ,"llmusageid": luid}
+		ed = {"error": f"ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid}
 		s = json.dumps(ed)
 		s = ''.join(s.split('\n'))
 		outlines.append(ed)
@@ -298,7 +298,7 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
-		ed = {"error": f"ERROR:{estr}:{format_exc()}", "status": "FAILED" ,"llmusageid": luid}
+		ed = {"error": f"ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid}
 		s = json.dumps(ed)
 		s = ''.join(s.split('\n'))
 		outlines.append(ed)
@@ -321,7 +321,7 @@ async def async_uapi_request(request, llm, sor, params_kw=None):
 			except Exception as e:
 				exception(f'{e=},{format_exc()}')
 				estr = erase_apikey(e)
-				ed = {"error": f"ERROR:{estr}:{format_exc()}", "status": "FAILED" ,"llmusageid": luid}
+				ed = {"error": f"ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid}
 				s = json.dumps(ed)
 				s = ''.join(s.split('\n'))
 				outlines.append(ed)
