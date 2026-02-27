@@ -18,7 +18,8 @@
 					"options":{
 						"wrap":true,
 						"halign": "left",
-						"text":"{{cate.catelogname}}"
+						"i18n": true,
+						"otext":"{{cate.catelogname}}"
 					}
 				},
 				{
