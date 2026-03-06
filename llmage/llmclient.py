@@ -391,6 +391,11 @@ async def inference_generator(request, *args, params_kw=None, **kw):
 	async with db.sqlorContext(dbname) as sor:
 		f = None
 		llm = await get_llm(llmid)
+		if llm is None:
+			errmsg = f'{{"status": "FAILED", "error":"llmid:{llmid}没找到模型"}}\n'
+			exception(errmsg)
+			yield errmsg
+			return
 		if not params_kw.model:
 			params_kw.model = llm.model
 		if params_kw.nostream and llm.stream == 'stream':
