@@ -164,12 +164,12 @@ async def write_llmusage(id, llm, userid, usage, params_kw, outdata, sor):
 	}
 	await sor.C('llmusage', d)
 
-async def uapi_request(request, llm, sor, params_kw=None):
+async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None):
 	env = request._run_ns.copy()
 	if not params_kw:
 		params_kw = env.params_kw
-	callerorgid = await env.get_userorgid()
-	callerid = await env.get_user()
+	# callerorgid = await env.get_userorgid()
+	# callerid = await env.get_user()
 	uapi = UAPI(request, sor=sor)
 	userid = await get_owner_userid(sor, llm)
 	outlines = []
@@ -236,12 +236,12 @@ async def uapi_request(request, llm, sor, params_kw=None):
 		await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 
-async def sync_uapi_request(request, llm, sor, params_kw=None):
+async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None):
 	env = request._run_ns.copy()
 	if not params_kw:
 		params_kw = env.params_kw
-	callerid = await env.get_user()
-	callerorgid = await env.get_userorgid()
+	# callerid = await env.get_user()
+	# callerorgid = await env.get_userorgid()
 	uapi = UAPI(request, sor=sor)
 	userid = await get_owner_userid(sor, llm)
 	outlines = []
@@ -281,12 +281,12 @@ async def sync_uapi_request(request, llm, sor, params_kw=None):
 		debug(f'{usage=},{llm.ownerid=},{callerorgid=}')
 		await llm_accounting(request, llm.id, usage, callerorgid, callerid)
 
-async def async_uapi_request(request, llm, sor, params_kw=None):
+async def async_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None):
 	env = request._run_ns.copy()
 	if not params_kw:
 		params_kw = env.params_kw
-	callerorgid = await env.get_userorgid()
-	callerid = await env.get_user()
+	# callerorgid = await env.get_userorgid()
+	# callerid = await env.get_user()
 	uapi = UAPI(request, sor=sor)
 	userid = await get_owner_userid(sor, llm)
 	outlines = []
@@ -381,6 +381,14 @@ def b64media2url(request, mediafile):
 
 async def inference_generator(request, *args, params_kw=None, **kw):
 	env = request._run_ns.copy()
+	callerorgid = await env.get_userorgid()
+	callerid = await env.get_user()
+	async for d in _inference_generator(request, callerid, 
+						callerorgid, params_kw=params_kw, **kw):
+		yield d
+
+async def _inference_generator(request, callerid, callerorgid, 
+							params_kw=params_kw, **kw):
 	if not params_kw:
 		params_kw = env.params_kw
 	if not params_kw.transno:
@@ -401,13 +409,13 @@ async def inference_generator(request, *args, params_kw=None, **kw):
 		if params_kw.nostream and llm.stream == 'stream':
 			llm.stream = 'sync'
 		if llm.stream == 'async':
-			f = partial(async_uapi_request, request, llm, sor, params_kw=params_kw)
+			f = partial(async_uapi_request, request, llm, sor, callerid, callerorgid, params_kw=params_kw)
 		elif llm.stream == 'sync':
-			f = partial(sync_uapi_request, request, llm, sor, params_kw=params_kw)
+			f = partial(sync_uapi_request, request, llm, sor, callerid, callerorgid, params_kw=params_kw)
 		# env.update(llm)
 		else:
 			uapi = UAPI(request, sor=sor)
-			f = partial(uapi_request, request, llm, sor, params_kw=params_kw)
+			f = partial(uapi_request, request, llm, sor, callerid, callerorgid, params_kw=params_kw)
 		async for d in f():
 			yield d
 

@@ -1,0 +1,23 @@
+"""
+params_kw has:
+  model: name of model
+  messages:
+"""
+if params_kw.model is None:
+	return json_response(
+		{"error": {"message": "Missing required parameter: model", "type": "invalid_request_error"}},
+                status=400
+            )
+if params_kw.messages is None:
+	return json_response(
+		{
+			"error": {
+				"message": "Messages array cannot be empty", 
+				"type": "invalid_request_error"
+			}
+		},
+		status=400
+	)
+try:
+	async with get_sor_context(request._run_ns, 'llmage') as sor:
+		recs = await sor.R('llm', {'model': params_kw.model})
