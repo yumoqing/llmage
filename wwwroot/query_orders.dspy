@@ -1,0 +1,12 @@
+"""
+        "page":                     # 当前页，缺省第一页
+        "pagerows":                 # 每页记录数，缺省80
+"""
+page = 1
+if params_kw.page:
+	page = int(page)
+pagerows = 80
+if params_kw.pagerows:
+	pagerows = int(params_kw.pagerows)
+
+	
