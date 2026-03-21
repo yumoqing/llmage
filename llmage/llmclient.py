@@ -389,6 +389,7 @@ async def inference_generator(request, *args, params_kw=None, **kw):
 
 async def _inference_generator(request, callerid, callerorgid, 
 							params_kw={}, **kw):
+	env = request._run_ns
 	if not params_kw:
 		params_kw = env.params_kw
 	if not params_kw.transno:
