@@ -3,7 +3,7 @@ from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from sqlor.dbpools import get_sor_context
 from ahserver.serverenv import ServerEnv
-from pricing.pricing import pricing_program_charging
+# from pricing.pricing import pricing_program_charging
 from accounting.consume import consume_accounting
 from accounting.getaccount import getCustomerBalance
 
@@ -43,7 +43,7 @@ async def llm_accounting(request, llmid,
 			raise e
 		resellerid = recs[0].ownerid
 		providerid = recs[0].providerid
-		charges = await pricing_program_charging(sor, recs[0].ppid, usage)
+		charges = await env.pricing_program_charging(sor, recs[0].ppid, usage)
 		trans_amount = trans_cost = 0
 		for c in charges:
 			trans_amount += c.amount
