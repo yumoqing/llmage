@@ -9,7 +9,7 @@ where a.llmcatelogid = b.id
 	and ${biz_date}$ < a.expired_date
 	#and ppid is not NULL
 	and b.name=${lt}$'''
-	biz_date = get_business_date(sor)
+	biz_date = await get_business_date(sor)
 	recs = await sor.sqlExe(sql, {
 		'biz_date': biz_date,
 		'lt': lt
