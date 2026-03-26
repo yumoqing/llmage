@@ -5,7 +5,7 @@ if params_kw.type in ['文生视频', '参考生视频', '图生视频']:
 async with get_sor_context(request._run_ns, 'llmage') as sor:
 	sql = '''select a.*, e.input_fields from llm a, llmcatelog b, upapp c, uapi d, uapiio e
 where a.llmcatelogid = b.id 
-	and a.uappid = c.id
+	and a.upappid = c.id
 	and c.apisetid = d.apisetid
 	and d.ioid = e.id
 	and a.enabled_date <= ${biz_date}$
