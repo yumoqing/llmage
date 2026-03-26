@@ -14,5 +14,13 @@ where a.llmcatelogid = b.id
 		'biz_date': biz_date,
 		'lt': lt
 	})
-	return recs
-return []
+	return {
+		'status': 'ok',
+		'data': recs
+	}
+return {
+	'status': 'error',
+	'data':{
+		'message': 'server error'
+	}
+}
