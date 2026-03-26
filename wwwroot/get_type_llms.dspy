@@ -18,6 +18,8 @@ where a.llmcatelogid = b.id
 		'biz_date': biz_date,
 		'lt': lt
 	})
+	for r in recs:
+		r.input_fields = json.loads(r.input_fields)
 	return {
 		'status': 'ok',
 		'data': recs
