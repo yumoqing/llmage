@@ -7,7 +7,7 @@ async with get_sor_context(request._run_ns, 'llmage') as sor:
 where a.llmcatelogid = b.id 
 	and a.enabled_date <= ${biz_date}$
 	and ${biz_date}$ < a.expired_date
-	#and ppid is not NULL
+	and ppid is not NULL
 	and b.name=${lt}$'''
 	biz_date = await get_business_date(sor)
 	recs = await sor.sqlExe(sql, {
