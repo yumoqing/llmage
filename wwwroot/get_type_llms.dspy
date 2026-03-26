@@ -1,0 +1,18 @@
+
+lt = '文生视频'
+if params_kw.type in ['文生视频', '参考生视频', '图生视频']:
+	lt = params_kw.type
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+	sql = '''select a.* from llm a, llmcatelog b
+where a.llmcatelogid = b.id 
+	and a.enabled_date <= ${biz_date}$
+	and ${biz_date}$ < a.expired_date
+	and ppid is not NULL
+	and b.name=${lt}$'''
+	biz_date = get_business_date(sor)
+	recs = await sor.sqlExe(sql, {
+		'biz_date': biz_date,
+		'lt': lt
+	})
+	return recs
+return []
