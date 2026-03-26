@@ -7,6 +7,7 @@ async with get_sor_context(request._run_ns, 'llmage') as sor:
 where a.llmcatelogid = b.id 
 	and a.upappid = c.id
 	and c.apisetid = d.apisetid
+	and a.apiname = d.name
 	and d.ioid = e.id
 	and a.enabled_date <= ${biz_date}$
 	and ${biz_date}$ < a.expired_date
