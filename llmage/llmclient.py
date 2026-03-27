@@ -110,7 +110,7 @@ async def get_llm(llmid):
 		sql = """select x.*,
 z.input_fields
 from (
-select a.*, e.ioid, e.stream
+select a.*, e.ioid, e.callbackurl, e.stream
 from llm a, upapp c, uapiset d, uapi e
 where a.upappid = c.id
 	and c.apisetid = d.id
@@ -176,15 +176,19 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 	txt = ''
 	luid = getID()
 	try:
-		t1 = time.time()
-		t2 = t1
-		t3 = t1
+		start_timestamp = time.time()
+		responsed_seconds = None
+		finish_seconds = None
+		t2 = start_timestamp
+		t3 = start_timestamp
 		first = True
+		usage = None
 		async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, 
 					params=params_kw):
 			if first:
 				first = False
 				t2 = time.time() 
+				responsed_seconds = t2 - start_timestamp
 			if isinstance(l, bytes):
 				l = l.decode('utf-8')
 			if l[-1] == '\n':
@@ -205,13 +209,17 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 				if d.get('content'):
 					txt = txt + d['content']
 					yield_it = True
+				if d.get('usage'):
+					usage = d['usage']
 				d['llmusageid'] = luid
 				outlines.append(d)
 				yield json.dumps(d) + '\n'
-		usage = outlines[-1].get('usage',{})
+		if usage is None:
+			error(f'{llm=} response has not usage')
 		t3 = time.time()
-		usage['response_time'] = t2 - t1
-		usage['finish_time'] = t3 - t1
+		finish_seconds = t3 - start_timestamp
+		if responsed_seconds is None:
+			responsed_seconds = finish_seconds
 		if not usage.get('completion_tokens'):
 			usage['completion_tokens'] = len(txt)
 		if not usage.get('prompt_tokens'):
@@ -221,7 +229,29 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 			if params_kw.negitive_prompt:
 				cnt += len(params_kw.negitive_promot)
 			usage['prompt_tokens'] = cnt
-		u = await write_llmusage(luid, llm, callerid, usage, params_kw, outlines, sor)
+		llmusage = DictObject()
+		llmusage.id = luid
+		llmusage.llmid = llm.id
+		llmusage.use_date = curDateString()
+		llmusage.use_time = timestampstr()
+		llmusage.userid = callerid
+		llmusage.usage = json.dumps(usage)
+		llmusage.ioinfo = json.dumps({
+			"input": params_kw,
+			"output": outlines
+		})
+		llmusage.transno = params_kw.transno
+		llmusage.responsed_seconds = responsed_seconds
+		llmusage.finish_seconds = finish_seconds
+		llmusage.status = 'SUCCEEDED'
+		if llm.ppid and callerorgid:
+			chargings = await llm_query_price(llm.ppid, usage)
+		else:
+			llmusage.amount = 0
+			llmusage.cost = 0
+		llmusage.userorgid = callerorgid
+		llmusage.ownerid = llm.orgid
+		await sor.C('llmusage', llmusage)
 		if llm.ppid and callerorgid != llm.ownerid:
 			debug(f'{usage=},{llm.ownerid=},{callerorgid=}')
 			await llm_accounting(request, llm.id, usage, callerorgid, callerid)
