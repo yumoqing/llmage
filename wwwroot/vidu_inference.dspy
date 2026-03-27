@@ -11,21 +11,5 @@ userorgid = await get_userorgid()
 if userid is None:
 	return UiError(title='llm inference', message='Please login first')
 f = await checkCustomerBalance(params_kw.llmid, userorgid)
-kdbids = params_kw.kdbids
-if kdbids:
-	data = {
-		'prompt': params_kw.prompt
-	}
-	params = {
-		'query': params_kw.prompt,
-		'fiids': params_kw.kdbids,
-		'limit': params_kw.recall_cnt
-	}
-	tmpl = params_kw.prompt_tmpl
-	ret = await rfexe('fusedsearch', request, params)
-	data.update(ret)
-	params_kw.prompt = await tmpl_engine.renders(tmpl, data)
-	debug(f'{params=}rag return {data}, {params_kw.prompt=}')
-
 env = DictObject(**globals())
 return await inference(request, env=env)
