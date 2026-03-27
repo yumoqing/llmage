@@ -438,5 +438,5 @@ async def llm_query_price(llmid, config_data):
 			e = Exception(f'{llm=} ppid is None')
 			exception(f'{e}')
 			raise e
-		prices = env.pricing_program_charging(sor, llm.ppid, config_data)
+		prices = await env.pricing_program_charging(sor, llm.ppid, config_data)
 		return prices
