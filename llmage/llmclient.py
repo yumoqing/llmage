@@ -425,3 +425,18 @@ async def inference(request, *args, params_kw=None, **kw):
 	f = partial(inference_generator, request, *args, params_kw=params_kw, **kw)
 	return await env.stream_response(request, f)
 	
+async def llm_query_price(llmid, config_data):
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		llms = await sor.R('llm', {id': llmid})
+		if not llms:
+			e = Exception(f'id={llmid} llm not founnd')
+			exception(f'{e}')
+			raise e
+		llm = llms[0]
+		if llm.ppid is None:	
+			e = Exception(f'{llm=} ppid is None')
+			exception(f'{e}')
+			raise e
+		prices = env.pricing_program_charging(sor, llm.ppid, config_data)
+		return prices

@@ -8,6 +8,7 @@ from llmage.llmclient import (
 	get_llm, 
 	inference_generator,
 	inference, 
+	llm_query_price,
 	get_llmproviders,
 	get_llms_sort_by_provider,
 	get_llmcatelogs,
@@ -29,6 +30,6 @@ def load_llmage():
 	env.get_llmproviders = get_llmproviders
 	env.get_llms_sort_by_provider = get_llms_sort_by_provider
 	env.keling_token = keling_token
-	
+	env.llm_query_price = llm_query_price
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)

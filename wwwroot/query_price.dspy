@@ -3,5 +3,40 @@ product_id:
 product_type: llm
 config_data:
 """
-
+product_id = params_kw.product_id
+if product_id is None:
+	return {
+		"status": "error",
+		"data": {
+			"message": "need a llmid"
+		}
+	}
+config_data = params_kw.config_data
+if config_data is None:
+	return {
+		"status": "error",
+		"data": {
+			"message": "need a config_data"
+		}
+	}
+try:
+	prices = llm_query_price(product_id, config_data)
+	amount  = 0
+	for p in prices:
+		amount += p.amount
+	return {
+		"status": "ok",
+		"data": {
+			"price": amount
+		}
+	}
+except Exception as e:
+	msg = f'{product_id=}, {config_data=}, {e=}'
+	exception(msg)
+	return {
+		"status": "error",
+		"data": {
+			"message": msg
+		}
+	}
 
