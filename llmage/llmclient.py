@@ -428,7 +428,7 @@ async def inference(request, *args, params_kw=None, **kw):
 async def llm_query_price(llmid, config_data):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
-		llms = await sor.R('llm', {id': llmid})
+		llms = await sor.R('llm', {'id': llmid})
 		if not llms:
 			e = Exception(f'id={llmid} llm not founnd')
 			exception(f'{e}')
