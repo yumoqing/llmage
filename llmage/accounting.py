@@ -7,6 +7,8 @@ from ahserver.serverenv import ServerEnv
 from accounting.consume import consume_accounting
 from accounting.getaccount import getCustomerBalance
 
+async def llm_charging(sor, ppid, userid, usage):
+
 async def checkCustomerBalance(llmid, userorgid):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
