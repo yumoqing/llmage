@@ -149,5 +149,5 @@ where a.upappid=b.id
 async def write_llmusage(llmusage):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
-		await sor.C('llmusage', d)
+		await sor.C('llmusage', llmusage)
 
