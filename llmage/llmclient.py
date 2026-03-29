@@ -308,6 +308,9 @@ async def _inference_generator(request, callerid, callerorgid,
 		if params_kw.nostream and llm.stream == 'stream':
 			llm.stream = 'sync'
 		if llm.stream == 'async':
+			if llm.callbackurl:
+				cb_url = env.entire_url(llm.callbackurl)
+				params_kw.callbackurl = cb_url
 			f = partial(async_uapi_request, request, llm, sor, callerid, callerorgid, params_kw=params_kw)
 		elif llm.stream == 'sync':
 			f = partial(sync_uapi_request, request, llm, sor, callerid, callerorgid, params_kw=params_kw)
