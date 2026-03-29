@@ -25,7 +25,7 @@ where userid=${userid}$
 		recs = await sor.sqlExe(sql, {
 			'date': today,
 			'userid': userid
-		}
+		})
 		return recs
 	return []
 
