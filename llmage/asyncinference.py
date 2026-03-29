@@ -147,10 +147,13 @@ async def query_task_status(request, upappid, apinames, luid, userid, taskid):
 				if rzt.status == 'SUCCEEDED':
 					if llm.ppid:
 						try:
-							chargings = await llm_charging(sor, 
+							charging = await llm_charging(sor, 
 												llm.ppid, llmusage)
-							llmusage.amount = chargings.amount
-							llmusage.cost = chargings.cost
+							if charging:
+								llmusage.amount = charging.amount
+								llmusage.cost = charging.cost
+							else:
+								llmusage.amount = cost = 0.0
 						except Exception as e:
 							e = Exception(f'{llm.pid} charging error{e}')
 							exception(f'{e}')

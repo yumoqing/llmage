@@ -97,8 +97,11 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 		if llm.ppid and callerorgid:
 			try:
 				chargings = await llm_charging(sor, llm.ppid, llmusage)
-				llmusage.amount = chargings.amount
-				llmusage.cost = chargings.cost
+				if chargings:
+					llmusage.amount = chargings.amount
+					llmusage.cost = chargings.cost
+				else:
+					llmusage.amount = llmusage.cost = 0.00
 			except Exception as e:
 				e = Exception(f'{llm.pid} charging error{e}')
 				exception(f'{e}')

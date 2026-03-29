@@ -59,9 +59,12 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 		llmusage.status = 'SUCCEEDED'
 		if llm.ppid:
 			try:
-				chargings = await llm_charging(sor, llm.ppid, llmusage)
-				llmusage.amount = chargings.amount
-				llmusage.cost = chargings.cost
+				charging = await llm_charging(sor, llm.ppid, llmusage)
+				if charging:
+					llmusage.amount = charging.amount
+					llmusage.cost = charging.cost
+				else:
+					llmusage.amount = llmusage.cost = 0.0
 			except Exception as e:
 				e = Exception(f'{llm.pid} charging error{e}')
 				exception(f'{e}')
