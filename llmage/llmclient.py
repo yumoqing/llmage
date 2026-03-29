@@ -353,7 +353,7 @@ async def add_new_llmusage_output(luid, rzt):
 				'input': io.get('input',{}),
 				'output': out
 			})
-			await await sor.U('llmusage', r)
+			await sor.U('llmusage', r)
 			return
 
 async def query_task_status(request, upappid, apinames, luid, userid, taskid):
