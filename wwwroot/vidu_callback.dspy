@@ -1,0 +1,8 @@
+try:
+	r = await asynctask_callbacka('vidu平台', 'taskSTatus', params_kw)
+except Exception as e:
+	exception(f'{e}')
+return json_response({
+		text:'success'
+})
+

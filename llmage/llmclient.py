@@ -5,7 +5,7 @@ from random import randint
 from functools import partial
 from traceback import format_exc
 from sqlor.dbpools import DBPools, get_sor_context
-from appPublic.log import debug, exception
+from appPublic.log import debug, exception, error
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from appPublic.timeUtils import curDateString, timestampstr
@@ -13,7 +13,9 @@ from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
-from llmage.accounting import llm_accounting
+from .asyncinference import async_uapi_request
+from .syncinference import syncinference
+from .accounting import llm_accounting
 
 def erase_apikey(e):
 	e = str(e)
@@ -516,6 +518,23 @@ async def llm_query_price(llmid, config_data):
 		prices = await env.pricing_program_charging(sor, llm.ppid, config_data)
 		return prices
 
+async def add_new_llmusage_output(luid, rzt):
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		recs = await sor.R('llmusage', {'id': luid})
+		if recs:
+			r = recs[0]
+			io = json.loads(r.ioinfo)
+			out = io.get('output', [])
+			out.append(out)
+			io['output'] = out
+			r.ioinfo = json.dumps({
+				'input': io.get('input',{}),
+				'output': out
+			})
+			await await sor.U('llmusage', r)
+			return
+
 async def query_task_status(request, upappid, apinames, luid, userid, taskid):
 	async with get_sor_context(env, 'llmage') as sor:
 		uapi = UAPI(request, sor)
@@ -527,18 +546,29 @@ async def query_task_status(request, upappid, apinames, luid, userid, taskid):
 					b = b.decode('utf-8')
 				d = json.loads(b)
 				rzt = DictObject(**d)
+				await add_new_llmusage_output(luid, rzt)
 				if rzt.status == 'FAILED':
+					return
+				if rzt.status == 'SUCCEEDED':
+					if llm.ppid:
+						try:
+							chargings = await llm_charginng(sor, 
+												llm.ppid, callerid, usage)
+							llmusage.amount = chargings.amount
+							llmusage.cost = chargings.cost
+						except Exception as e:
+							e = Exception(f'{llm.pid} charging error{e}')
+							exception(f'{e}')
+					else:
+						llmusage.amount = 0
+						llmusage.cost = 0
+					await llm_accounting(request, llmusage)
+					
 			except Exception as e:
 				exception(f'{e=},{format_exc()}')
 				estr = erase_apikey(e)
 				recs = sor.R('llmusage', {'id': luid})
-				ed = {"error": f"ERROR:{estr}", "status": "FAILED"}
-				s = json.dumps(ed)
-				s = ''.join(s.split('\n'))
-				outlines.append(ed)
-				yield f'{s}\n'
-				await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
+				ed = {"error": f"ERROR:{estr}", "status": "FAILED", 'taskid': taskid}
+				await add_new_llmusage_output(luid, ed)
 				return
-
-			rzt['llmusageid'] = luid
 
