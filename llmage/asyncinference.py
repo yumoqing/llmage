@@ -97,8 +97,8 @@ async def async_uapi_request(request, llm, sor,
 		yield b
 		await write_llmusage(llmusage)
 		await llm_accounting(request, llmusage)
-		if llm.callbackurl:
-			return
+		# if llm.callbackurl:
+		#	return
 		apinames = [ name.strip() for name in llm.query_apiname.split(',') ]
 		asyncio.create_task(query_task_status(request, llm.upappid, 
 								apinames, luid, userid, d.taskid))
