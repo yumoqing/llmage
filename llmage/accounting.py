@@ -7,7 +7,23 @@ from ahserver.serverenv import ServerEnv
 from accounting.consume import consume_accounting
 from accounting.getaccount import getCustomerBalance
 
-async def llm_charging(sor, ppid, userid, usage):
+async def llm_charging(sor, ppid, llmusage):
+	env = ServerEnv()
+	prices = await env.pricing_program_charging(sor, ppid, llmusage.usage)
+	amount = 0
+	cost = 0
+	for p in prices:
+		amount += p.amount
+		if p.cost:
+			cost += p.cost
+	discount = await env.sor_get_customer_discount(sor, 
+				llmusage.ownerid, 
+				llmusage.userorgid)
+	return DictObject(**{
+		'original_amount': amount,
+		'amount': amount * discount,
+		'cost': cost
+	})
 
 async def checkCustomerBalance(llmid, userorgid):
 	env = ServerEnv()
@@ -29,12 +45,11 @@ async def checkCustomerBalance(llmid, userorgid):
 		return ret
 	return False
 
-async def llm_accounting(request, llmid, 
-			usage, customerid, userid, orderid=None):
+async def llm_accounting(request, llmusage):
 	env = request._run_ns
 	async with get_sor_context(request._run_ns, 'llmage') as sor:
 		sql = "select * from llm where id=${llmid}$"
-		recs = await sor.sqlExe(sql, {'llmid': llmid})
+		recs = await sor.sqlExe(sql, {'llmid': llmusage.llmid})
 		if len(recs) == 0:
 			e = Exception(f'llm not found({llmid})')
 			exception(f'{e}')
@@ -45,29 +60,23 @@ async def llm_accounting(request, llmid,
 			raise e
 		resellerid = recs[0].ownerid
 		providerid = recs[0].providerid
-		charges = await env.pricing_program_charging(sor, recs[0].ppid, usage)
-		trans_amount = trans_cost = 0
-		for c in charges:
-			trans_amount += c.amount
-			trans_cost += c.cost
-		if trans_amount < 0.00001:
-			return
+		trans_amount = llmusage.amount
+		trans_cost = llmusage.cost
 		biz_date = await env.get_business_date(sor)
 		timestamp = env.timestampstr()
-		if orderid is None:
-			orderid = getID()
-			order = {
-				"id": orderid,
-				"customerid": customerid,
-				"resellerid": resellerid,
-				"order_date": biz_date,
-				"order_status": "1",  # accounted
-				"business_op": "PAY",
-				"amount": trans_amount,
-				"userid": userid,
-				"productid": llmid
-			}
-			await sor.C('biz_order', order)
+		orderid = getID()
+		order = {
+			"id": orderid,
+			"customerid": customerid,
+			"resellerid": resellerid,
+			"order_date": biz_date,
+			"order_status": "1",  # accounted
+			"business_op": "PAY",
+			"amount": trans_amount,
+			"userid": userid,
+			"productid": llmid
+		}
+		await sor.C('biz_order', order)
 		orderdetail = {
 			"id": getID(),
 			"orderid": orderid,

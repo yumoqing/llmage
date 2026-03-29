@@ -13,7 +13,7 @@ from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
-from llmage.accounting import llm_accounting, llm_charginng
+from llmage.accounting import llm_accounting, llm_charging
 
 async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None):
 	env = request._run_ns.copy()
@@ -58,7 +58,7 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 		llmusage.status = 'SUCCEEDED'
 		if llm.ppid:
 			try:
-				chargings = await llm_charginng(sor, llm.ppid, callerid, usage)
+				chargings = await llm_charging(sor, llm.ppid, llmusage)
 				llmusage.amount = chargings.amount
 				llmusage.cost = chargings.cost
 			except Exception as e:
