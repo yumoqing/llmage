@@ -1,7 +1,6 @@
 from appPublic.base64_to_file import hex2base64
 from appPublic.registerfunction import RegisterFunction
-from .jimeng import jimeng_auth_headers
-from .keling import keling_token
+from ahserver.serverenv import ServerEnv
 
 from .llmclient import (
 	b64media2url,
@@ -15,8 +14,7 @@ from .llmclient import (
 	get_llms_by_catelog
 )
 from .accounting import checkCustomerBalance
-from .serverenv import ServerEnv
-from asyncinference import (
+from .asyncinference import (
 	get_asynctask_status,
 	get_today_asynctask_list
 )
