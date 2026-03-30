@@ -12,6 +12,7 @@ async with get_sor_context(request._run_ns, 'llmage') as sor:
 		exception(f'{e}')
 		raise e
 	llm = recs[0]
+	userid = sor_sor_get_callerid(sor, llm.ownerid)
 	x = await query_task_status(request, llm.upappid, llm.query_apiname, 
-					llmusage.id, llm.ownerid, taskid)
+					llmusage.id, userid, taskid)
 	
