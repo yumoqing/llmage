@@ -180,11 +180,3 @@ async def query_task_status(request, upappid, apinames, luid, userid, taskid):
 					return
 				await asyncio.sleep(0.1)
 					
-			except Exception as e:
-				exception(f'{e=},{format_exc()}')
-				estr = erase_apikey(e)
-				recs = sor.R('llmusage', {'id': luid})
-				ed = {"error": f"ERROR:{estr}", "status": "FAILED", 'taskid': taskid}
-				await add_new_llmusage_output(luid, ed)
-				return
-
