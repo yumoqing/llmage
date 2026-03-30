@@ -197,11 +197,12 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 							if charging:
 								changed.amount = charging.amount
 								changed.cost = charging.cost
+								debug(f'{changed=},{charging=}')
 							else:
 								changed.amount = cost = 0.0
 						except Exception as e:
 							e1 = Exception(f'{llm.ppid} charging error{e}, {llm.ppid}, {llmusage=}')
-							exception(f'{e1}')
+							exception(f'{e}')
 							changed.amount = changed.cost = 0
 					else:
 						changed.amount = 0
