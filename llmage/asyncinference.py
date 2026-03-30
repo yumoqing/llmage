@@ -134,10 +134,11 @@ async def add_new_llmusage_output(luid, rzt):
 			await sor.U('llmusage', r)
 			return
 
-async def query_task_status(request, upappid, apinames, luid, userid, taskid):
+async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 	env = request._run_ns
 	async with get_sor_context(env, 'llmage') as sor:
 		uapi = UAPI(request, sor)
+		apinames = apiname.split(',')
 		for apiname in apinames:
 			status = 'unknown'
 			while status != 'SUCCEEDED':
