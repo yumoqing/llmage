@@ -67,7 +67,11 @@ async def async_uapi_request(request, llm, sor,
 		start_timestamp = time.time()
 		if llm.callbackurl:
 			params_kw.callbackurl = llm.callbackurl
-		b = await uapi.call(llm.upappid, llm.apiname, userid, params=params_kw)
+		
+		b = None
+		try:
+			b = await uapi.call(llm.upappid, llm.apiname, userid, params=params_kw)
+		except Exception as e:
 		if isinstance(b, bytes):
 			b = b.decode('utf-8')
 		debug(f'task sumbited:{b}')

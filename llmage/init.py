@@ -18,6 +18,7 @@ from .llmclient import (
 from .accounting import checkCustomerBalance
 from .asyncinference import (
 	get_asynctask_status,
+	query_task_status,
 	get_today_asynctask_list
 )
 
@@ -25,6 +26,7 @@ def load_llmage():
 	env = ServerEnv()
 	env.get_today_asynctask_list = get_today_asynctask_list
 	env.get_asynctask_status = get_asynctask_status
+	env.query_task_status = query_task_status
 	env.get_llm = get_llm
 	env.b64media2url = b64media2url
 	env.hex2base64 = hex2base64

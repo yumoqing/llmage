@@ -1,0 +1,18 @@
+taskid = params_kw.taskid
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+	recs = await sor.R('llmusage', {'taskid': taskid})
+	if len(recs) == 0:
+		e = Exception(f'{taskid=} not found in llmusage')
+		exception(f'{e}')
+		raise e
+	llmusage = recs[0]
+request, upappid, apinames, luid, userid, taskid
+	recs = await sor.R('llm', {'id': llmusage.llmid})
+	if len(recs) == 0:
+		e = Exception(f'{llmusage.llmid=} not found in llm')
+		exception(f'{e}')
+		raise e
+	llm = recs[0]
+	x = await query_task_status(request, llm.upappid, llm.query_apiname, 
+					llmusage.id, llm.ownerid, taskid)
+	
