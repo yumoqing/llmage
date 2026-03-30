@@ -51,6 +51,7 @@ async def checkCustomerBalance(llmid, userorgid):
 
 async def llm_accounting(request, llmusage):
 	env = request._run_ns
+	llmid = llmusage.llmid
 	async with get_sor_context(request._run_ns, 'llmage') as sor:
 		sql = "select * from llm where id=${llmid}$"
 		recs = await sor.sqlExe(sql, {'llmid': llmusage.llmid})
@@ -63,6 +64,7 @@ async def llm_accounting(request, llmusage):
 			exception(f'{e}')
 			raise e
 		customerid = llmusage.userorgid
+		userid = llmusage.userid
 		resellerid = recs[0].ownerid
 		providerid = recs[0].providerid
 		trans_amount = llmusage.amount
