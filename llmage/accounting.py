@@ -10,7 +10,7 @@ from accounting.getaccount import getCustomerBalance
 async def llm_charging(sor, ppid, llmusage):
 	env = ServerEnv()
 	prices = await env.pricing_program_charging(sor, ppid, llmusage.usage)
-	if len(prics) == 0:
+	if len(prices) == 0:
 		d = DictObject()
 		d.original_amount = d.amount = d.cost = 0.00
 		return d
