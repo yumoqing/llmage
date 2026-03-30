@@ -41,7 +41,7 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 		if status and status != 'SUCCEEDED':
 			raise Exception(d['error'])
 		responsed_seconds = time.time() - start_timestamp
-		finish_seconds = response_seconds
+		finish_seconds = responsed_seconds
 		llmusage = DictObject()
 		llmusage.id = luid
 		llmusage.llmid = llm.id

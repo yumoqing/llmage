@@ -82,7 +82,7 @@ async def async_uapi_request(request, llm, sor,
 			e = Exception(f'resp={d} not success')
 			raise e
 		responsed_seconds = time.time() - start_timestamp
-		finish_seconds = response_seconds
+		finish_seconds = responsed_seconds
 		llmusage = DictObject()
 		llmusage.id = luid
 		llmusage.llmid = llm.id
