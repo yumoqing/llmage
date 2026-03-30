@@ -78,8 +78,8 @@ async def async_uapi_request(request, llm, sor,
 			b = b.decode('utf-8')
 		debug(f'task submited:{b}')
 		d = DictObject(**json.loads(b))
-		if d.status != 'SUCCEEDED':
-			e = Exception(f'resp={d} not success')
+		if d.status == 'FAILED':
+			e = Exception(f'resp={d} FFAILED')
 			raise e
 		responsed_seconds = time.time() - start_timestamp
 		finish_seconds = responsed_seconds
@@ -89,7 +89,6 @@ async def async_uapi_request(request, llm, sor,
 		llmusage.use_date = curDateString()
 		llmusage.use_time = timestampstr()
 		llmusage.userid = callerid
-		llmusage.usage = json.dumps(usage)
 		llmusage.ioinfo = json.dumps({
 			"input": params_kw
 		})
