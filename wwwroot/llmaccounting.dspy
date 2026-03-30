@@ -1,0 +1,8 @@
+env = request._run_ns
+async with sor_get_context(env, 'llmage') as sor:
+	sql = "select * from llmusage where status='SUCCEEDED' and accounting_status != 'accounted'"
+	recs = sor.sqlExe(sql, {})
+	for r in recs:
+		try:
+			x = await llm_accounting(request, r)
+		except Exception(f'{r.id=} accounting error')
