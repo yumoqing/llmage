@@ -135,7 +135,7 @@ async def add_new_llmusage_output(luid, newd):
 			r.update(newd)
 			await sor.U('llmusage', r)
 			return
-def get_llmusage_last_output(llmusage):
+def get_llmusage_last_output(r):
 	io = json.loads(r.ioinfo)
 	outs = io.get('output', [])
 	if len(outs) == 0:
