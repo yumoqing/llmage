@@ -11,7 +11,7 @@ async def llm_charging(sor, ppid, llmusage):
 	env = ServerEnv()
 	prices = await env.pricing_program_charging(sor, ppid, llmusage.usage)
 	if prices is None:
-		e = Exception(f'{ppid=}, {llmusage.usage=} env.pricing_program_charging() return None')
+		e = Exception(f'{ppid=}, {llmusage.usage=}{llmusage.id=}  env.pricing_program_charging() return None')
 		exception(f'{e}')
 		raise e
 		return None

@@ -9,11 +9,10 @@ async with get_sor_context(env, 'llmage') as sor:
 				e = Exception(f'{r.llmid=} not found in llm')
 				exception(f'{e}')
 				raise e
-			prices = await llm_charging(sor, llms[0].ppid, r)
-			if not prices:
-				e = Exception(f'{llms[0].ppid=}{r=} not price')
-				exception(f'{e}')
-				raise e
+			try:
+				prices = await llm_charging(sor, llms[0].ppid, r)
+			except:
+				continue
 
 			r.amount = prices.amount
 			r.cost = prices.cost
