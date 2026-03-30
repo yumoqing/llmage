@@ -187,13 +187,14 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 							else:
 								changed.amount = cost = 0.0
 						except Exception as e:
-							e = Exception(f'{llm.pid} charging error{e}')
+							e = Exception(f'{llm.pid} charging error{e}, {llm.ppid}, {llmusage=}')
 							exception(f'{e}')
+							changed.amount = changed.cost = 0
 					else:
 						changed.amount = 0
 						changed.cost = 0
 				await add_new_llmusage_output(luid, changed)
-				if llmusage.accounting_status != 'accounted':
+				if llmusage.accounting_status != 'accounted' and changed.amount > 0.00001:
 					await llm_accounting(request, llmusage)
 				status = rzt.status
 				if rzt.status == 'FAILED':
