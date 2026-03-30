@@ -139,6 +139,12 @@ async def add_new_llmusage_output(luid, newd):
 async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 	env = request._run_ns
 	async with get_sor_context(env, 'llmage') as sor:
+		recs = await sor.R('llmusage', {'id': luid})
+		if len(recs) == 0:
+			e = Exception(f'{luid=} is not found in llmusage')
+			exception(f'{e}')
+			raise e
+		llmusage = recs[0]
 		uapi = UAPI(request, sor)
 		apinames = apiname.split(',')
 		for apiname in apinames:
