@@ -135,6 +135,13 @@ async def add_new_llmusage_output(luid, newd):
 			r.update(newd)
 			await sor.U('llmusage', r)
 			return
+def get_llmusage_last_output(llmusage):
+	io = json.loads(r.ioinfo)
+	outs = io.get('output', [])
+	if len(outs) == 0
+		return None
+	d = DictObject(**outs[-1])
+	return d
 
 async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 	env = request._run_ns
@@ -145,6 +152,9 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 			exception(f'{e}')
 			raise e
 		llmusage = recs[0]
+		lastoutout = get_llmusage_last_output(llmusage)
+		if lastoutout and lastoutout.status == 'SUCCEEDED':
+			pass		# return
 		uapi = UAPI(request, sor)
 		apinames = apiname.split(',')
 		for apiname in apinames:
