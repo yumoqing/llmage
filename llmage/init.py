@@ -15,7 +15,12 @@ from .llmclient import (
 	get_llmcatelogs,
 	get_llms_by_catelog
 )
-from .accounting import checkCustomerBalance
+from .accounting import (
+	checkCustomerBalance, 
+	llm_charging,
+	llm_accounting
+)
+
 from .asyncinference import (
 	get_asynctask_status,
 	query_task_status,
@@ -24,6 +29,8 @@ from .asyncinference import (
 
 def load_llmage():
 	env = ServerEnv()
+	env.llm_charging = llm_charging
+	env.llm_accounting = llm_accounting
 	env.get_today_asynctask_list = get_today_asynctask_list
 	env.get_asynctask_status = get_asynctask_status
 	env.query_task_status = query_task_status
