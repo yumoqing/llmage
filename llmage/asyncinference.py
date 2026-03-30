@@ -149,7 +149,6 @@ async def query_task_status(request, upappid, apinames, luid, userid, taskid):
 						b = b.decode('utf-8')
 					d = json.loads(b)
 				except Exception as e:
-					e = Exception(f'{e}')
 					exception(f'{e}')
 					changed = {
 						'status': 'FAILED',
