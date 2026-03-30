@@ -4,6 +4,19 @@ async with get_sor_context(env, 'llmage') as sor:
 	recs = await sor.sqlExe(sql, {})
 	for r in recs:
 		try:
+			llms = await sor.R('llm', {'id': r.llmid})
+			if len(llms) == 0:
+				e = Exception(f'{r.llmid=} not found in llm')
+				exception(f'{e}')
+				raise e
+			prices = await llm_charging(sor, llms[0].ppid, r)
+			if not prices:
+				e = Exception(f'{llms[0].ppid=}{r=} not price')
+				exception(f'{e}')
+				raise e
+
+			r.amount = prices.amount
+			r.cost = prices.cost
 			x = await llm_accounting(request, r)
 		except Exception as e:
 			exception(f'{r.id=} accounting error')
