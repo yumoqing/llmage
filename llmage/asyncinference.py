@@ -180,6 +180,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					'output': rzt
 				})
 				if rzt.status == 'SUCCEEDED':
+					llmusage.usage = rzt['usage']
 					llms = await sor.R('llm', {'id': llmusage.llmid})
 					if len(llms) == 0:
 						e = Exception(f'{llmusage.llmid=} not found in llm')
