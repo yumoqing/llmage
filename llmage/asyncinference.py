@@ -205,8 +205,12 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 						changed.cost = 0
 				await add_new_llmusage_output(luid, changed)
 				if llmusage.accounting_status != 'accounted' and changed.amount > 0.00001:
-					await llm_accounting(request, llmusage)
-					debug(f'{changed=} accounted ')
+					llmusage.amount = changed.amount
+					llmusage.cost   = changed.cost
+					try:
+						await llm_accounting(request, llmusage)
+					except Exception as e:
+						debug(f'{changed=} accounting failed,{e=} ')
 				if changed.status in ['FAILED', 'SUCCEEDED']:
 					return
 				await asyncio.sleep(llm.query_period or 30)
