@@ -163,6 +163,11 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					'output': rzt
 				}
 				if rzt.status == 'SUCCEEDED':
+					llms = await sor.R('llm', {'id': llmusage.llmid})
+					if len(llms) == 0:
+						e = Exception(f'{llmusage.llmid=} not found in llm')
+						exception(f'{e}')
+						raise e
 					if llm.ppid:
 						try:
 							charging = await llm_charging(sor, 
