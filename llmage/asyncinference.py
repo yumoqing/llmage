@@ -135,6 +135,7 @@ async def add_new_llmusage_output(luid, rzt):
 			return
 
 async def query_task_status(request, upappid, apinames, luid, userid, taskid):
+	env = request._run_ns
 	async with get_sor_context(env, 'llmage') as sor:
 		uapi = UAPI(request, sor)
 		for apiname in apinames:
