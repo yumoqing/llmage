@@ -6,7 +6,6 @@ async with get_sor_context(request._run_ns, 'llmage') as sor:
 		exception(f'{e}')
 		raise e
 	llmusage = recs[0]
-request, upappid, apinames, luid, userid, taskid
 	recs = await sor.R('llm', {'id': llmusage.llmid})
 	if len(recs) == 0:
 		e = Exception(f'{llmusage.llmid=} not found in llm')
