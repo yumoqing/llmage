@@ -19,7 +19,7 @@ from .utils import *
 async def get_today_asynctask_list(userid):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
-		today = env.get_business_date(sor)
+		today = await env.get_business_date(sor)
 		sql = '''select * from llmusage 
 where userid=${userid}$ 
 	and use_date = ${date}$'''
