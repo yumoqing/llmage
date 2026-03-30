@@ -152,6 +152,12 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 			exception(f'{e}')
 			raise e
 		llmusage = recs[0]
+		llms = await sor.R('llm', {'id': llmusage.llmid})
+		if len(llms) == 0:
+			e = Exception(f'{llmusage.llmid=} not found in llm')
+			exception(f'{e}')
+			raise e
+		llm = llms[0]
 		lastoutout = get_llmusage_last_output(llmusage)
 		if lastoutout and lastoutout.status == 'SUCCEEDED':
 			return
@@ -182,12 +188,6 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					return
 				if changed.status == 'SUCCEEDED':
 					llmusage.usage = changed.output.usage
-					llms = await sor.R('llm', {'id': llmusage.llmid})
-					if len(llms) == 0:
-						e = Exception(f'{llmusage.llmid=} not found in llm')
-						exception(f'{e}')
-						raise e
-					llm = llms[0]
 					if llm.ppid:
 						try:
 							charging = await llm_charging(sor, 
@@ -210,5 +210,6 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					debug(f'{changed=} accounted ')
 				if changed.status in ['FAILED', 'SUCCEEDED']:
 					return
-				await asyncio.sleep(0.1)
+				await asyncio.sleep(llm.query_period or 30)
+				debug(f'{llm.query_period=} seconds will retry, {changed.status=}')
 					
