@@ -175,11 +175,10 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					}
 					await add_new_llmusage_output(luid, changed)
 					return
-				rzt = DictObject(**d)
-				changed = {
-					'status': rzt.status,
+				changed = DictObject(**{
+					'status': rzt['status'],
 					'output': rzt
-				}
+				})
 				if rzt.status == 'SUCCEEDED':
 					llms = await sor.R('llm', {'id': llmusage.llmid})
 					if len(llms) == 0:
