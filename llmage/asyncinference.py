@@ -117,20 +117,22 @@ async def async_uapi_request(request, llm, sor,
 		yield f'{s}\n'
 		return
 
-async def add_new_llmusage_output(luid, rzt):
+async def add_new_llmusage_output(luid, newd):
 	env = ServerEnv()
+	newd = newd.copy()
 	async with get_sor_context(env, 'llmage') as sor:
 		recs = await sor.R('llmusage', {'id': luid})
 		if recs:
 			r = recs[0]
 			io = json.loads(r.ioinfo)
 			out = io.get('output', [])
-			out.append(rzt)
+			rzt = newd.get('output')
+			if rzt:
+				out.append(rzt)
+				newd = {k:v for k,v in newd.items() if k != 'output'}
 			io['output'] = out
-			r.ioinfo = json.dumps({
-				'input': io.get('input',{}),
-				'output': out
-			})
+			r.ioinfo = json.dumps(io)
+			r.update(newd)
 			await sor.U('llmusage', r)
 			return
 
@@ -183,7 +185,8 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					else:
 						changed.amount = 0
 						changed.cost = 0
-					await add_new_llmusage_output(luid, changed)
+				await add_new_llmusage_output(luid, changed)
+				if llmusage.accounting_status != 'accounted':
 					await llm_accounting(request, llmusage)
 				status = rzt.status
 				if rzt.status == 'FAILED':

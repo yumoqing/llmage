@@ -123,4 +123,6 @@ async def llm_accounting(request, llmusage):
 		}
 		ais.append(ai1)
 		await consume_accounting(sor, orderid, ais)
+		llmusage.accounting_status = 'accounted'
+		await sor.U('llmusage', llmusage)
 
