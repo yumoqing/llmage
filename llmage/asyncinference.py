@@ -159,6 +159,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 		apinames = apiname.split(',')
 		for apiname in apinames:
 			status = 'unknown'
+			changed = None
 			while status != 'SUCCEEDED':
 				ns = {'taskid': taskid}
 				d = None
@@ -167,6 +168,10 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					if isinstance(b, bytes):
 						b = b.decode('utf-8')
 					d = json.loads(b)
+					changed = DictObject(**{
+						'status': d['status'],
+						'output': d
+					})
 				except Exception as e:
 					exception(f'{e}')
 					changed = {
@@ -175,12 +180,8 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					}
 					await add_new_llmusage_output(luid, changed)
 					return
-				changed = DictObject(**{
-					'status': rzt['status'],
-					'output': rzt
-				})
-				if rzt.status == 'SUCCEEDED':
-					llmusage.usage = rzt['usage']
+				if changed.status == 'SUCCEEDED':
+					llmusage.usage = changed.output.usage
 					llms = await sor.R('llm', {'id': llmusage.llmid})
 					if len(llms) == 0:
 						e = Exception(f'{llmusage.llmid=} not found in llm')
@@ -206,8 +207,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 				await add_new_llmusage_output(luid, changed)
 				if llmusage.accounting_status != 'accounted' and changed.amount > 0.00001:
 					await llm_accounting(request, llmusage)
-				status = rzt.status
-				if rzt.status == 'FAILED':
+				if changed.status == 'FAILED':
 					return
 				await asyncio.sleep(0.1)
 					
