@@ -138,7 +138,7 @@ async def add_new_llmusage_output(luid, newd):
 def get_llmusage_last_output(llmusage):
 	io = json.loads(r.ioinfo)
 	outs = io.get('output', [])
-	if len(outs) == 0
+	if len(outs) == 0:
 		return None
 	d = DictObject(**outs[-1])
 	return d
