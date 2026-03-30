@@ -1,0 +1,8 @@
+userid = await get_userid()
+tasks = await get_today_asynctask_list(userrid)
+return {
+	'status': 'ok',
+	'data': {
+		'tasks': tasks
+	}
+}

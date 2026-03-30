@@ -19,7 +19,7 @@ from .utils import *
 async def get_today_asynctask_list(userid):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
-		today = getCurrentDate()
+		today = env.get_business_date(sor)
 		sql = '''select * from llmusage 
 where userid=${userid}$ 
 	and use_date = ${date}$'''
@@ -121,7 +121,7 @@ async def add_new_llmusage_output(luid, rzt):
 			r = recs[0]
 			io = json.loads(r.ioinfo)
 			out = io.get('output', [])
-			out.append(out)
+			out.append(rzt)
 			io['output'] = out
 			r.ioinfo = json.dumps({
 				'input': io.get('input',{}),
@@ -134,33 +134,51 @@ async def query_task_status(request, upappid, apinames, luid, userid, taskid):
 	async with get_sor_context(env, 'llmage') as sor:
 		uapi = UAPI(request, sor)
 		for apiname in apinames:
-			try:
+			status = 'unknown'
+			while status != 'SUCCEEDED':
 				ns = {'taskid': taskid}
-				b = await uapi.call(upappid, apiname, userid, params=ns)
-				if isinstance(b, bytes):
-					b = b.decode('utf-8')
-				d = json.loads(b)
-				rzt = DictObject(**d)
-				await add_new_llmusage_output(luid, rzt)
-				if rzt.status == 'FAILED':
+				d = None
+				try:
+					b = await uapi.call(upappid, apiname, userid, params=ns)
+					if isinstance(b, bytes):
+						b = b.decode('utf-8')
+					d = json.loads(b)
+				except Exception as e:
+					e = Exception(f'{e}')
+					exception(f'{e}')
+					changed = {
+						'status': 'FAILED',
+						'output': {'status': 'FAILED', 'error': str(e)}
+					}
+					await add_new_llmusage_output(luid, changed)
 					return
+				rzt = DictObject(**d)
+				changed = {
+					'status': rzt.status,
+					'output': rzt
+				}
 				if rzt.status == 'SUCCEEDED':
 					if llm.ppid:
 						try:
 							charging = await llm_charging(sor, 
 												llm.ppid, llmusage)
 							if charging:
-								llmusage.amount = charging.amount
-								llmusage.cost = charging.cost
+								changed.amount = charging.amount
+								changed.cost = charging.cost
 							else:
-								llmusage.amount = cost = 0.0
+								changed.amount = cost = 0.0
 						except Exception as e:
 							e = Exception(f'{llm.pid} charging error{e}')
 							exception(f'{e}')
 					else:
-						llmusage.amount = 0
-						llmusage.cost = 0
+						changed.amount = 0
+						changed.cost = 0
+					await add_new_llmusage_output(luid, changed)
 					await llm_accounting(request, llmusage)
+				status = rzt.status
+				if rzt.status == 'FAILED':
+					return
+				await asyncio.sleep(0.1)
 					
 			except Exception as e:
 				exception(f'{e=},{format_exc()}')

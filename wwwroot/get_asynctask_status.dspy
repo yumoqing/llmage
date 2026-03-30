@@ -1,0 +1,8 @@
+taskid = params_kw.taskid
+s = await get_asynctask_status(taskid)
+return {
+	'status': 'ok',
+	'data': {
+		'resposne': s
+	}
+}
