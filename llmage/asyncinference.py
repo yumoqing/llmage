@@ -72,9 +72,11 @@ async def async_uapi_request(request, llm, sor,
 		try:
 			b = await uapi.call(llm.upappid, llm.apiname, userid, params=params_kw)
 		except Exception as e:
+			exception(f'{e}')
+			raise e
 		if isinstance(b, bytes):
 			b = b.decode('utf-8')
-		debug(f'task sumbited:{b}')
+		debug(f'task submited:{b}')
 		d = DictObject(**json.loads(b))
 		if d.status != 'SUCCEEDED':
 			e = Exception(f'resp={d} not success')
