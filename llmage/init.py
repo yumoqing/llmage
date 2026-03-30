@@ -1,6 +1,8 @@
 from appPublic.base64_to_file import hex2base64
 from appPublic.registerfunction import RegisterFunction
 from ahserver.serverenv import ServerEnv
+from .keling import keling_token
+from .jimeng import jimeng_auth_headers
 
 from .llmclient import (
 	b64media2url,
