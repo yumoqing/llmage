@@ -102,7 +102,6 @@ async def async_uapi_request(request, llm, sor,
 		b = json.dumps(d, ensure_ascii=False)
 		yield b
 		await write_llmusage(llmusage)
-		await llm_accounting(request, llmusage)
 		# if llm.callbackurl:
 		#	return
 		apinames = [ name.strip() for name in llm.query_apiname.split(',') ]
