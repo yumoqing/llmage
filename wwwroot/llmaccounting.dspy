@@ -5,4 +5,5 @@ async with sor_get_context(env, 'llmage') as sor:
 	for r in recs:
 		try:
 			x = await llm_accounting(request, r)
-		except Exception(f'{r.id=} accounting error')
+		except Exception as e:
+			exception(f'{r.id=} accounting error')
