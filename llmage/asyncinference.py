@@ -78,9 +78,6 @@ async def async_uapi_request(request, llm, sor,
 			b = b.decode('utf-8')
 		debug(f'task submited:{b}')
 		d = DictObject(**json.loads(b))
-		if d.status == 'FAILED':
-			e = Exception(f'resp={d} FFAILED')
-			raise e
 		responsed_seconds = time.time() - start_timestamp
 		finish_seconds = responsed_seconds
 		llmusage = DictObject()
@@ -90,22 +87,28 @@ async def async_uapi_request(request, llm, sor,
 		llmusage.use_time = timestampstr()
 		llmusage.userid = callerid
 		llmusage.ioinfo = json.dumps({
-			"input": params_kw
+			"input": params_kw,
+			'output': [d]
 		})
 		llmusage.taskid = d.taskid
 		llmusage.transno = params_kw.transno
 		llmusage.responsed_seconds = responsed_seconds
 		llmusage.finish_seconds = finish_seconds
-		llmusage.status = 'CREATED'
+		llmusage.status = d.status
 		llmusage.userorgid = callerorgid
 		llmusage.ownerid = llm.orgid
+		llmusage.accounting_status = 'created'
 		b = json.dumps(d, ensure_ascii=False)
 		yield b
 		await write_llmusage(llmusage)
 		# if llm.callbackurl:
 		#	return
+		if d.status == 'FAILED':
+			e = Exception(f'resp={d} FFAILED')
+			raise e
 		asyncio.create_task(query_task_status(request, llm.upappid, 
 								llm.query_apiname, luid, userid, d.taskid))
+		yield d
 
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')

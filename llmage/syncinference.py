@@ -37,7 +37,7 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 			b = b.decode('utf-8')
 		d = json.loads(b)
 		status = d.get('status')
-		usage = d.get('usage', {})
+		usage = d.get('usage')
 		if status and status != 'SUCCEEDED':
 			raise Exception(d['error'])
 		responsed_seconds = time.time() - start_timestamp
@@ -51,7 +51,7 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 		llmusage.usage = json.dumps(usage)
 		llmusage.ioinfo = json.dumps({
 			"input": params_kw,
-			"output": d
+			"output": [d]
 		})
 		llmusage.transno = params_kw.transno
 		llmusage.responsed_seconds = responsed_seconds
@@ -77,7 +77,8 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 		b = json.dumps(d, ensure_ascii=False)
 		yield b
 		await write_llmusage(llmusage)
-		await llm_accounting(request, llmusage)
+		if llmusage.amount > 0.0001:
+			await llm_accounting(request, llmusage)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)

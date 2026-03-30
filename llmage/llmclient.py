@@ -105,6 +105,7 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 			except Exception as e:
 				e = Exception(f'{llm.pid} charging error{e}')
 				exception(f'{e}')
+			llmusage.amount = llmusage.cost = 0
 		else:
 			llmusage.amount = 0
 			llmusage.cost = 0
@@ -112,7 +113,8 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 		llmusage.ownerid = llm.orgid
 		llmusage.accounting_status = 'created'
 		await write_llmusage(llmusage)
-		await llm_accounting(request, llmusage)
+		if llmusage.amount > 0.0001:
+			await llm_accounting(request, llmusage)
 
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
