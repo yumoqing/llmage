@@ -154,7 +154,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 		llmusage = recs[0]
 		lastoutout = get_llmusage_last_output(llmusage)
 		if lastoutout and lastoutout.status == 'SUCCEEDED':
-			pass		# return
+			return
 		uapi = UAPI(request, sor)
 		apinames = apiname.split(',')
 		for apiname in apinames:
@@ -207,7 +207,8 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 				await add_new_llmusage_output(luid, changed)
 				if llmusage.accounting_status != 'accounted' and changed.amount > 0.00001:
 					await llm_accounting(request, llmusage)
-				if changed.status == 'FAILED':
+					debug(f'{changed=} accounted ')
+				if changed.status in ['FAILED', 'SUCCEEDED']:
 					return
 				await asyncio.sleep(0.1)
 					
