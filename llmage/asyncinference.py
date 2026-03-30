@@ -176,6 +176,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 						e = Exception(f'{llmusage.llmid=} not found in llm')
 						exception(f'{e}')
 						raise e
+					llm = llms[0]
 					if llm.ppid:
 						try:
 							charging = await llm_charging(sor, 
