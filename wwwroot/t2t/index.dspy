@@ -13,11 +13,6 @@ if userid is None:
 	d = return_error('Authoration Error')
 	return json_response(d, status=401)
 		
-f = await checkCustomerBalance(params_kw.llmid, userorgid)
-if not f:
-	d = return_error('InsufficientFunds')
-	return json_response(d, status=400)
-
 if not params_kw.prompt:
 	d = return_error('Missing need data(prompt)')
 	return json_response(d, status=400)
@@ -35,6 +30,11 @@ where a.llmcatelogid=b.id
 		d = return_error(f'{params_kw.model} not found')
 		return json_response(d, status=400)
 	params_kw.llmid = recs[0].id
+
+f = await checkCustomerBalance(params_kw.llmid, userorgid)
+if not f:
+	d = return_error('InsufficientFunds')
+	return json_response(d, status=400)
 
 env = DictObject(**globals())
 return await inference(request, env=env)
