@@ -48,6 +48,7 @@ async def checkCustomerBalance(llmid, userorgid):
 		ret = llm.ppid and llm.min_balance < bal
 		debug(f'{llms=},{userorgid=},{balance=},{ret=}')
 		return ret
+	debug(f'{userorgid=} checkCustomerBalance() failed')
 	return False
 
 async def llm_accounting(request, llmusage):
