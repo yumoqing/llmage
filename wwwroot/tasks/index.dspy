@@ -1,0 +1,12 @@
+taskid = params_kw.taskid
+userid = await get_user()
+if userid is None:
+	return openai_403
+	
+s = await get_asynctask_status(taskid)
+return {
+	'status': 'ok',
+	'data': {
+		'resposne': s
+	}
+}

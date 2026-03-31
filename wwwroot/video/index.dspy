@@ -1,0 +1,25 @@
+params_kw.action = 't2v'
+lctype =
+userid = await get_user()
+if userid is None:
+	return openai_403
+
+if params_kw.model is None:
+	return openai_400()
+
+llms = await get_llm_by_model(params_kw.model)
+if llms is None:
+	debug(f'{params_kw.model=} not found in llm with error')
+	return openai_400()
+if len(llms) == 0:
+	debug(f'{params_kw.model=} not found in llm')
+	return openai_400()
+	
+f = await checkCustomerBalance(params_kw.llmid, userorgid)
+if not f:
+    return openai_429()
+
+model = params_kw.model
+env = request._run_ns
+async with get_sor.context(env, 'llmage') as sor:
+
