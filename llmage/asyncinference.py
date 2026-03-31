@@ -181,7 +181,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 						'output': d
 					})
 				except Exception as e:
-					exception(f'{e}')
+					exception(f'{e}, {b=}')
 					changed = {
 						'status': 'FAILED',
 						'output': {'status': 'FAILED', 'error': str(e)}
