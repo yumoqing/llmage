@@ -12,8 +12,8 @@ userorgid = await get_userorgid()
 if userid is None:
 	return openai_403()
 		
-if not params_kw.prompt:
-	d = return_error('Missing need data(prompt)')
+if not params_kw.prompt and not params_kw.messages:
+	d = return_error('Missing need data(prompt or messages)')
 	return json_response(d, status=400)
 env = request._run_ns
 async with get_sor_context(env, 'llmage') as sor:
