@@ -57,6 +57,7 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 		llmusage.responsed_seconds = responsed_seconds
 		llmusage.finish_seconds = finish_seconds
 		llmusage.status = 'SUCCEEDED'
+		llmusage.amount = llmusage.cost = 0.00
 		if llm.ppid:
 			try:
 				charging = await llm_charging(sor, llm.ppid, llmusage)
