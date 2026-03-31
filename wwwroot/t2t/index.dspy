@@ -16,7 +16,7 @@ if userid is None:
 if not params_kw.prompt:
 	d = return_error('Missing need data(prompt)')
 	return json_response(d, status=400)
-env = ServerEnv()
+env = request._run_ns
 async with get_sor_context(env, 'llmage') as sor:
 	sql = """select a.* from llm a, llmcatelog b 
 where a.llmcatelogid=b.id
