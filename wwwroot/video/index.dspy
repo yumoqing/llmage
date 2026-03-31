@@ -14,6 +14,8 @@ if llms is None:
 if len(llms) == 0:
 	debug(f'{params_kw.model=} not found in llm')
 	return openai_400()
+llm = llms[0]
+params_kw.llmid = llm.id
 	
 f = await checkCustomerBalance(params_kw.llmid, userorgid)
 if not f:
