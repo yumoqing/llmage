@@ -181,7 +181,7 @@ async def _inference_generator(request, callerid, callerorgid,
 				cb_url = env.entire_url(llm.callbackurl)
 				params_kw.callbackurl = cb_url
 			f = partial(async_uapi_request, request, llm, sor, callerid, callerorgid, params_kw=params_kw)
-		elif not params.stream:
+		elif not params_kw.stream:
 			f = partial(sync_uapi_request, request, llm, sor, callerid, callerorgid, params_kw=params_kw)
 		# env.update(llm)
 		else:
