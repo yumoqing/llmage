@@ -33,7 +33,7 @@ where userid=${userid}$
 async def get_asynctask_status(taskid):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
-		recs = sor.R('llmusage', {'taskid', taskid})
+		recs = await sor.R('llmusage', {'taskid', taskid})
 		if recs:
 			r = recs[0]
 			io = json.loads(r.ioinfo)
