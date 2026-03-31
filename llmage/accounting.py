@@ -40,13 +40,14 @@ async def checkCustomerBalance(llmid, userorgid):
 			raise e
 		llm = llms[0].copy()
 		if llm.ownerid == userorgid:
+			debug(f'self orgid user')
 			return True
 		balance = await getCustomerBalance(sor, userorgid)
 		bal = 0 if balance is None else balance
 		if llm.min_balance is None:
 			llm.min_balance = 0.00
+		debug(f'{userorgid=}, {balance=}, {llm.min_balance=}, {llm.ppid=}')
 		ret = llm.ppid and llm.min_balance < bal
-		debug(f'{llms=},{userorgid=},{balance=},{ret=}')
 		return ret
 	debug(f'{userorgid=} checkCustomerBalance() failed')
 	return False
