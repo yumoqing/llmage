@@ -32,7 +32,7 @@ from .asyncinference import (
 
 def load_llmage():
 	env = ServerEnv()
-	eng.get_llm_by_model = get_llm_by_model
+	env.get_llm_by_model = get_llm_by_model
 	env.llm_charging = llm_charging
 	env.llm_accounting = llm_accounting
 	env.get_today_asynctask_list = get_today_asynctask_list
