@@ -11,5 +11,12 @@ userorgid = await get_userorgid()
 if userid is None:
 	return UiError(title='llm inference', message='Please login first')
 f = await checkCustomerBalance(params_kw.llmid, userorgid)
+if not f:
+	return {
+		"status": "error",
+		"data": {
+			"message": "账户余额不够"
+		}
+	}
 env = DictObject(**globals())
 return await inference(request, env=env)
