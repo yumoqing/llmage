@@ -1,0 +1,26 @@
+debug(f'{params_kw=}')
+if params_kw.off_peak:
+    off_peak = params_kw.off_peak
+    if off_peak in [True, "Y" "y", 1, "1"]:
+        off_peak = True
+    else:
+        off_peak = False
+    params_kw.off_peak = off_peak
+userid = await get_user()
+userorgid = await get_userorgid()
+if userid is None:
+	d = return_error('Authoration Error')
+    return json_response(d, status=401)
+		
+f = await checkCustomerBalance(params_kw.llmid, userorgid)
+if not f:
+	d = return_error('InsufficientFunds')
+	return json_response(d, status=400)
+
+if not params_kw.prompt:
+	d = return_error('Missing need data(prompt)')
+	return json_response(d, status=400)
+
+env = DictObject(**globals())
+return await inference(request, env=env)
+
