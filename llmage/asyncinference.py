@@ -72,8 +72,11 @@ async def async_uapi_request(request, llm, sor,
 		try:
 			b = await uapi.call(llm.upappid, llm.apiname, userid, params=params_kw)
 		except Exception as e:
-			exception(f'{e}')
-			raise e
+			estr = erase_apikey(e)
+			ed = {"error": f"ERROR:{estr}", "status": "FAILED"}
+			exception(f'{ed}')
+			yield f'{ed}\n'
+			return
 		if isinstance(b, bytes):
 			b = b.decode('utf-8')
 		debug(f'task submited:{b}')
@@ -89,7 +92,7 @@ async def async_uapi_request(request, llm, sor,
 		llmusage.ioinfo = json.dumps({
 			"input": params_kw,
 			'output': [d]
-		})
+		}, ensure_ascii=False)
 		llmusage.taskid = d.taskid
 		llmusage.transno = params_kw.transno
 		llmusage.responsed_seconds = responsed_seconds
@@ -105,17 +108,15 @@ async def async_uapi_request(request, llm, sor,
 		#	return
 		if d.status == 'FAILED':
 			e = Exception(f'resp={d} FFAILED')
-			raise e
+			return
 		asyncio.create_task(query_task_status(request, llm.upappid, 
 								llm.query_apiname, luid, userid, d.taskid))
-		yield d
 
 	except Exception as e:
-		exception(f'{e=},{format_exc()}')
-		estr = erase_apikey(e)
-		ed = {"error": f"ERROR:{estr}", "status": "FAILED"}
-		s = json.dumps(ed)
+		ed = {"error": f"ERROR:{e}", "status": "FAILED"}
+		s = json.dumps(ed, ensure_ascii=False)
 		s = ''.join(s.split('\n'))
+		exception(s)
 		yield f'{s}\n'
 		return
 
