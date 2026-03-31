@@ -1,4 +1,5 @@
 debug(f'{params_kw=}')
+lctype='文生文'
 if params_kw.off_peak:
 	off_peak = params_kw.off_peak
 	if off_peak in [True, "Y" "y", 1, "1"]:
@@ -20,6 +21,20 @@ if not f:
 if not params_kw.prompt:
 	d = return_error('Missing need data(prompt)')
 	return json_response(d, status=400)
+env = ServerEnv()
+async with get_sor_context(env, 'llmage') as sor:
+	sql = """select a.* from llm a, llmcatelog b 
+where a.llmcatelogid=b.id
+	and a.model=${model}$
+	and b.name = ${lctype}$"""
+	recs = await sor.sqlExe(sql, {
+		'lctype': lctype, 
+		'model': params_kw.model or 'qwen3-max'
+	})
+	if len(recs) == 0:
+		d = return_error(f'{params_kw.model} not found')
+		return json_response(d, status=400)
+	params_kw.llmid = recs[0].id
 
 env = DictObject(**globals())
 return await inference(request, env=env)
