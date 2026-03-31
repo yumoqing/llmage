@@ -1,5 +1,8 @@
 userid = await get_user()
 tasks = await get_today_asynctask_list(userid)
+for t in tasks:
+	t.ioinfo = json.loads(t.ioinfo)
+
 return {
 	'status': 'ok',
 	'data': {
