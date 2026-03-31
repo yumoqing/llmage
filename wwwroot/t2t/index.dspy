@@ -10,8 +10,7 @@ if params_kw.off_peak:
 userid = await get_user()
 userorgid = await get_userorgid()
 if userid is None:
-	d = return_error('Authoration Error')
-	return json_response(d, status=401)
+	return openai_403()
 		
 if not params_kw.prompt:
 	d = return_error('Missing need data(prompt)')
@@ -27,14 +26,12 @@ where a.llmcatelogid=b.id
 		'model': params_kw.model or 'qwen3-max'
 	})
 	if len(recs) == 0:
-		d = return_error(f'{params_kw.model} not found')
-		return json_response(d, status=400)
+		return openai_400()
 	params_kw.llmid = recs[0].id
 
 f = await checkCustomerBalance(params_kw.llmid, userorgid)
 if not f:
-	d = return_error('InsufficientFunds')
-	return json_response(d, status=400)
+	return openai_429()
 
 env = DictObject(**globals())
 return await inference(request, env=env)
