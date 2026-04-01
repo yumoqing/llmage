@@ -3,7 +3,7 @@ userid = await get_user()
 if userid is None:
 	return openai_403
 	
-s = await grab_task_status(taskid)
+s = await grab_task_status(request, taskid)
 return {
 	'status': 'ok',
 	'data': {
