@@ -17,14 +17,14 @@ from .accounting import llm_accounting, llm_charging
 from .utils import *
 
 async def grab_task_status(request, taskid):
-    env = ServerEnv()
-    llm = llmusage = None
+	env = ServerEnv()
+	llm = llmusage = None
 	async with get_sor_context(env, 'llmage') as sor:
-        recs = await sor.R('llmusage', {'taskid': taskid})
-        if len(recs) == 0:
+		recs = await sor.R('llmusage', {'taskid': taskid})
+		if len(recs) == 0:
 			exception(f'{taskid=} not found in llmusage')
 			return None
-        r = recs[0]
+		r = recs[0]
 		if r.status == 'SUCCEEDED':
 			io = json.loads(r.ioinfo)
 			return io['output'][-1]
@@ -57,8 +57,8 @@ async def grab_task_status(request, taskid):
 					if changed.output.video:
 						break;
 					x = await uapi.call(llm.upappid, apiname[1], userid, params=d)
-                    g = json.load(x)
-                    if g.get('video'):
+					g = json.load(x)
+					if g.get('video'):
 						changed.output.video = g.get('video')
 						break
 					await asyncio.sleep(0.2)
