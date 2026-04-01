@@ -1,3 +1,14 @@
+async def gen():
+	env = request._run_ns.copy()
+    f = partial(inference_generator, request, *args, params_kw=params_kw, **kw)
+    if params_kw.stream:
+		async for l in f():
+			yield b'data: ' + l + b'\n'
+		yield b'data: [DONE]'
+	else:
+		async for l in f():
+			yield l
+
 debug(f'{params_kw=}')
 lctype='文生文'
 if params_kw.off_peak:
@@ -33,6 +44,7 @@ f = await checkCustomerBalance(params_kw.llmid, userorgid)
 if not f:
 	return openai_429()
 
+return await env.stream_response(request, gen)
 env = DictObject(**globals())
 return await inference(request, env=env)
 
