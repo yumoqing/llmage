@@ -64,7 +64,7 @@ async def grab_task_status(request, taskid):
 					await asyncio.sleep(0.2)
 
 		except Exception as e:
-			exception(f'{e}, {b=}')
+			exception(f'{e}')
 			changed = {
 				'status': 'FAILED',
 				'output': {'status': 'FAILED', 'error': str(e)}
