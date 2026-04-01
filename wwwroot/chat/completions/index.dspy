@@ -1,7 +1,7 @@
 async def gen():
 	env = request._run_ns.copy()
-    f = partial(inference_generator, request, *args, params_kw=params_kw, **kw)
-    if params_kw.stream:
+	f = partial(inference_generator, request, *args, params_kw=params_kw, **kw)
+	if params_kw.stream:
 		async for l in f():
 			yield b'data: ' + l + b'\n'
 		yield b'data: [DONE]'
