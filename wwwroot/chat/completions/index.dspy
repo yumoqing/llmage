@@ -3,8 +3,8 @@ async def gen():
 	f = partial(inference_generator, request, params_kw=params_kw)
 	if params_kw.stream:
 		async for l in f():
-			yield b'data: ' + l + b'\n'
-		yield b'data: [DONE]'
+			yield f'data: {l}\n'
+		yield 'data: [DONE]\n'
 	else:
 		async for l in f():
 			yield l
