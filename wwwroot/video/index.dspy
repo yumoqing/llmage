@@ -1,4 +1,6 @@
 userid = await get_user()
+userorgid = await get_userorgid()
+
 if userid is None:
 	return openai_403
 
