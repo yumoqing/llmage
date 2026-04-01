@@ -137,7 +137,10 @@ async def add_new_llmusage_output(luid, newd):
 			r.ioinfo = json.dumps(io)
 			r.update(newd)
 			await sor.U('llmusage', r)
+			debug(f'llmuasage update to {r}')
 			return
+	exception(f'add_new_llmusage_output({luid}, {newd}) Error')
+
 def get_llmusage_last_output(r):
 	io = json.loads(r.ioinfo)
 	outs = io.get('output', [])
