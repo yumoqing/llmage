@@ -25,7 +25,7 @@ async def grab_task_status(request, taskid):
 			exception(f'{taskid=} not found in llmusage')
 			return {"status": "FAILED", "error": f"{taskid} not exist"}
 		r = recs[0]
-		if r.status == 'SUCCEEDED':
+		if r.status in [ 'SUCCEEDED', 'FAILED' ]:
 			io = json.loads(r.ioinfo)
 			return io['output'][-1]
 		llmusage = r
