@@ -39,7 +39,7 @@ async def grab_task_status(request, taskid):
 	if llm is None:
 		e = Exception(f'id={r.llmid} Error happend!')
 		exception(f'{e}')
-		return {"status": "FAILED", "error": f"{taskid} {r.llmid=} {e}")
+		return {"status": "FAILED", "error": f"{taskid} {r.llmid=} {e}" }
 
 	async with get_sor_context(env, 'llmage') as sor:
 		uapi = UAPI(request, sor)
