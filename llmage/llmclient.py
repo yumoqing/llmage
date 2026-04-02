@@ -141,11 +141,11 @@ def b64media2url(request, mediafile):
 		except Exception as e:
 			e = Exception(f'{e}\n{format_exc()}')
 			exception(f'{e}')
-			raise e
+			return ''
 	elif len(mediafile) > 8000:
 		e = Exception(f'mediafile is not a media file')
 		exception(f'{e}')
-		raise e
+		return ''
 	if mediafile.startswith('http://') or mediafile.startswith('https://'):
 		return mediafile
 	url = entire_url('/idfile?path=') + env.quote(mediafile)
