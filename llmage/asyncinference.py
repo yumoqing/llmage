@@ -23,7 +23,7 @@ async def grab_task_status(request, taskid):
 		recs = await sor.R('llmusage', {'taskid': taskid})
 		if len(recs) == 0:
 			exception(f'{taskid=} not found in llmusage')
-			return None
+			return {"status": "FAILED", "error": f"{taskid} not exist"}
 		r = recs[0]
 		if r.status == 'SUCCEEDED':
 			io = json.loads(r.ioinfo)
@@ -32,7 +32,7 @@ async def grab_task_status(request, taskid):
 		recs = await sor.R('llm', {'id': r.llmid})
 		if len(recs) == 0:
 			exception(f'id={r.llmid} not found in llm')
-			return None
+			return {"status": "FAILED", "error": f"{taskid} {r.llmid=} not exist in llm"}
 		llm = recs[0]
 
 	async with get_sor_context(env, 'llmage') as sor:
@@ -71,7 +71,7 @@ async def grab_task_status(request, taskid):
 				'output': {'status': 'FAILED', 'error': str(e)}
 			}
 			await add_new_llmusage_output(llmusage.id, changed)
-			return
+			return {'status': 'FAILED', 'error': str(e)}
 		if changed.status == 'SUCCEEDED':
 			llmusage.usage = changed.output.usage
 			if llm.ppid:
