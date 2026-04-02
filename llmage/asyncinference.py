@@ -28,12 +28,18 @@ async def grab_task_status(request, taskid):
 		if r.status in [ 'SUCCEEDED', 'FAILED' ]:
 			io = json.loads(r.ioinfo)
 			return io['output'][-1]
+
 		llmusage = r
 		recs = await sor.R('llm', {'id': r.llmid})
 		if len(recs) == 0:
 			exception(f'id={r.llmid} not found in llm')
 			return {"status": "FAILED", "error": f"{taskid} {r.llmid=} not exist in llm"}
 		llm = recs[0]
+
+	if llm is None:
+		e = Exception(f'id={r.llmid} Error happend!')
+		exception(f'{e}')
+		return {"status": "FAILED", "error": f"{taskid} {r.llmid=} {e}")
 
 	async with get_sor_context(env, 'llmage') as sor:
 		uapi = UAPI(request, sor)
