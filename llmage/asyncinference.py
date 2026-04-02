@@ -52,6 +52,7 @@ async def grab_task_status(request, taskid):
 				'status': d['status'],
 				'output': d
 			})
+			debug(f'grab_task_status({taskid}): {llm.upappid=}, {apiname=}, {userid=},{changed=}')
 			if changed.status == 'SUCCEEDED' and len(apinames) > 1:
 				while True:
 					if changed.output.video:
@@ -64,7 +65,7 @@ async def grab_task_status(request, taskid):
 					await asyncio.sleep(0.2)
 
 		except Exception as e:
-			exception(f'{e}')
+			exception(f'grab_task_status({taskid}): {e},{llm.name=}, {llm.upappid=}, {apiname=}, {userid=},{changed=}')
 			changed = {
 				'status': 'FAILED',
 				'output': {'status': 'FAILED', 'error': str(e)}
