@@ -229,7 +229,7 @@ async def add_new_llmusage_output(luid, newd):
 				out.append(rzt)
 				newd = {k:v for k,v in newd.items() if k != 'output'}
 			io['output'] = out
-			r.ioinfo = json.dumps(io)
+			r.ioinfo = json.dumps(io, ensure_ascii=False)
 			r.update(newd)
 			await sor.U('llmusage', r)
 			debug(f'llmuasage update to {r}')

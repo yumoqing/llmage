@@ -64,7 +64,7 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 					usage = d['usage']
 				d['llmusageid'] = luid
 				outlines.append(d)
-				yield json.dumps(d) + '\n'
+				yield json.dumps(d, ensure_ascii=False) + '\n'
 		if usage is None:
 			error(f'{llm=} response has not usage')
 		finish_seconds = time.time() - start_timestamp
@@ -85,11 +85,11 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 		llmusage.use_date = curDateString()
 		llmusage.use_time = timestampstr()
 		llmusage.userid = callerid
-		llmusage.usage = json.dumps(usage)
+		llmusage.usage = json.dumps(usage, ensure_ascii=False)
 		llmusage.ioinfo = json.dumps({
 			"input": params_kw,
 			"output": outlines
-		})
+		}, ensure_ascii=False)
 		llmusage.transno = params_kw.transno
 		llmusage.responsed_seconds = responsed_seconds
 		llmusage.finish_seconds = finish_seconds
@@ -120,7 +120,7 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
 		ed = {"error": f"ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid}
-		s = json.dumps(ed)
+		s = json.dumps(ed, ensure_ascii=False)
 		s = ''.join(s.split('\n'))
 		outlines.append(ed)
 		yield f'{s}\n'
