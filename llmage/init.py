@@ -26,7 +26,6 @@ from .accounting import (
 
 from .asyncinference import (
 	get_asynctask_status,
-	grab_task_status,
 	query_task_status,
 	get_today_asynctask_list
 )
@@ -40,7 +39,6 @@ def load_llmage():
 	env.get_asynctask_status = get_asynctask_status
 	env.query_task_status = query_task_status
 	env.get_llm = get_llm
-	env.grab_task_status = grab_task_status
 	env.b64media2url = b64media2url
 	env.hex2base64 = hex2base64
 	env.inference = inference
