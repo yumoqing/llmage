@@ -16,108 +16,6 @@ from ahserver.filestorage import FileStorage
 from .accounting import llm_accounting, llm_charging
 from .utils import *
 
-async def grab_task_status(request, taskid):
-	env = ServerEnv()
-	llm = llmusage = None
-	async with get_sor_context(env, 'llmage') as sor:
-		recs = await sor.R('llmusage', {'taskid': taskid})
-		if len(recs) == 0:
-			exception(f'{taskid=} not found in llmusage')
-			return {"status": "FAILED", "error": f"{taskid} not exist"}
-		r = recs[0]
-		if r.status in [ 'SUCCEEDED', 'FAILED' ]:
-			io = json.loads(r.ioinfo)
-			return io['output'][-1]
-
-		llmusage = r
-		recs = await sor.R('llm', {'id': r.llmid})
-		if len(recs) == 0:
-			exception(f'id={r.llmid} not found in llm')
-			return {"status": "FAILED", "error": f"{taskid} {r.llmid=} not exist in llm"}
-		llm = recs[0]
-
-	if llm is None:
-		e = Exception(f'id={r.llmid} Error happend!')
-		exception(f'{e}')
-		return {"status": "FAILED", "error": f"{taskid} {r.llmid=} {e}" }
-
-	async with get_sor_context(env, 'llmage') as sor:
-		uapi = UAPI(request, sor)
-		apinames = llm.apiname.split(',')
-		apiname = apinames[0]
-		userid = await get_owner_userid(sor, llm)
-		changed = None
-		ns = {'taskid': taskid}
-		d = None
-		try:
-			b = await uapi.call(llm.upappid, apiname, userid, params=ns)
-			if isinstance(b, bytes):
-				b = b.decode('utf-8')
-			d = json.loads(b)
-			changed = DictObject(**{
-				'status': d['status'],
-				'output': d
-			})
-			debug(f'grab_task_status({taskid}): {llm.upappid=}, {apiname=}, {userid=},{changed=}')
-			if changed.status == 'SUCCEEDED' and len(apinames) > 1:
-				while True:
-					if changed.output.video:
-						break;
-					x = await uapi.call(llm.upappid, apiname[1], userid, params=d)
-					g = json.load(x)
-					if g.get('video'):
-						changed.output.video = g.get('video')
-						break
-					await asyncio.sleep(0.2)
-
-		except Exception as e:
-			exception(f'grab_task_status({taskid}): {e},{llm.name=}, {llm.upappid=}, {apiname=}, {userid=},{changed=}')
-			changed = {
-				'status': 'FAILED',
-				'output': {'status': 'FAILED', 'error': str(e)}
-			}
-			await add_new_llmusage_output(llmusage.id, changed)
-			return {'status': 'FAILED', 'error': str(e)}
-		if changed.status == 'SUCCEEDED':
-			llmusage.usage = changed.output.usage
-			if llm.ppid:
-				try:
-					charging = await llm_charging(sor, 
-										llm.ppid, llmusage)
-					if charging:
-						changed.amount = charging.amount
-						changed.cost = charging.cost
-						debug(f'{changed=},{charging=}')
-					else:
-						changed.amount = cost = 0.0
-				except Exception as e:
-					e1 = Exception(f'{llm.ppid} charging error{e}, {llm.ppid}, {llmusage=}')
-					exception(f'{e}')
-					changed.amount = changed.cost = 0
-			else:
-				changed.amount = 0
-				changed.cost = 0
-			llmusage.amount = changed.amount
-			llmusage.cost   = changed.cost
-			if len(apinames) > 1:
-				while True:	
-					x = await uapi.call(llm.upappid, apiname[1], userid, params=d)
-					g = json.load(x)
-					if g.get('video'):
-						changed
-		await add_new_llmusage_output(llmusage.id, changed)
-		if changed.status == 'FAILED':
-			return changed.output
-		if changed.status == 'SUCCEEDED':
-			if llmusage.accounting_status != 'accounted' \
-							and changed.amount > 0.00001:
-				try:
-					await llm_accounting(request, llmusage)
-				except Exception as e:
-					debug(f'{changed=} accounting failed,{e=} ')
-			return changed.output
-		return changed.output
-					
 async def get_today_asynctask_list(userid):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
@@ -264,6 +162,10 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 			exception(f'{e}')
 			raise e
 		llmusage = recs[0]
+		if llmusage.status == 'SUCCEEDED':
+			return
+		if llmusage.status == 'FAILED':
+			return
 		llms = await sor.R('llm', {'id': llmusage.llmid})
 		if len(llms) == 0:
 			e = Exception(f'{llmusage.llmid=} not found in llm')
@@ -271,8 +173,6 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 			raise e
 		llm = llms[0]
 		lastoutout = get_llmusage_last_output(llmusage)
-		if lastoutout and lastoutout.status == 'SUCCEEDED':
-			return
 		uapi = UAPI(request, sor)
 		apinames = apiname.split(',')
 		for apiname in apinames:
