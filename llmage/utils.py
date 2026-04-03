@@ -35,7 +35,7 @@ where userorgid = ${userorgid}$
 		ns = dict(
 			page=page,
 			pagerows=pagerows,
-			order="use_time desc",
+			sort="use_time desc",
 			userorgid=userorgid)
 
 		data = await sor.sqlExe(sql, ns)
