@@ -180,7 +180,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 			changed = None
 			while status != 'SUCCEEDED':
 				ns = {'taskid': taskid}
-				d = None
+				b = d = None
 				try:
 					b = await uapi.call(upappid, apiname, userid, params=ns)
 					if isinstance(b, bytes):
