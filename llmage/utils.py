@@ -14,12 +14,29 @@ from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 
-async def llm_query_order(userorgid):
+async def llm_query_orders(userorgid, page, pagerows=80):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
-		recs = await sor.R('llmusage', {'userorgid': userorgid})
-		return recs
-	return []
+		sql = """select llmid,
+use_date,
+use_time,
+userid,
+usage,
+status,
+amount,
+userorgid,
+accounting_status
+from llmusage
+where userorgid = ${userorgid}$"""
+		ns = dict(
+			page=page,
+			pagerows=pagerows,
+			order="use_time desc",
+			userorgid=userorgid)
+
+		data = await sor.sqlExe(sql, ns)
+		return data
+	return {'total': 0, 'rows':[]}
 
 async def get_llm_by_model(id, lctype=None):
 	env = ServerEnv()
