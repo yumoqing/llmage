@@ -4,6 +4,7 @@ from ahserver.serverenv import ServerEnv
 from .keling import keling_token
 from .jimeng import jimeng_auth_headers
 from .utils import (
+	query_order,
 	get_llm_by_model
 )
 
@@ -32,6 +33,7 @@ from .asyncinference import (
 
 def load_llmage():
 	env = ServerEnv()
+	env.query_order = query_order
 	env.get_llm_by_model = get_llm_by_model
 	env.llm_charging = llm_charging
 	env.llm_accounting = llm_accounting
