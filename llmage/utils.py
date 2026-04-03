@@ -14,7 +14,7 @@ from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 
-async def query_order(userorgid):
+async def llm_query_order(userorgid):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
 		recs = await sor.R('llmusage', {'userorgid': userorgid})
