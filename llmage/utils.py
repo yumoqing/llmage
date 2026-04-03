@@ -17,17 +17,21 @@ from ahserver.filestorage import FileStorage
 async def llm_query_orders(userorgid, page, pagerows=80):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
-		sql = """select llmid,
-use_date,
-use_time,
-userid,
-usage,
-status,
-amount,
-userorgid,
-accounting_status
-from llmusage
-where userorgid = ${userorgid}$"""
+		sql = """select a.llmid,
+a.use_date,
+a.use_time,
+a.userid,
+a.usages,
+a.status,
+a.amount,
+a.userorgid,
+a.accounting_status,
+b.name,
+b.model
+from llmusage a, llm b
+where userorgid = ${userorgid}$
+	and a.llmid = b.id
+"""
 		ns = dict(
 			page=page,
 			pagerows=pagerows,
