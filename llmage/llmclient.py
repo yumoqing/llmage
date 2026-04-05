@@ -103,7 +103,7 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 				else:
 					llmusage.amount = llmusage.cost = 0.00
 			except Exception as e:
-				e = Exception(f'{llm.pid} charging error{e}')
+				e = Exception(f'{llmusage.id} {llm.ppid=} {llmusage.usages=}, {llm.id=} {llm.model=} charging error{e}')
 				exception(f'{e}')
 			llmusage.amount = llmusage.cost = 0
 		else:
