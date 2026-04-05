@@ -192,6 +192,7 @@ async def backend_accounting():
 	while True:
 		lus = await get_accounting_llmusages()
 		for lu in lus:
+			debug(f{lu.id=} handleing...')
 			await llm_accounting(lu)
 		await asyncio.sleep(0.1)
 
