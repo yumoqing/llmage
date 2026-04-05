@@ -181,6 +181,8 @@ where a.llmid = b.id
 				debug(f'{r.usages=} is None')
 				continue
 			try:
+				if isinstance(r.usages, str):
+					r.usages = json.loads(r.usages)
 				d = await llm_charging(sor, r.ppid, r)
 			except Exception as e:
 				debug(f'{r.ppid=}, {r.usages=} llm_charging() failed')
