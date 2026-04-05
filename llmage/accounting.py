@@ -164,8 +164,8 @@ where a.llmid = b.id
 		if luid:
 			sql += " and a.id=${luid}$"
 			ns['luid'] = luid
-		debug(f'{sql=}, {ns=}')
 		recs = await sor.sqlExe(sql, ns)
+		debug(f'{sql=}, {ns=}, {len(recs)=}')
 		for r in recs:
 			if r.usages is None:
 				io = json.loads(r.ioinfo)
