@@ -185,6 +185,8 @@ where a.llmid = b.id
 					r.usages = json.loads(r.usages)
 				d = await llm_charging(sor, r.ppid, r)
 			except Exception as e:
+				llmusage.accounting_status = 'failed'
+				await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})
 				debug(f'{r.ppid=}, {r.usages=} llm_charging() failed')
 				continue
 			r.amount = d.amount
