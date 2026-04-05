@@ -35,7 +35,7 @@ from .asyncinference import (
 )
 
 async def start_backend(app):
-	task = asyncio.create_task(abackend_accounting())
+	task = asyncio.create_task(backend_accounting())
 	yield
 	task.cancel()
 
