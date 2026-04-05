@@ -190,10 +190,17 @@ async def backend_accounting():
 	env = ServerEnv()
 	debug(f'backend accounting started ...')
 	while True:
-		lus = await get_accounting_llmusages()
-		debug(f'get accounting {len(lus)}  lus')
+		try:
+			lus = await get_accounting_llmusages()
+			debug(f'get accounting {len(lus)}  lus')
+		except Exception as e:
+			exception(f'{e}')
 		for lu in lus:
-			debug(f'backend_accounting(): {lu.id=} handleing...')
-			await llm_accounting(lu)
+			try:
+				debug(f'backend_accounting(): {lu.id=} handleing...')
+				await llm_accounting(lu)
+			except Exception as e:
+				exception(f'{e}, {lu.id=}')
+
 		await asyncio.sleep(10)
 
