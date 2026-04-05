@@ -24,6 +24,7 @@ from .llmclient import (
 from .accounting import (
 	checkCustomerBalance, 
 	llm_charging,
+	get_accounting_llmusages,
 	backend_accounting,
 	llm_accounting
 )
@@ -44,6 +45,7 @@ def load_llmage():
 	env.llm_query_orders = llm_query_orders
 	env.get_llm_by_model = get_llm_by_model
 	env.llm_charging = llm_charging
+	env.get_accounting_llmusages = get_accounting_llmusages
 	env.llm_accounting = llm_accounting
 	env.get_today_asynctask_list = get_today_asynctask_list
 	env.get_asynctask_status = get_asynctask_status
