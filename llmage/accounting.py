@@ -183,7 +183,7 @@ where a.llmid = b.id
 			try:
 				d = await llm_charging(sor, r.ppid, r)
 			except Exception as e:
-				debug(f'{r.usages=} is None')
+				debug(f'{r.ppid=}, {r.usages=} llm_charging() failed')
 				continue
 			r.amount = d.amount
 			r.cost = d.cost
