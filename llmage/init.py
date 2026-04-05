@@ -1,3 +1,4 @@
+import asyncio
 from appPublic.base64_to_file import hex2base64
 from appPublic.registerfunction import RegisterFunction
 from ahserver.serverenv import ServerEnv
