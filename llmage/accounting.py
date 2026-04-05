@@ -153,7 +153,7 @@ async def get_accounting_llmusages(luid=None):
 	dt = datetime.fromtimestamp(t)
 	tsstr = dt.strftime('%Y-%m-%d %H:%M:%S.') + f'{dt.microsecond // 1000:03d}'
 	async with get_sor_context(env, 'llmage') as sor:
-		sql = """select a.*. b.ppid 
+		sql = """select a.*, b.ppid 
 from llmusage a, llm b 
 where a.llmid = b.id 
 	and a.status = 'SUCCEEDED'
