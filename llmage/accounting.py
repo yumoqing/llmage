@@ -186,12 +186,12 @@ where a.llmid = b.id
 			lus.append(r)
 	return lus
 
-	async def backend_accounting():
-		env = ServerEnv()
-		debug(f'backend accounting started ...')
-		while True:
-			lus = await get_accounting_llmusages()
-			for lu in lus:
-				await llm_accounting(lu)
-			await asyncio.sleep(0.1)
+async def backend_accounting():
+	env = ServerEnv()
+	debug(f'backend accounting started ...')
+	while True:
+		lus = await get_accounting_llmusages()
+		for lu in lus:
+			await llm_accounting(lu)
+		await asyncio.sleep(0.1)
 
