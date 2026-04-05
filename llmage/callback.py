@@ -49,6 +49,6 @@ async def asynctask_callbacka(appname, apiname, params_kw)
 			raise e
 
 	if llmusage:
-		await llm_accounting(request, llmusage)
+		await llm_accounting(llmusage)
 
 		

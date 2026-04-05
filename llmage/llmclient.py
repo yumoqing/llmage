@@ -114,7 +114,7 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 		llmusage.accounting_status = 'created'
 		await write_llmusage(llmusage)
 		if llmusage.amount > 0.0001:
-			await llm_accounting(request, llmusage)
+			await llm_accounting(llmusage)
 
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')

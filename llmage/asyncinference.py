@@ -226,7 +226,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					if llmusage.accounting_status != 'accounted' \
 									and changed.amount > 0.00001:
 						try:
-							await llm_accounting(request, llmusage)
+							await llm_accounting(llmusage)
 						except Exception as e:
 							debug(f'{changed=} accounting failed,{e=} ')
 					return

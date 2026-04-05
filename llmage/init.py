@@ -1,6 +1,7 @@
 from appPublic.base64_to_file import hex2base64
 from appPublic.registerfunction import RegisterFunction
 from ahserver.serverenv import ServerEnv
+from ahserver.configuredServer import add_cleanupctx
 from .keling import keling_token
 from .jimeng import jimeng_auth_headers
 from .utils import (
@@ -22,6 +23,7 @@ from .llmclient import (
 from .accounting import (
 	checkCustomerBalance, 
 	llm_charging,
+	backend_accounting,
 	llm_accounting
 )
 
@@ -30,6 +32,11 @@ from .asyncinference import (
 	query_task_status,
 	get_today_asynctask_list
 )
+
+async def start_backend(app):
+	task = asyncio.create_task(abackend_accounting())
+	yield
+	task.cancel()
 
 def load_llmage():
 	env = ServerEnv()
@@ -54,3 +61,4 @@ def load_llmage():
 	env.llm_query_price = llm_query_price
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
+	add_cleanupctx(start_backend)

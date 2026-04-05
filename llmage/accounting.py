@@ -1,3 +1,6 @@
+import asyncio
+import time
+from datetime import datetime
 from appPublic.log import exception, debug
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
@@ -52,17 +55,27 @@ async def checkCustomerBalance(llmid, userorgid):
 	debug(f'{userorgid=} checkCustomerBalance() failed')
 	return False
 
-async def llm_accounting(request, llmusage):
-	env = request._run_ns
+async def llm_accounting(llmusage):
+	env = ServerEnv()
 	llmid = llmusage.llmid
-	async with get_sor_context(request._run_ns, 'llmage') as sor:
+	async with get_sor_context(env, 'llmage') as sor:
 		sql = "select * from llm where id=${llmid}$"
 		recs = await sor.sqlExe(sql, {'llmid': llmusage.llmid})
 		if len(recs) == 0:
+			ns = {
+				'id': llmusage.id,
+				'accounting_status': 'failed'
+			}
+			await sor.U('llmusage', ns)
 			e = Exception(f'llm not found({llmid})')
 			exception(f'{e}')
 			raise e
 		if recs[0].ppid is None:
+			ns = {
+				'id': llmusage.id,
+				'accounting_status': 'failed'
+			}
+			await sor.U('llmusage', ns)
 			e = Exception(f'llm ({llmid}) donot has a pricing_program')
 			exception(f'{e}')
 			raise e
@@ -132,4 +145,53 @@ async def llm_accounting(request, llmusage):
 			'accounting_status': 'accounted'
 		}
 		await sor.U('llmusage', ns)
+
+async def get_accounting_llmusages(luid=None):
+	env = ServerEnv()
+	lus = []
+	t = time.time - 20
+	dt = datetime.fromtimestamp(t)
+	tsstr = dt.strftime('%Y-%m-%d %H:%M:%S.') + f'{dt.microsecond // 1000:03d}'
+	async with get_sor_context(env, 'llmage') as sor:
+		sql = """select a.*. b.ppid 
+from llmusage a, llm b 
+where a.llmid = b.id 
+	and a.status = 'SUCCEEDED'
+	and a.use_time < ${tsstr}$
+	and a.accounting_status='created'"""
+		ns = {'tsstr': tsstr}
+		if luid:
+			sql += " and a.id=${luid}$"
+			ns['luid'] = luid
+		recs = await sor.sqlExe(sql, ns)
+		for r in recs:
+			if r.usages is None:
+				io = json.loads(r.ioinfo)
+				if len(io['output']) == 0:
+					llmusage.accounting_status = 'failed'
+					await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})
+					continue
+				r.usages = io['output'][-1]['usage']
+			if r.usages is None:
+				llmusage.accounting_status = 'failed'
+				await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})
+				continue
+			try:
+				r = await llm_charging(sor, llmusage.ppid, llmusage)
+			except Exception as e:
+				continue
+			llmusage.amount = r.amount
+			llmusage.cost = r.cost
+			await sor.U('llmusage', llmusage.copy())
+			lus.append(r)
+	return lus
+
+	async def backend_accounting():
+		env = ServerEnv()
+		debug(f'backend accounting started ...')
+		while True:
+			lus = await get_accounting_llmusages()
+			for lu in lus:
+				await llm_accounting(lu)
+			await asyncio.sleep(0.1)
 

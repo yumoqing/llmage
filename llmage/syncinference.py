@@ -79,7 +79,7 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 		yield b
 		await write_llmusage(llmusage)
 		if llmusage.amount > 0.0001:
-			await llm_accounting(request, llmusage)
+			await llm_accounting(llmusage)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
