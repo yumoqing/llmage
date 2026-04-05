@@ -172,19 +172,22 @@ where a.llmid = b.id
 				if len(io['output']) == 0:
 					llmusage.accounting_status = 'failed'
 					await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})
+					debug(f'{len(io['output'])} is 0')
 					continue
 				r.usages = io['output'][-1]['usage']
 			if r.usages is None:
 				llmusage.accounting_status = 'failed'
 				await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})
+				debug(f'{r.usages=} is None')
 				continue
 			try:
-				r = await llm_charging(sor, llmusage.ppid, llmusage)
+				d = await llm_charging(sor, r.ppid, r)
 			except Exception as e:
+				debug(f'{r.usages=} is None')
 				continue
-			llmusage.amount = r.amount
-			llmusage.cost = r.cost
-			await sor.U('llmusage', llmusage.copy())
+			r.amount = d.amount
+			r.cost = d.cost
+			await sor.U('llmusage', r.copy())
 			lus.append(r)
 	return lus
 
