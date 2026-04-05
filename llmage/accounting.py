@@ -149,7 +149,7 @@ async def llm_accounting(llmusage):
 async def get_accounting_llmusages(luid=None):
 	env = ServerEnv()
 	lus = []
-	t = time.time - 20
+	t = time.time() - 20
 	dt = datetime.fromtimestamp(t)
 	tsstr = dt.strftime('%Y-%m-%d %H:%M:%S.') + f'{dt.microsecond // 1000:03d}'
 	async with get_sor_context(env, 'llmage') as sor:
