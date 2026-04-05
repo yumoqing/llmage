@@ -199,7 +199,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					await add_new_llmusage_output(luid, changed)
 					return
 				if changed.status == 'SUCCEEDED':
-					llmusage.usage = changed.output.usage
+					llmusage.usages = changed.output.usage
 					if llm.ppid:
 						try:
 							charging = await llm_charging(sor, 

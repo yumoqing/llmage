@@ -48,7 +48,7 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 		llmusage.use_date = curDateString()
 		llmusage.use_time = timestampstr()
 		llmusage.userid = callerid
-		llmusage.usage = json.dumps(usage, ensure_ascii=False)
+		llmusage.usages = json.dumps(usage, ensure_ascii=False)
 		llmusage.ioinfo = json.dumps({
 			"input": params_kw,
 			"output": [d]

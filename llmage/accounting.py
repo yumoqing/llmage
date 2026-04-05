@@ -12,7 +12,7 @@ from accounting.getaccount import getCustomerBalance
 
 async def llm_charging(sor, ppid, llmusage):
 	env = ServerEnv()
-	prices = await env.pricing_program_charging(sor, ppid, llmusage.usage)
+	prices = await env.pricing_program_charging(sor, ppid, llmusage.usages)
 	if prices is None:
 		e = Exception(f'{ppid=}, {llmusage.usage=}{llmusage.id=}  env.pricing_program_charging() return None')
 		exception(f'{e}')
