@@ -192,9 +192,10 @@ async def backend_accounting():
 	while True:
 		try:
 			lus = await get_accounting_llmusages()
-			debug(f'get accounting {len(lus)}  lus')
 		except Exception as e:
 			exception(f'{e}')
+			lus = []
+		debug(f'get accounting {len(lus)}  lus')
 		for lu in lus:
 			try:
 				debug(f'backend_accounting(): {lu.id=} handleing...')
