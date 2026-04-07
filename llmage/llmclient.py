@@ -10,7 +10,7 @@ from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from appPublic.timeUtils import curDateString, timestampstr
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
-from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
+# from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 from .asyncinference import async_uapi_request
@@ -24,7 +24,8 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 		params_kw = env.params_kw
 	# callerorgid = await env.get_userorgid()
 	# callerid = await env.get_user()
-	uapi = UAPI(request, sor=sor)
+	uapi = env.UpAppApi()
+	# uapi = UAPI(request, sor=sor)
 	userid = await get_owner_userid(sor, llm)
 	outlines = []
 	txt = ''
