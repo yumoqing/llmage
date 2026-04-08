@@ -203,7 +203,6 @@ async def backend_accounting():
 		except Exception as e:
 			exception(f'{e}')
 			lus = []
-		debug(f'get accounting {len(lus)}  lus')
 		for lu in lus:
 			try:
 				debug(f'backend_accounting(): {lu.id=} handleing...')

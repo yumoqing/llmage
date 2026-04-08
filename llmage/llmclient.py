@@ -128,30 +128,6 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 		#  await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 
-def b64media2url(request, mediafile):
-	env = request._run_ns
-	entire_url = env.entire_url
-	if mediafile.startswith('data:'):
-		try:
-			fs = FileStorage()
-			fname = getFilenameFromBase64(mediafile)
-			fpath = fs._name2path(fname)
-			base64_to_file(mediafile, fpath)
-			path = fs.webpath(fpath)
-			return entire_url('/idfile?path=') + env.quote(path)
-		except Exception as e:
-			e = Exception(f'{e}\n{format_exc()}')
-			exception(f'{e}')
-			return ''
-	elif len(mediafile) > 8000:
-		e = Exception(f'mediafile is not a media file')
-		exception(f'{e}')
-		return ''
-	if mediafile.startswith('http://') or mediafile.startswith('https://'):
-		return mediafile
-	url = entire_url('/idfile?path=') + env.quote(mediafile)
-	return url
-
 async def inference_generator(request, *args, params_kw=None, **kw):
 	env = request._run_ns.copy()
 	callerorgid = await env.get_userorgid()
