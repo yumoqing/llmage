@@ -1,5 +1,4 @@
 import asyncio
-from appPublic.base64_to_file import hex2base64
 from appPublic.registerfunction import RegisterFunction
 from ahserver.serverenv import ServerEnv
 from ahserver.configuredServer import add_cleanupctx
@@ -12,7 +11,6 @@ from .utils import (
 )
 
 from .llmclient import (
-	b64media2url,
 	get_llm, 
 	inference_generator,
 	inference, 
@@ -51,8 +49,6 @@ def load_llmage():
 	env.get_asynctask_status = get_asynctask_status
 	env.query_task_status = query_task_status
 	env.get_llm = get_llm
-	env.b64media2url = b64media2url
-	env.hex2base64 = hex2base64
 	env.inference = inference
 	env.inference_generator = inference_generator
 	env.get_llms_by_catelog = get_llms_by_catelog

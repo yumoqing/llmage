@@ -9,37 +9,9 @@ from appPublic.log import debug, exception, error
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from appPublic.timeUtils import curDateString, timestampstr
-from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
-
-def b64media2url(request, mediafile):
-	# env = request._run_ns
-	# entire_url = env.entire_url
-	env = ServerEnv()
-	if request:
-		entire_url = request._run_ns.entire_url
-	if mediafile.startswith('data:'):
-		try:
-			fs = FileStorage()
-			fname = getFilenameFromBase64(mediafile)
-			fpath = fs._name2path(fname)
-			base64_to_file(mediafile, fpath)
-			path = fs.webpath(fpath)
-			return entire_url('/idfile?path=') + env.quote(path)
-		except Exception as e:
-			e = Exception(f'{e}\n{format_exc()}')
-			exception(f'{e}')
-			return ''
-	elif len(mediafile) > 8000:
-		e = Exception(f'mediafile is not a media file')
-		exception(f'{e}')
-		return ''
-	if mediafile.startswith('http://') or mediafile.startswith('https://'):
-		return mediafile
-	url = entire_url('/idfile?path=') + env.quote(mediafile)
-	return url
 
 async def llm_query_orders(userorgid, page, pagerows=80):
 	env = ServerEnv()
