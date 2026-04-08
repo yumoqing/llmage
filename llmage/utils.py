@@ -15,10 +15,11 @@ from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 
 def b64media2url(request, mediafile):
-
 	# env = request._run_ns
 	# entire_url = env.entire_url
 	env = ServerEnv()
+	if request:
+		entire_url = request._run_ns.entire_url
 	if mediafile.startswith('data:'):
 		try:
 			fs = FileStorage()
@@ -37,7 +38,7 @@ def b64media2url(request, mediafile):
 		return ''
 	if mediafile.startswith('http://') or mediafile.startswith('https://'):
 		return mediafile
-	url = '/idfile?path=' + env.quote(mediafile)
+	url = entire_url('/idfile?path=') + env.quote(mediafile)
 	return url
 
 async def llm_query_orders(userorgid, page, pagerows=80):
