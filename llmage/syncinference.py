@@ -23,7 +23,7 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 	# callerid = await env.get_user()
 	# callerorgid = await env.get_userorgid()
 	# uapi = UAPI(request, sor=sor)
-	uapi = UpAppApi()
+	uapi = env.UpAppApi()
 	userid = await get_owner_userid(llm)
 	outlines = []
 	b = None

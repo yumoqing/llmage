@@ -60,7 +60,7 @@ async def async_uapi_request(request, llm,
 	# callerorgid = await env.get_userorgid()
 	# callerid = await env.get_user()
 	# uapi = UAPI(request, sor=sor)
-	uapi = UpAppApi()
+	uapi = env.UpAppApi()
 	userid = await get_owner_userid(llm)
 	b = None
 	luid = getID()
