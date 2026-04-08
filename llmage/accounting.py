@@ -184,10 +184,10 @@ where a.llmid = b.id
 			try:
 				if isinstance(r.usages, str):
 					r.usages = json.loads(r.usages)
-				d = await llm_charging(sor, r.ppid, r)
+				d = await llm_charging(r.ppid, r)
 			except Exception as e:
 				await sor.U('llmusage', {'id': r.id, 'accounting_status': 'failed'})
-				debug(f'{r.ppid=}, {r.usages=} llm_charging() failed')
+				exception(f'{r.ppid=}, {r.usages=} llm_charging() failed,{e}')
 				continue
 			r.amount = d.amount
 			r.cost = d.cost
