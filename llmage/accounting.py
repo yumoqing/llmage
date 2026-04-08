@@ -12,9 +12,12 @@ from accounting.getaccount import getCustomerBalance
 
 async def llm_charging(ppid, llmusage):
 	env = ServerEnv()
-	prices = await env.buffered_charging(ppid, llmusage.usages)
+	usages =  llmusage.usages
+	if isinstance(usages):
+		usages = json.loads(usages)
+	prices = await env.buffered_charging(ppid, usages)
 	if prices is None:
-		e = Exception(f'{ppid=}, {llmusage.usage=}{llmusage.id=}  env.buffered_charging() return None')
+		e = Exception(f'{ppid=}, {usages=}{llmusage.id=}  env.buffered_charging() return None')
 		exception(f'{e}')
 		raise e
 		return None
