@@ -13,7 +13,7 @@ from accounting.getaccount import getCustomerBalance
 async def llm_charging(ppid, llmusage):
 	env = ServerEnv()
 	usages =  llmusage.usages
-	if isinstance(usages):
+	if isinstance(usages, str):
 		usages = json.loads(usages)
 	prices = await env.buffered_charging(ppid, usages)
 	if prices is None:
