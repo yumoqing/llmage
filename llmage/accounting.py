@@ -27,8 +27,7 @@ async def llm_charging(ppid, llmusage):
 		amount += p.amount
 		if p.cost:
 			cost += p.cost
-	discount = await env.sor_get_customer_discount(sor, 
-				llmusage.ownerid, 
+	discount = await env.get_customer_discount(llmusage.ownerid, 
 				llmusage.userorgid)
 	return DictObject(**{
 		'original_amount': amount,
