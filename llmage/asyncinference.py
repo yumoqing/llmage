@@ -201,6 +201,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 					return
 				if changed.status == 'SUCCEEDED':
 					llmusage.usages = changed.output.usage
+					"""联机不记账
 					if llm.ppid:
 						try:
 							charging = await llm_charging(sor, 
@@ -215,21 +216,25 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 							e1 = Exception(f'{llm.ppid} charging error{e}, {llm.ppid}, {llmusage=}')
 							exception(f'{e}')
 							changed.amount = changed.cost = 0
+
 					else:
 						changed.amount = 0
 						changed.cost = 0
 					llmusage.amount = changed.amount
 					llmusage.cost   = changed.cost
+					"""
 				await add_new_llmusage_output(luid, changed)
 				if changed.status == 'FAILED':
 					return
 				if changed.status == 'SUCCEEDED':
+					"""联机不记账
 					if llmusage.accounting_status != 'accounted' \
 									and changed.amount > 0.00001:
 						try:
 							await llm_accounting(llmusage)
 						except Exception as e:
 							debug(f'{changed=} accounting failed,{e=} ')
+					"""
 					return
 
 				await asyncio.sleep(llm.query_period or 30)

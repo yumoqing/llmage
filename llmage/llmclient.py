@@ -92,6 +92,7 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		llmusage.responsed_seconds = responsed_seconds
 		llmusage.finish_seconds = finish_seconds
 		llmusage.status = 'SUCCEEDED'
+		""" 联机不记账
 		if llm.ppid and callerorgid:
 			try:
 				chargings = await llm_charging(llm.ppid, llmusage)
@@ -107,12 +108,15 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		else:
 			llmusage.amount = 0
 			llmusage.cost = 0
+		"""
 		llmusage.userorgid = callerorgid
 		llmusage.ownerid = llm.orgid
 		llmusage.accounting_status = 'created'
 		await write_llmusage(llmusage)
+		"""
 		if llmusage.amount > 0.0001:
 			await llm_accounting(llmusage)
+		"""
 
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')

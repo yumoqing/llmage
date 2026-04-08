@@ -59,6 +59,7 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 		llmusage.finish_seconds = finish_seconds
 		llmusage.status = 'SUCCEEDED'
 		llmusage.amount = llmusage.cost = 0.00
+		""" 联机不记账
 		if llm.ppid:
 			try:
 				charging = await llm_charging(llm.ppid, llmusage)
@@ -73,14 +74,17 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 		else:
 			llmusage.amount = 0
 			llmusage.cost = 0
+		"""
 		llmusage.userorgid = callerorgid
 		llmusage.ownerid = llm.orgid
 		llmusage.accounting_status = 'created'
 		b = json.dumps(d, ensure_ascii=False)
 		yield b
 		await write_llmusage(llmusage)
+		"""联机不记账
 		if llmusage.amount > 0.0001:
 			await llm_accounting(llmusage)
+		"""
 	except Exception as e:
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
