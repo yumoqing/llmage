@@ -211,13 +211,9 @@ async def get_llm(llmid):
 	return await bllms.get_llm(llmid)
 
 async def get_owner_userid(sor, llm):
-	sql = '''select a.ownerid as userid from upappkey a, upapp b
-where a.upappid=b.id
-	and a.orgid = b.ownerid
-	and a.orgid = ${ownerid}$'''
-	recs = await sor.sqlExe(sql, {'ownerid': llm.ownerid})
-	i = randint(0, len(recs)-1)
-	return recs[i].userid
+	env = ServerEnv()
+	userid = await env.uapi_data.get_calluserid(llm.uappid, orgid=llm.ownerid)
+	return userid
 
 async def write_llmusage(llmusage):
 	env = ServerEnv()

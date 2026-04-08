@@ -10,9 +10,9 @@ from ahserver.serverenv import ServerEnv
 from accounting.consume import consume_accounting
 from accounting.getaccount import getCustomerBalance
 
-async def llm_charging(sor, ppid, llmusage):
+async def llm_charging(ppid, llmusage):
 	env = ServerEnv()
-	prices = await env.pbuffered_chargin(ppid, llmusage.usages)
+	prices = await env.buffered_charging(ppid, llmusage.usages)
 	if prices is None:
 		e = Exception(f'{ppid=}, {llmusage.usage=}{llmusage.id=}  env.buffered_charging() return None')
 		exception(f'{e}')

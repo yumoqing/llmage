@@ -4,13 +4,11 @@ import asyncio
 from random import randint
 from functools import partial
 from traceback import format_exc
-from sqlor.dbpools import DBPools, get_sor_context
 from appPublic.log import debug, exception, error
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from appPublic.timeUtils import curDateString, timestampstr
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
-# from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 from .asyncinference import async_uapi_request
@@ -18,15 +16,14 @@ from .syncinference import sync_uapi_request
 from .accounting import llm_accounting, llm_charging
 from .utils import *
 
-async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None):
+async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 	env = request._run_ns.copy()
 	if not params_kw:
 		params_kw = env.params_kw
 	# callerorgid = await env.get_userorgid()
 	# callerid = await env.get_user()
 	uapi = env.UpAppApi()
-	# uapi = UAPI(request, sor=sor)
-	userid = await get_owner_userid(sor, llm)
+	userid = await get_owner_userid(llm)
 	outlines = []
 	txt = ''
 	luid = getID()
@@ -97,7 +94,7 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 		llmusage.status = 'SUCCEEDED'
 		if llm.ppid and callerorgid:
 			try:
-				chargings = await llm_charging(sor, llm.ppid, llmusage)
+				chargings = await llm_charging(llm.ppid, llmusage)
 				if chargings:
 					llmusage.amount = chargings.amount
 					llmusage.cost = chargings.cost
@@ -125,7 +122,6 @@ async def uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None)
 		s = ''.join(s.split('\n'))
 		outlines.append(ed)
 		yield f'{s}\n'
-		#  await write_llmusage(luid, llm, callerid, None, params_kw, outlines, sor)
 		return
 
 async def inference_generator(request, *args, params_kw=None, **kw):
@@ -144,33 +140,29 @@ async def _inference_generator(request, callerid, callerorgid,
 	if not params_kw.transno:
 		params_kw.transno = getID()
 	llmid = params_kw.llmid
-	dbname = env.get_module_dbname('llmage')
-	db = env.DBPools()
-	async with db.sqlorContext(dbname) as sor:
-		f = None
-		llm = await get_llm(llmid)
-		if llm is None:
-			errmsg = f'{{"status": "FAILED", "error":"llmid:{llmid}没找到模型"}}\n'
-			exception(errmsg)
-			yield errmsg
-			return
-		if not params_kw.model:
-			params_kw.model = llm.model
-		if params_kw.stream and llm.stream == 'stream':
-			llm.stream = 'sync'
-		if llm.stream == 'async':
-			if llm.callbackurl:
-				cb_url = env.entire_url(llm.callbackurl)
-				params_kw.callbackurl = cb_url
-			f = partial(async_uapi_request, request, llm, sor, callerid, callerorgid, params_kw=params_kw)
-		elif not params_kw.stream:
-			f = partial(sync_uapi_request, request, llm, sor, callerid, callerorgid, params_kw=params_kw)
-		# env.update(llm)
-		else:
-			uapi = UAPI(request, sor=sor)
-			f = partial(uapi_request, request, llm, sor, callerid, callerorgid, params_kw=params_kw)
-		async for d in f():
-			yield d
+	f = None
+	llm = await get_llm(llmid)
+	if llm is None:
+		errmsg = f'{{"status": "FAILED", "error":"llmid:{llmid}没找到模型"}}\n'
+		exception(errmsg)
+		yield errmsg
+		return
+	if not params_kw.model:
+		params_kw.model = llm.model
+	if params_kw.stream and llm.stream == 'stream':
+		llm.stream = 'sync'
+	if llm.stream == 'async':
+		if llm.callbackurl:
+			cb_url = env.entire_url(llm.callbackurl)
+			params_kw.callbackurl = cb_url
+		f = partial(async_uapi_request, request, llm, callerid, callerorgid, params_kw=params_kw)
+	elif not params_kw.stream:
+		f = partial(sync_uapi_request, request, llm, callerid, callerorgid, params_kw=params_kw)
+	# env.update(llm)
+	else:
+		f = partial(uapi_request, request, llm, callerid, callerorgid, params_kw=params_kw)
+	async for d in f():
+		yield d
 
 async def inference(request, *args, params_kw=None, **kw):
 	env = request._run_ns.copy()

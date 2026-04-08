@@ -16,7 +16,7 @@ from ahserver.filestorage import FileStorage
 from .accounting import llm_accounting, llm_charging
 from .utils import *
 
-async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=None):
+async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 	env = request._run_ns.copy()
 	if not params_kw:
 		params_kw = env.params_kw
@@ -24,7 +24,7 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 	# callerorgid = await env.get_userorgid()
 	# uapi = UAPI(request, sor=sor)
 	uapi = UpAppApi()
-	userid = await get_owner_userid(sor, llm)
+	userid = await get_owner_userid(llm)
 	outlines = []
 	b = None
 	d = None
@@ -61,7 +61,7 @@ async def sync_uapi_request(request, llm, sor, callerid, callerorgid, params_kw=
 		llmusage.amount = llmusage.cost = 0.00
 		if llm.ppid:
 			try:
-				charging = await llm_charging(sor, llm.ppid, llmusage)
+				charging = await llm_charging(llm.ppid, llmusage)
 				if charging:
 					llmusage.amount = charging.amount
 					llmusage.cost = charging.cost

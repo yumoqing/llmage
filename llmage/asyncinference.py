@@ -52,7 +52,7 @@ async def get_asynctask_status(taskid):
 		'error': f'system error'
 	}
 	
-async def async_uapi_request(request, llm, sor, 
+async def async_uapi_request(request, llm, 
 				callerid, callerorgid, params_kw=None):
 	env = request._run_ns.copy()
 	if not params_kw:
@@ -61,7 +61,7 @@ async def async_uapi_request(request, llm, sor,
 	# callerid = await env.get_user()
 	# uapi = UAPI(request, sor=sor)
 	uapi = UpAppApi()
-	userid = await get_owner_userid(sor, llm)
+	userid = await get_owner_userid(llm)
 	b = None
 	luid = getID()
 	try:
