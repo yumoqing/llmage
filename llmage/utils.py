@@ -193,7 +193,7 @@ class BufferedLLMs:
 				dates.append(today)
 				cnt = len(dates)
 				if cnt > 2:
-					for i in range(0, cnt -2)
+					for i in range(0, cnt -2):
 						dat = dates[i]
 						del BufferedLLMs.llms[f'{llmid}.{dat}']
 					dates = dates[-2:]
