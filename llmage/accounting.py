@@ -7,15 +7,14 @@ from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from sqlor.dbpools import get_sor_context
 from ahserver.serverenv import ServerEnv
-# from pricing.pricing import pricing_program_charging
 from accounting.consume import consume_accounting
 from accounting.getaccount import getCustomerBalance
 
 async def llm_charging(sor, ppid, llmusage):
 	env = ServerEnv()
-	prices = await env.pricing_program_charging(sor, ppid, llmusage.usages)
+	prices = await env.pbuffered_chargin(ppid, llmusage.usages)
 	if prices is None:
-		e = Exception(f'{ppid=}, {llmusage.usage=}{llmusage.id=}  env.pricing_program_charging() return None')
+		e = Exception(f'{ppid=}, {llmusage.usage=}{llmusage.id=}  env.buffered_charging() return None')
 		exception(f'{e}')
 		raise e
 		return None

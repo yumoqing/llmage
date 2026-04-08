@@ -160,41 +160,55 @@ where a.llmcatelogid = b.id
 		return d
 	return []
 	
-async def get_llm(llmid):
-	db = DBPools()
-	dbname = get_serverenv('get_module_dbname')('llmage')
-	async with db.sqlorContext(dbname) as sor:
+class BufferedLLMs:
+	lls = {}
+	async def get_llm(self, llmid):
 		today = curDateString()
-		sql = """select x.*,
-z.input_fields
-from (
-select a.*, e.ioid, e.callbackurl, e.stream
-from llm a, upapp c, uapiset d, uapi e
-where a.upappid = c.id
-	and c.apisetid = d.id
-	and e.apisetid = d.id
-	and a.apiname = e.name
-	and a.expired_date > ${today}$
-	and a.enabled_date <= ${today}$
-) x left join uapiio z on x.ioid = z.id
-where x.id = ${llmid}$	
-"""
-		ns = {'llmid': llmid, 'today': today}
-		recs = await sor.sqlExe(sql, ns.copy())
-		if len(recs) > 0:
-			r = recs[0]
-			api = await sor_get_uapi(sor, r.upappid, r.apiname)
-			if api is None:
-				e = Exception(f'{r.upappid=},{r.apiname=} uapi not found')
-				exception(f'{e=}\n{format_exc()}')
-				raise e
-			r.inputfields = api.input_fields
-			return recs[0]
-		else:
-			debug(f'{llmid=} not found, {ns=}, {sql=}')
-			return None
-	exception(f'{db.e_except}\n{format_exc()}')
-	return None
+		k = f'{llmid}.{today}'
+		d = BufferedLLMs.llms.get(k)
+		if d:
+			return d
+		env = ServerEnv()
+		async with get_sor_context(env, 'llmage') as sor:
+			sql = """select x.*,
+	z.input_fields
+	from (
+	select a.*, e.ioid, e.callbackurl, e.stream, f.input_fields as inputfields
+	from llm a, upapp c, uapiset d, uapi e, uapiio f
+	where a.upappid = c.id
+		and c.apisetid = d.id
+		and e.apisetid = d.id
+		and e.ioid = f.id
+		and a.apiname = e.name
+		and a.expired_date > ${today}$
+		and a.enabled_date <= ${today}$
+	) x left join uapiio z on x.ioid = z.id
+	where x.id = ${llmid}$  
+	"""
+			ns = {'llmid': llmid, 'today': today}
+			recs = await sor.sqlExe(sql, ns.copy())
+			if len(recs) > 0:
+				r = recs[0]
+				dates = BufferedLLMs.llms.get(llmid, [])
+				dates.append(today)
+				cnt = len(dates)
+				if cnt > 2:
+					for i in range(0, cnt -2)
+						dat = dates[i]
+						del BufferedLLMs.llms[f'{llmid}.{dat}']
+					dates = dates[-2:]
+					BufferedLLMs.llms[llmid] = dates
+				BufferedLLMs.llms[k] = r
+				return r
+			else:
+				debug(f'{llmid=} not found, {ns=}, {sql=}')
+            return None
+		exception(f'Error: format_exc()}')
+		return None
+
+async def get_llm(llmid):
+	bllms = BufferedLLMs()
+	return await bllms.get_llm(llmid)
 
 async def get_owner_userid(sor, llm):
 	sql = '''select a.ownerid as userid from upappkey a, upapp b
@@ -209,4 +223,14 @@ async def write_llmusage(llmusage):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
 		await sor.C('llmusage', llmusage)
+
+async def llm_query_price(llmid, config_data):
+	env = ServerEnv()
+	llm = await get_llm(llmid)
+	if llm.ppid is None:	
+		e = Exception(f'{llm=} ppid is None')
+		exception(f'{e}')
+		raise e
+	prices = await env.buffered_charging(llm.ppid, config_data)
+	return prices
 

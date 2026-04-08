@@ -7,6 +7,7 @@ from .keling import keling_token
 from .jimeng import jimeng_auth_headers
 from .utils import (
 	llm_query_orders,
+	llm_query_price,
 	get_llm_by_model
 )
 
@@ -15,7 +16,6 @@ from .llmclient import (
 	get_llm, 
 	inference_generator,
 	inference, 
-	llm_query_price,
 	get_llmproviders,
 	get_llms_sort_by_provider,
 	get_llmcatelogs,
