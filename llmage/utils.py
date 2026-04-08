@@ -161,7 +161,7 @@ where a.llmcatelogid = b.id
 	return []
 	
 class BufferedLLMs:
-	lls = {}
+	llms = {}
 	async def get_llm(self, llmid):
 		today = curDateString()
 		k = f'{llmid}.{today}'
