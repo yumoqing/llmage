@@ -175,7 +175,7 @@ where a.llmid = b.id
 					await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})
 					debug(f'{len(io["output"])} is 0')
 					continue
-				r.usages = io['output'][-1]['usage']
+				r.usages = json.dumps(io['output'][-1].get('usage'))
 			if r.usages is None:
 				llmusage.accounting_status = 'failed'
 				await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})
