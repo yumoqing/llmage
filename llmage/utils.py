@@ -212,7 +212,7 @@ async def get_llm(llmid):
 
 async def get_owner_userid(llm):
 	env = ServerEnv()
-	userid = await env.uapi_data.get_calluserid(llm.uappid, orgid=llm.ownerid)
+	userid = await env.uapi_data.get_calluserid(llm.upappid, orgid=llm.ownerid)
 	return userid
 
 async def write_llmusage(llmusage):
