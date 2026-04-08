@@ -1,9 +1,8 @@
 from ahserver.serverenv import ServerEnv
 from appPublic.dictObject import DictObject
 from sqlor.dbpools import get_sor_context
-from .accounting import llm_charging, llm_accounting
 
-async def asynctask_callbacka(appname, apiname, params_kw)
+async def asynctask_callback(appname, apiname, params_kw)
 	env = ServerEnv()
 	llmusage = None
 	async with get_sor_context(env, 'llmage') as sor:
@@ -20,28 +19,9 @@ async def asynctask_callbacka(appname, apiname, params_kw)
 			io = json.loads(llmusage.ioinfo)
 			out = io.get('output')
 			out.append(d)
+			llmusage.ioinfo = json.dumps(io, ensure_ascii=False)
 			llmusage.status = d.status
-			if d.status == 'SUCCEEDED':
-				llms = await sor.R('llm', {'id': llmusage.llmid})
-				if len(llms) == 0:
-					e = Exception(f'{llmusage.llmid} llm not found')
-					exception(f'{e}')
-					raise e
-				llm = llms[0]
-				if llm.ppid:
-					try:
-						chargings = await llm_charging(sor, llm.ppid, 
-												llmusage.userid, d.usage)
-						llmusage.amount = chargings.amount
-						llmusage.cost = chargings.cost
-					except Exception as e:
-						e = Exception(f'{llm.pid} charging error{e}')
-						exception(f'{e}')
-				else:
-					llmusage.amount = 0
-					llmusage.cost = 0
-				sor.U('llmusage', llmusage)
-
+			await sor.U('llmusage', llmusage)
 
 		except Exception as e:
 			e = Exception(f'{uapi.response=}, {params_kw=} render error')
@@ -50,5 +30,4 @@ async def asynctask_callbacka(appname, apiname, params_kw)
 
 	if llmusage:
 		await llm_accounting(llmusage)
-
 		
