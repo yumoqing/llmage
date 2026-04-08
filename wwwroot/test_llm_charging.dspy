@@ -1,5 +1,5 @@
 luid=params_kw.luid
-env = ServerEnv()
+env = request._run_ns
 async with get_sor_context(env, 'llmage') as sor:
 	sql = "select a.ppid, b.* from llm a, llmusage b where a.id=b.llmid and b.id=${id}$"
 	recs = await sor.sqlExe(sql, {'id': luid})
