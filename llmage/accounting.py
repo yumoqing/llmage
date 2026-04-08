@@ -181,6 +181,7 @@ where a.llmid = b.id
 				await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})
 				debug(f'{r.usages=} is None')
 				continue
+			d = None
 			try:
 				if isinstance(r.usages, str):
 					r.usages = json.loads(r.usages)

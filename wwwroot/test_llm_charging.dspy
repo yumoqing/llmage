@@ -1,0 +1,12 @@
+luid=params_kw.luid
+env = ServerEnv()
+async with get_sor_context(env, 'llmage') as sor:
+	sql = "select a.ppid, b.* from llm a, llmusage b where a.id=b.llmid and b.id=${id}$"
+	recs = await sor.sqlExe(sql, {'id': luid})
+	if recs:
+		r = recs[0]
+		x = await llm_charging(r.ppid, r.usages)
+		return x
+	return {'sql': sql, 'luid': luid, 'error': 'llm not found'}
+return {
+	'error': 'error'}
