@@ -203,7 +203,7 @@ class BufferedLLMs:
 			else:
 				debug(f'{llmid=} not found, {ns=}, {sql=}')
 				return None
-		exception(f'Error: format_exc()}')
+		exception(f'Error: {format_exc()}')
 		return None
 
 async def get_llm(llmid):
