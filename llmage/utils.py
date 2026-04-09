@@ -13,6 +13,25 @@ from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 
+async def append_new_llmoutput(webpath, output):
+	fs = FileStorage()
+	p = fs.realPath(webpath)
+	if not isinstance(output, str):
+		output = json.loads(output)
+	bin = await read_webpath(webpath)
+	io = json.loads(bin.decode('utf-8'))
+	io['output'].append(output)
+	async with aiofiles.open(p, 'wb') as f:
+		iostr = json.dumps(io, ensure_ascii=False, indent=4)
+		f.write(iostr.encode('utf-8'))
+	
+async def read_webpath(webpath):
+	fs = FileStorage()
+	p = fs.realPath(webpath)
+	async with aiofiles.open(p,'rb') as f:
+		bin = f.read()
+		return bin
+
 async def write_llmio(luid, io_dic):
 	fs = FileStorage()
 	s = json.dumps(io_dic, ensure_ascii=False, indent=4)
