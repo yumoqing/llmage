@@ -168,7 +168,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 				exception(f'{e}, {b=}')
 				new_output = {
 					'status': 'FAILED', 
-					'error': f'{b},{e}}'
+					'error': f'{b},{e}'
 				}
 			if lastoutout['status'] != new_output['status']:
 				llmusage.status = new_output['status']
