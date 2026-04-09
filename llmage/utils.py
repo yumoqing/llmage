@@ -39,7 +39,9 @@ async def read_webpath(webpath):
 
 async def write_llmio(luid, io_dic):
 	fs = FileStorage()
-	s = json.dumps(io_dic, ensure_ascii=False, indent=4)
+	s = io_dic
+	if not isinstance(io_dic, str):
+		s = json.dumps(io_dic, ensure_ascii=False, indent=4)
 	name = f'{luid}.json'
 	webpath = await fs.save(name, s, userid='llmio')
 	return webpath

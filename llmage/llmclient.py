@@ -33,6 +33,7 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		finish_seconds = None
 		first = True
 		usage = None
+		output = []
 		async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, 
 					params=params_kw):
 			if first:
@@ -68,15 +69,6 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		finish_seconds = time.time() - start_timestamp
 		if responsed_seconds is None:
 			responsed_seconds = finish_seconds
-		if not usage.get('completion_tokens'):
-			usage['completion_tokens'] = len(txt)
-		if not usage.get('prompt_tokens'):
-			cnt = 0
-			if params_kw.prompt:
-				cnt += len(params_kw.prompt)
-			if params_kw.negitive_prompt:
-				cnt += len(params_kw.negitive_promot)
-			usage['prompt_tokens'] = cnt
 		llmusage = DictObject()
 		llmusage.id = luid
 		llmusage.llmid = llm.id
@@ -84,10 +76,10 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		llmusage.use_time = timestampstr()
 		llmusage.userid = callerid
 		llmusage.usages = json.dumps(usage, ensure_ascii=False)
-		ioinfo = json.dumps({
+		ioinfo = {
 			"input": params_kw,
-			'output': [d]
-		}, ensure_ascii=False)
+			'output': outlines
+		}
 		webpath = await write_llmio(llmusage.id, ioinfo)
 		llmusage.ioinfo = webpath
 		debug(f'webpath={webpath}:')
