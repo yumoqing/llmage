@@ -153,7 +153,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 	llm, llmusage = await get_llm_llmusage(luid)
 
 	for apiname in apinames:
-		while True
+		while True:
 			lastoutout = await get_lastoutput(llmusage.ioinfo)
 			if lastoutout['status'] in ['FAILED', 'SUCCEEDED']
 				return
