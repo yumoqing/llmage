@@ -33,7 +33,6 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		finish_seconds = None
 		first = True
 		usage = None
-		output = []
 		async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, 
 					params=params_kw):
 			if first:
@@ -66,6 +65,7 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 				yield json.dumps(d, ensure_ascii=False) + '\n'
 		if usage is None:
 			error(f'{llm=} response has not usage')
+		debug(f' {usage=}, {type(usage)=}')
 		finish_seconds = time.time() - start_timestamp
 		if responsed_seconds is None:
 			responsed_seconds = finish_seconds
@@ -82,7 +82,6 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		}
 		webpath = await write_llmio(llmusage.id, ioinfo)
 		llmusage.ioinfo = webpath
-		debug(f'webpath={webpath}:')
 		llmusage.transno = params_kw.transno
 		llmusage.responsed_seconds = responsed_seconds
 		llmusage.finish_seconds = finish_seconds
