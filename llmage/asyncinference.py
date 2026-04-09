@@ -10,7 +10,6 @@ from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from appPublic.timeUtils import curDateString, timestampstr
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
-# from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 from .accounting import llm_accounting, llm_charging
@@ -59,7 +58,6 @@ async def async_uapi_request(request, llm,
 		params_kw = env.params_kw
 	# callerorgid = await env.get_userorgid()
 	# callerid = await env.get_user()
-	# uapi = UAPI(request, sor=sor)
 	uapi = env.UpAppApi(request)
 	userid = await get_owner_userid(llm)
 	b = None
@@ -138,7 +136,7 @@ async def add_new_llmusage_output(luid, newd):
 			r.ioinfo = json.dumps(io, ensure_ascii=False)
 			r.update(newd)
 			await sor.U('llmusage', r)
-			debug(f'llmuasage update to {r}')
+			# debug(f'llmuasage update to {r}')
 			return
 		else:
 			exception(f'add_new_llmusage_output({luid}, {newd}) llmusage not found')
@@ -174,7 +172,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 			raise e
 		llm = llms[0]
 		lastoutout = get_llmusage_last_output(llmusage)
-		uapi = UAPI(request, sor)
+		uapi = UpAppApi(request)
 		apinames = apiname.split(',')
 		for apiname in apinames:
 			status = 'unknown'

@@ -13,6 +13,13 @@ from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 
+async def write_llmio(luid, io_dic):
+	fs = FileStorage()
+	s = json.dumps(io_dic, ensure_ascii=False, indent=4)
+	name = f'{luid}.json'
+	webpath = await fs.save(name, s, userid='llmio')
+	return webpath
+
 async def llm_query_orders(userorgid, page, pagerows=80):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
