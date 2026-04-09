@@ -169,13 +169,8 @@ where a.llmid = b.id
 		# debug(f'{sql=}, {ns=}, {len(recs)=}')
 		for r in recs:
 			if r.usages is None:
-				io = json.loads(r.ioinfo)
-				if len(io['output']) == 0:
-					llmusage.accounting_status = 'failed'
-					await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})
-					debug(f'{len(io["output"])} is 0')
-					continue
-				r.usages = json.dumps(io['output'][-1].get('usage'))
+				output = await get_lastoutput(r.ioinfo)
+				r.usages = output.get('usage')
 			if r.usages is None:
 				llmusage.accounting_status = 'failed'
 				await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})

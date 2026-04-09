@@ -35,11 +35,8 @@ async def get_asynctask_status(taskid):
 		recs = await sor.R('llmusage', {'taskid': taskid})
 		if recs:
 			r = recs[0]
-			io = json.loads(r.ioinfo)
-			d = io.get('output', {})
-			if isinstance(d, list):
-				return d[-1]
-			return d
+			output = await get_lastoutput(r.ioinfo)
+			return output
 		return {
 			'taskid': taskid,
 			'status': 'FAILED',
@@ -129,14 +126,6 @@ async def modify_llmusage_status(llmusage):
 			'status': llmusage.status
 		})
 
-def get_llmusage_last_output(r):
-	io = json.loads(r.ioinfo)
-	outs = io.get('output', [])
-	if len(outs) == 0:
-		return None
-	d = DictObject(**outs[-1])
-	return d
-
 async def get_llm_llmusage(luid):
 	env = request._run_ns
 	async with get_sor_context(env, 'llmage') as sor:
@@ -165,7 +154,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 
 	for apiname in apinames:
 		while True
-			lastoutout = get_llmusage_last_output(llmusage)
+			lastoutout = await get_lastoutput(llmusage.ioinfo)
 			if lastoutout['status'] in ['FAILED', 'SUCCEEDED']
 				return
 			ns = {'taskid': taskid}
