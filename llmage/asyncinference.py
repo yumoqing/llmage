@@ -155,7 +155,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 	for apiname in apinames:
 		while True:
 			lastoutout = await get_lastoutput(llmusage.ioinfo)
-			if lastoutout['status'] in ['FAILED', 'SUCCEEDED']
+			if lastoutout['status'] in ['FAILED', 'SUCCEEDED']:
 				return
 			ns = {'taskid': taskid}
 			new_output = b = d = None
