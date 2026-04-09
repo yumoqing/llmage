@@ -6,6 +6,7 @@ from .keling import keling_token
 from .jimeng import jimeng_auth_headers
 from .utils import (
 	llm_query_orders,
+	read_webpath,
 	llm_query_price,
 	get_llm_by_model
 )
@@ -41,6 +42,7 @@ async def start_backend(app):
 def load_llmage():
 	env = ServerEnv()
 	env.llm_query_orders = llm_query_orders
+	env.read_webpath = read_webpath
 	env.get_llm_by_model = get_llm_by_model
 	env.llm_charging = llm_charging
 	env.get_accounting_llmusages = get_accounting_llmusages

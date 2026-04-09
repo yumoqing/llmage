@@ -1,7 +1,9 @@
 userid = await get_user()
 tasks = await get_today_asynctask_list(userid)
+
 for t in tasks:
-	t.ioinfo = json.loads(t.ioinfo)
+	bin = await read_webpath(t.ioinfo)
+	t.ioinfo = json.loads(bin.decode('utf-8')
 
 return {
 	'status': 'ok',
