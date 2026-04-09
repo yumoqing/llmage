@@ -65,7 +65,6 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 				yield json.dumps(d, ensure_ascii=False) + '\n'
 		if usage is None:
 			error(f'{llm=} response has not usage')
-		debug(f' {usage=}, {type(usage)=}')
 		finish_seconds = time.time() - start_timestamp
 		if responsed_seconds is None:
 			responsed_seconds = finish_seconds
@@ -75,7 +74,8 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		llmusage.use_date = curDateString()
 		llmusage.use_time = timestampstr()
 		llmusage.userid = callerid
-		llmusage.usages = json.dumps(usage, ensure_ascii=False)
+		llmusage.usages = json.dumps(usage, ensure_ascii=False, indent=4)
+		debug(f' {usage=}, {type(usage)=}, {llmusage.usages=}')
 		ioinfo = {
 			"input": params_kw,
 			'output': outlines
