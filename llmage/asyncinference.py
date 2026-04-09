@@ -85,10 +85,10 @@ async def async_uapi_request(request, llm,
 		llmusage.use_date = curDateString()
 		llmusage.use_time = timestampstr()
 		llmusage.userid = callerid
-		ioinfo = json.dumps({
+		ioinfo = {
 			"input": params_kw,
 			'output': [d]
-		}, ensure_ascii=False)
+		}
 		webpath = await write_llmio(llmusage.id, ioinfo)
 		llmusage.ioinfo = webpath
 		llmusage.taskid = d.taskid
