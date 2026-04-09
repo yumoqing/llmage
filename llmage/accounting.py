@@ -193,7 +193,7 @@ where a.llmid = b.id
 				'cost': r.cost,
 				'usage': json.dumps(r.usage, ensure_ascii=False, indent=4)
 			}
-			await sor.U('llmusage', r.copy())
+			await sor.U('llmusage', ns)
 			lus.append(r)
 	return lus
 
