@@ -50,12 +50,12 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 		llmusage.use_time = timestampstr()
 		llmusage.userid = callerid
 		llmusage.usages = json.dumps(usage, ensure_ascii=False)
-        ioinfo = json.dumps({
-            "input": params_kw,
-            'output': [d]
-        }, ensure_ascii=False)
-        webpath = await write_llmio(llmusage.id, ioinfo)
-        llmusage.ioinfo = webpath
+		ioinfo = json.dumps({
+			"input": params_kw,
+			'output': [d]
+		}, ensure_ascii=False)
+		webpath = await write_llmio(llmusage.id, ioinfo)
+		llmusage.ioinfo = webpath
 		llmusage.transno = params_kw.transno
 		llmusage.responsed_seconds = responsed_seconds
 		llmusage.finish_seconds = finish_seconds
