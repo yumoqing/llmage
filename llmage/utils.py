@@ -23,10 +23,12 @@ async def append_new_llmoutput(webpath, output):
 	critical(f'{webpath=}')
 	bin = await read_webpath(webpath)
 	io = json.loads(bin.decode('utf-8'))
+	debug(f'append_new_llmoutput({webpath=}, {output=}')
 	io['output'].append(output)
 	async with aiofiles.open(p, 'wb') as f:
 		iostr = json.dumps(io, ensure_ascii=False, indent=4)
-		f.write(iostr.encode('utf-8'))
+		debug(f'append_new_llmoutput({webpath=}, {output=}')
+		await f.write(iostr.encode('utf-8'))
 	
 async def get_lastoutput(webpath):
 	bin =  await read_webpath(webpath)
