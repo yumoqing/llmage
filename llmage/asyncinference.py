@@ -180,7 +180,7 @@ async def query_task_status(request, luid, onetime=False):
 				}
 			if lastoutout['status'] != new_output['status']:
 				llmusage.status = new_output['status']
-				await append_new_llmoutput(llmusage.id, new_output)
+				await append_new_llmoutput(llmusage.ioinfo, new_output)
 				await modify_llmusage_status(llmusage)
 			if  llmusage.status in ['FAILED', 'SUCCEEDED']:
 				dcritical(f'finished .. {llmusage.status=}')
