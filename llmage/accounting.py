@@ -170,7 +170,10 @@ where a.llmid = b.id
 		# debug(f'{sql=}, {ns=}, {len(recs)=}')
 		for r in recs:
 			if r.usages is None:
-				output = await get_lastoutput(r.ioinfo)
+				try:
+					output = await get_lastoutput(r.ioinfo)
+				except Exception as e:
+					continue
 				r.usages = output.get('usage')
 			if r.usages is None:
 				llmusage.accounting_status = 'failed'
