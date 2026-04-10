@@ -35,7 +35,7 @@ async def read_webpath(webpath):
 	fs = FileStorage()
 	p = fs.realPath(webpath)
 	async with aiofiles.open(p,'rb') as f:
-		bin = f.read()
+		bin = await f.read()
 		return bin
 
 async def write_llmio(luid, io_dic):
