@@ -15,10 +15,12 @@ from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 
 async def append_new_llmoutput(webpath, output):
+	critical(f'{webpath=}')
 	fs = FileStorage()
 	p = fs.realPath(webpath)
 	if isinstance(output, str):
 		output = json.loads(output)
+	critical(f'{webpath=}')
 	bin = await read_webpath(webpath)
 	io = json.loads(bin.decode('utf-8'))
 	io['output'].append(output)
