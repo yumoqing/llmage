@@ -6,7 +6,7 @@ from random import randint
 from functools import partial
 from traceback import format_exc
 from sqlor.dbpools import DBPools, get_sor_context
-from appPublic.log import debug, exception, error
+from appPublic.log import debug, exception, error, critical
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from appPublic.timeUtils import curDateString, timestampstr
