@@ -151,9 +151,9 @@ async def get_llm_llmusage(luid):
 		return llm, llmusage
 
 async def query_task_status(request, luid, onetime=False):
-	uapi = UpAppApi(request)
-	llm, llmusage = await get_llm_llmusage(luid)
 	env = ServerEnv()
+	uapi = env.UpAppApi(request)
+	llm, llmusage = await get_llm_llmusage(luid)
 	userid = await env.uapi_data.get_calluserid(llm.upappid, orgid=llm.ownerid)
 	taskid = llmusage.taskid
 	upappid = llm.upappid
