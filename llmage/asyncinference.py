@@ -189,5 +189,5 @@ async def query_task_status(request, luid, onetime=False):
 			if onetime:
 				critical(f'onetime is true, returned')
 			await asyncio.sleep(llm.query_period or 30)
-			critical(f'{llm.query_period=} seconds will retry, {changed.status=}')
+			critical(f'{llm.query_period=} seconds will retry, {new_output["status"]=}')
 					
