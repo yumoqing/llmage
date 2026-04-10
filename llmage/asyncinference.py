@@ -130,7 +130,7 @@ async def modify_llmusage_status(llmusage):
 		})
 
 async def get_llm_llmusage(luid):
-	env = request._run_ns
+	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
 		recs = await sor.R('llmusage', {'id': luid})
 		if len(recs) == 0:
