@@ -5,7 +5,7 @@ from random import randint
 from functools import partial
 from traceback import format_exc
 from sqlor.dbpools import DBPools, get_sor_context
-from appPublic.log import debug, exception, error
+from appPublic.log import debug, exception, error, critical
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from appPublic.timeUtils import curDateString, timestampstr
@@ -156,6 +156,7 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 		while True:
 			lastoutout = await get_lastoutput(llmusage.ioinfo)
 			if lastoutout['status'] in ['FAILED', 'SUCCEEDED']:
+				critical(f"{lastoutout['status']=}")
 				return
 			ns = {'taskid': taskid}
 			new_output = b = d = None
@@ -175,9 +176,9 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 				await append_new_llmoutput(llmusage.id, new_output)
 				await modify_llmusage_status(llmusage)
 			if  llmusage.status in ['FAILED', 'SUCCEEDED']:
-				debug(f'finished .. {llmusage.status=}')
+				dcritical(f'finished .. {llmusage.status=}')
 				return
 
 			await asyncio.sleep(llm.query_period or 30)
-			debug(f'{llm.query_period=} seconds will retry, {changed.status=}')
+			critical(f'{llm.query_period=} seconds will retry, {changed.status=}')
 					
