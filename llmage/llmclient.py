@@ -23,7 +23,7 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 	# callerorgid = await env.get_userorgid()
 	# callerid = await env.get_user()
 	uapi = env.UpAppApi(request)
-	userid = await get_owner_userid(llm)
+	userid = await env.uapi_data.get_calluserid(llm.upappid, orgid=llm.ownerid)
 	outlines = []
 	txt = ''
 	luid = getID()

@@ -219,11 +219,6 @@ async def get_llm(llmid):
 	bllms = BufferedLLMs()
 	return await bllms.get_llm(llmid)
 
-async def get_owner_userid(llm):
-	env = ServerEnv()
-	userid = await env.uapi_data.get_calluserid(llm.upappid, orgid=llm.ownerid)
-	return userid
-
 async def write_llmusage(llmusage):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:

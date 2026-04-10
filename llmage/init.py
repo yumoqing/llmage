@@ -7,7 +7,6 @@ from .jimeng import jimeng_auth_headers
 from .utils import (
 	llm_query_orders,
 	read_webpath,
-	get_owner_userid,
 	llm_query_price,
 	get_llm_by_model
 )
@@ -61,7 +60,6 @@ def load_llmage():
 	env.get_llms_sort_by_provider = get_llms_sort_by_provider
 	env.keling_token = keling_token
 	env.llm_query_price = llm_query_price
-	env.get_owner_userid = get_owner_userid
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
 	add_cleanupctx(start_backend)
