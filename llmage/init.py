@@ -30,7 +30,7 @@ from .accounting import (
 
 from .asyncinference import (
 	get_asynctask_status,
-	query_task_status
+	query_task_status,
 	get_today_asynctask_list
 )
 
