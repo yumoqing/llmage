@@ -26,7 +26,7 @@ async def append_new_llmoutput(webpath, output):
 		iostr = json.dumps(io, ensure_ascii=False, indent=4)
 		f.write(iostr.encode('utf-8'))
 	
-async def get_usage_from_lastoutput(webpath):
+async def get_lastoutput(webpath):
 	bin =  await read_webpath(webpath)
 	io = json.load(bin.decode('utf-8'))
 	return io['output'][-1]
