@@ -173,8 +173,9 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 			if lastoutout['status'] != new_output['status']:
 				llmusage.status = new_output['status']
 				await append_new_llmoutput(llmusage.id, new_output)
-			if  llmusage.status in ['FAILED', 'SUCCEEDED']:
 				await modify_llmusage_status(llmusage)
+			if  llmusage.status in ['FAILED', 'SUCCEEDED']:
+				debug(f'finished .. {llmusage.status=}')
 				return
 
 			await asyncio.sleep(llm.query_period or 30)
