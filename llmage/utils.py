@@ -47,6 +47,7 @@ async def write_llmio(luid, io_dic):
 		s = json.dumps(io_dic, ensure_ascii=False, indent=4)
 	name = f'{luid}.json'
 	webpath = await fs.save(name, s, userid='llmio')
+	debug(f'write_llmio({luid=}, {io_dic=}): {s=}, {webpath=}')
 	return webpath
 
 async def llm_query_orders(userorgid, page, pagerows=80):
