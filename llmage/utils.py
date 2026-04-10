@@ -15,19 +15,15 @@ from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 
 async def append_new_llmoutput(webpath, output):
-	critical(f'{webpath=}')
 	fs = FileStorage()
 	p = fs.realPath(webpath)
 	if isinstance(output, str):
 		output = json.loads(output)
-	critical(f'{webpath=}')
 	bin = await read_webpath(webpath)
 	io = json.loads(bin.decode('utf-8'))
-	debug(f'append_new_llmoutput({webpath=}, {output=}')
 	io['output'].append(output)
 	async with aiofiles.open(p, 'wb') as f:
 		iostr = json.dumps(io, ensure_ascii=False, indent=4)
-		debug(f'append_new_llmoutput({webpath=}, {output=}')
 		await f.write(iostr.encode('utf-8'))
 	
 async def get_lastoutput(webpath):
@@ -49,7 +45,6 @@ async def write_llmio(luid, io_dic):
 		s = json.dumps(io_dic, ensure_ascii=False, indent=4)
 	name = f'{luid}.json'
 	webpath = await fs.save(name, s, userid='llmio')
-	debug(f'write_llmio({luid=}, {io_dic=}): {s=}, {webpath=}')
 	return webpath
 
 async def llm_query_orders(userorgid, page, pagerows=80):
