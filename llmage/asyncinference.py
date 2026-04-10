@@ -29,12 +29,16 @@ where userid=${userid}$
 		return recs
 	return []
 
-async def get_asynctask_status(taskid):
+async def get_asynctask_status(request, taskid):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
 		recs = await sor.R('llmusage', {'taskid': taskid})
 		if recs:
 			r = recs[0]
+			if r.status not in ['SUCCEEDED', 'FAILED']:
+				await query_task_status(request, r.id, onetime=True)
+				recs = await sor.R('llmusage', {'id': r.id})
+				r = recs[0]
 			output = await get_lastoutput(r.ioinfo)
 			return output
 		return {
@@ -107,8 +111,7 @@ async def async_uapi_request(request, llm,
 		if d.status == 'FAILED':
 			e = Exception(f'resp={d} FFAILED')
 			return
-		asyncio.create_task(query_task_status(request, llm.upappid, 
-								llm.query_apiname, luid, userid, d.taskid))
+		asyncio.create_task(query_task_status(request,  luid))
 
 	except Exception as e:
 		ed = {"error": f"ERROR:{e}", "status": "FAILED"}
@@ -147,10 +150,14 @@ async def get_llm_llmusage(luid):
 		llm = llms[0]
 		return llm, llmusage
 
-async def query_task_status(request, upappid, apiname, luid, userid, taskid):
+async def query_task_status(request, luid, onetime=False):
 	uapi = UpAppApi(request)
-	apinames = apiname.split(',')
 	llm, llmusage = await get_llm_llmusage(luid)
+	env = ServerEnv()
+	userid = await env.uapi_data.get_calluserid(llm.upappid, orgid=llm.ownerid)
+	taskid = llmusage.taskid
+	upappid = llm.upappid
+	apinames = llm.query_apiname.split(',')
 
 	for apiname in apinames:
 		while True:
@@ -179,6 +186,8 @@ async def query_task_status(request, upappid, apiname, luid, userid, taskid):
 				dcritical(f'finished .. {llmusage.status=}')
 				return
 
+			if onetime:
+				critical(f'onetime is true, returned')
 			await asyncio.sleep(llm.query_period or 30)
 			critical(f'{llm.query_period=} seconds will retry, {changed.status=}')
 					
