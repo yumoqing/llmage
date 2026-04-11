@@ -182,7 +182,7 @@ class BufferedLLMs:
 			sql = """select x.*,
 	z.input_fields
 	from (
-	select a.*, e.ioid, e.callbackurl, e.stream, f.input_fields as inputfields
+	select a.*, e.ioid, e.stream, e.callbackurl, f.input_fields as inputfields
 	from llm a, upapp c, uapiset d, uapi e, uapiio f
 	where a.upappid = c.id
 		and c.apisetid = d.id
