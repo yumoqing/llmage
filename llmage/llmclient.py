@@ -153,8 +153,10 @@ async def _inference_generator(request, callerid, callerorgid,
 			params_kw.callbackurl = cb_url
 		f = partial(async_uapi_request, request, llm, callerid, callerorgid, params_kw=params_kw)
 	elif not params_kw.stream:
+		llm.stream = False
 		f = partial(sync_uapi_request, request, llm, callerid, callerorgid, params_kw=params_kw)
 	else:
+		llm.stream = True
 		f = partial(uapi_request, request, llm, callerid, callerorgid, params_kw=params_kw)
 	async for d in f():
 		yield d
