@@ -201,6 +201,14 @@ where a.llmid = b.id
 			lus.append(r)
 	return lus
 
+async def llm_accoung_failed(luid):
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		await sor.U('llmusage', {
+			'id': luid,
+			'accounting_status': 'failed'
+		})
+
 async def backend_accounting():
 	env = ServerEnv()
 	debug(f'backend accounting started ...')
@@ -216,6 +224,8 @@ async def backend_accounting():
 				await llm_accounting(lu)
 			except Exception as e:
 				exception(f'{e}, {lu.id=}')
+				await llm_accoung_failed(lu.id)
+				
 
 		await asyncio.sleep(10)
 
