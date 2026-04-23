@@ -21,6 +21,7 @@ if params_kw.off_peak:
 userid = await get_user()
 userorgid = await get_userorgid()
 if userid is None:
+	debug(f'not params_kw.prompt and not params_kw.messages,{params_kw=}')
 	return openai_403()
 		
 if not params_kw.prompt and not params_kw.messages:
@@ -37,11 +38,13 @@ where a.llmcatelogid=b.id
 		'model': params_kw.model or 'qwen3-max'
 	})
 	if len(recs) == 0:
+		debug(f'{params_kw.model=} not found')
 		return openai_400()
 	params_kw.llmid = recs[0].id
 
 f = await checkCustomerBalance(params_kw.llmid, userorgid)
 if not f:
+	debug(f'{userid=} balance not enough')
 	return openai_429()
 
 return await env.stream_response(request, gen)
