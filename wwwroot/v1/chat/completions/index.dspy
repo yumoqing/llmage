@@ -21,20 +21,21 @@ if params_kw.off_peak:
 userid = await get_user()
 userorgid = await get_userorgid()
 if userid is None:
-	debug(f'not params_kw.prompt and not params_kw.messages,{params_kw=}')
+	debug(f'need login')
 	return openai_403()
-		
+
 if not params_kw.prompt and not params_kw.messages:
+	debug(f'not params_kw.prompt and not params_kw.messages,{params_kw=}')
 	d = return_error('Missing need data(prompt or messages)')
 	return json_response(d, status=400)
 env = request._run_ns
 async with get_sor_context(env, 'llmage') as sor:
-	sql = """select a.* from llm a, llmcatelog b 
+	sql = """select a.* from llm a, llmcatelog b
 where a.llmcatelogid=b.id
 	and a.model=${model}$
 	and b.name = ${lctype}$"""
 	recs = await sor.sqlExe(sql, {
-		'lctype': lctype, 
+		'lctype': lctype,
 		'model': params_kw.model or 'qwen3-max'
 	})
 	if len(recs) == 0:
@@ -46,8 +47,6 @@ f = await checkCustomerBalance(params_kw.llmid, userorgid)
 if not f:
 	debug(f'{userid=} balance not enough')
 	return openai_429()
-
+# debug(f'{tools=}, {request._run_ns.tools=}')
 return await env.stream_response(request, gen)
-env = DictObject(**globals())
-return await inference(request, env=env)
 
