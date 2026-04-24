@@ -35,10 +35,6 @@ async def get_asynctask_status(request, taskid):
 		recs = await sor.R('llmusage', {'taskid': taskid})
 		if recs:
 			r = recs[0]
-			if r.status not in ['SUCCEEDED', 'FAILED']:
-				await query_task_status(request, r.id, onetime=True)
-				recs = await sor.R('llmusage', {'id': r.id})
-				r = recs[0]
 			output = await get_lastoutput(r.ioinfo)
 			return output
 		return {
