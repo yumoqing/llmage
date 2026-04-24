@@ -52,7 +52,7 @@ async def checkCustomerBalance(llmid, userorgid):
 		bal = 0 if balance is None else balance
 		if llm.min_balance is None:
 			llm.min_balance = 0.00
-		debug(f'{userorgid=}, {balance=}, {llm.min_balance=}, {llm.ppid=}')
+		# debug(f'{userorgid=}, {balance=}, {llm.min_balance=}, {llm.ppid=}')
 		ret = llm.ppid and llm.min_balance < bal
 		return ret
 	debug(f'{userorgid=} checkCustomerBalance() failed')
@@ -149,6 +149,11 @@ async def llm_accounting(llmusage):
 		}
 		await sor.U('llmusage', ns)
 
+async def update_llmusage(ns):
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		await sor.U('llmusage', ns)
+
 async def get_accounting_llmusages(luid=None):
 	env = ServerEnv()
 	lus = []
@@ -176,8 +181,7 @@ where a.llmid = b.id
 					continue
 				r.usages = output.get('usage')
 			if r.usages is None:
-				llmusage.accounting_status = 'failed'
-				await sor.U('llmusage', {'id': llmusage.id, 'accounting_status': 'failed'})
+				await llm_accoung_failed(r.id)
 				debug(f'{r.usages=} is None')
 				continue
 			d = None
@@ -186,7 +190,7 @@ where a.llmid = b.id
 					r.usages = json.loads(r.usages)
 				d = await llm_charging(r.ppid, r)
 			except Exception as e:
-				await sor.U('llmusage', {'id': r.id, 'accounting_status': 'failed'})
+				await llm_accoung_failed(r.id)
 				exception(f'{r.ppid=}, {r.usages=} llm_charging() failed,{e}')
 				continue
 			r.amount = d.amount
