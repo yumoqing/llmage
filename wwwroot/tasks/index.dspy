@@ -1,5 +1,5 @@
 taskid = params_kw.taskid
-s = await get_asynctask_status(taskid)
+s = await get_asynctask_status(request, taskid)
 return {
     'status': 'ok',
     'data': {
