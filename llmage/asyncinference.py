@@ -97,7 +97,7 @@ async def async_uapi_request(request, llm,
 		llmusage.finish_seconds = finish_seconds
 		llmusage.status = d.status
 		llmusage.userorgid = callerorgid
-		llmusage.ownerid = llm.orgid
+		llmusage.ownerid = llm.ownerid
 		llmusage.accounting_status = 'created'
 		b = json.dumps(d, ensure_ascii=False)
 		yield b
