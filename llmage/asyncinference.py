@@ -117,13 +117,10 @@ async def async_uapi_request(request, llm,
 		yield f'{s}\n'
 		return
 
-async def modify_llmusage_status(llmusage):
+async def modify_llmusage(ns):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
-		await sor.U('llmusage', {
-			'id': llmusage.id,
-			'status': llmusage.status
-		})
+		await sor.U('llmusage', ns.copy())
 
 async def get_llm_llmusage(luid):
 	env = ServerEnv()
@@ -176,14 +173,21 @@ async def query_task_status(request, luid, onetime=False):
 				}
 			if lastoutout['status'] != new_output['status']:
 				llmusage.status = new_output['status']
+				ns = {
+					'id': llmusage.id,
+					'status': llmusage.status
+				}
+				if 'usage' in new_output.keys():
+					ns['usages'] = new_output['usage']
 				await append_new_llmoutput(llmusage.ioinfo, new_output)
-				await modify_llmusage_status(llmusage)
+				await modify_llmusage(ns)
 			if  llmusage.status in ['FAILED', 'SUCCEEDED']:
 				critical(f'finished .. {llmusage.status=}')
 				return
 
 			if onetime:
 				critical(f'onetime is true, returned')
+				return
 			await asyncio.sleep(llm.query_period or 30)
 			critical(f'{llm.query_period=} seconds will retry, {new_output["status"]=}')
 					
