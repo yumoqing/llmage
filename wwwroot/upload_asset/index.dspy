@@ -1,7 +1,7 @@
 upappid = 'wetokenai'
 apiname = 'uplaod_asset'
 uapi = UpAppApi(request)
-userid = await get_userid()
+userid = await get_user()
 try:
 	d = await uapi.call(uappid, apiname, userid, params=params_kw)
 	if isinstance(b, bytes):
