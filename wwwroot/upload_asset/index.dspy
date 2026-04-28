@@ -1,0 +1,15 @@
+upappid = 'wetokenai'
+apiname = 'uplaod_asset'
+uapi = UpAppApi(request)
+userid = await get_userid()
+try:
+	d = await uapi.call(uappid, apiname, userid, params=params_kw)
+	if isinstance(b, bytes):
+		b = b.decode('utf-8')
+	d = json.loads(b)
+	return d
+except Exception as e:
+	return {
+		'status': 'FAILED',
+		'error': f'{e}'
+	}
