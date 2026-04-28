@@ -18,7 +18,7 @@ if userid is None:
 		'error': f'sor_get_callerid() error'
 	}
 try:
-	d = await uapi.call(upappid, apiname, userid, params=params_kw)
+	b = await uapi.call(upappid, apiname, userid, params=params_kw)
 	if isinstance(b, bytes):
 		b = b.decode('utf-8')
 	d = json.loads(b)
