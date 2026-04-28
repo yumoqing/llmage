@@ -171,7 +171,11 @@ async def query_task_status(request, luid, onetime=False):
 					'status': 'FAILED', 
 					'error': f'{b},{e}'
 				}
-			if lastoutout['status'] != new_output['status']:
+			if not new_output.get('status'):
+				e = Exception(f"{new_outpu=} {upappid=}, {apiname=} has not status field")
+				critical(f'{e}')
+				raise e
+			if lastoutout['status'] != new_output.get('status'):
 				llmusage.status = new_output['status']
 				ns = {
 					'id': llmusage.id,
