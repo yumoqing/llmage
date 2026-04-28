@@ -178,7 +178,7 @@ async def query_task_status(request, luid, onetime=False):
 					'status': llmusage.status
 				}
 				if 'usage' in new_output.keys():
-					ns['usages'] = new_output['usage']
+					ns['usages'] = json.dumps(new_output['usage'])
 				await append_new_llmoutput(llmusage.ioinfo, new_output)
 				await modify_llmusage(ns)
 			if  llmusage.status in ['FAILED', 'SUCCEEDED']:
