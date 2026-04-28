@@ -1,5 +1,5 @@
 upappid = 'wetokenai'
-apiname = 'uplaod_asset'
+apiname = 'upload_asset'
 uapi = UpAppApi(request)
 userid = await get_user()
 try:
