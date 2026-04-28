@@ -1,7 +1,22 @@
 upappid = 'wetokenai'
 apiname = 'upload_asset'
 uapi = UpAppApi(request)
-userid = await get_user()
+env = request._run_ns
+userid = None
+async with get_sor_context(env, 'llmage') as sor:
+	recs = await sor.R('upapp', {'id': upappid})
+	if len(recs) < 1:
+		exception(f'{upappid=} upapp not found')
+		return {
+			'status': 'FAILED',
+			'error': f'{upappid=} upapp not found'
+		}
+	userid = await sor_get_callerid(sor, recs[0].ownerid)
+if userid is None:
+	return {
+		'status': 'FAILED',
+		'error': f'sor_get_callerid() error'
+	}
 try:
 	d = await uapi.call(upappid, apiname, userid, params=params_kw)
 	if isinstance(b, bytes):
@@ -9,6 +24,7 @@ try:
 	d = json.loads(b)
 	return d
 except Exception as e:
+	exception(f'{e}, {format_exc()}')
 	return {
 		'status': 'FAILED',
 		'error': f'{e}'
