@@ -172,7 +172,7 @@ async def query_task_status(request, luid, onetime=False):
 					'error': f'{b},{e}'
 				}
 			if not new_output.get('status'):
-				e = Exception(f"{new_outpu=} {upappid=}, {apiname=} has not status field")
+				e = Exception(f"{new_output=} {upappid=}, {apiname=} has not status field")
 				critical(f'{e}')
 				raise e
 			if lastoutout['status'] != new_output.get('status'):
