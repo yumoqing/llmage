@@ -48,5 +48,5 @@ if not f:
 	debug(f'{userid=} balance not enough')
 	return openai_429()
 # debug(f'{tools=}, {request._run_ns.tools=}')
-return await env.stream_response(request, gen)
+return await env.stream_response(request, gen, context_type='application/json')
 

@@ -18,6 +18,29 @@ if userid is None:
 		'error': f'sor_get_callerid() error'
 	}
 try:
+	name = params_kw.name
+	if name is None:
+		return {
+			"status": "FAILED",
+			"error": "name is None"
+		}
+	if media_file is None:
+		return {
+			"status": "FAILED",
+			"error": "media_file is None"
+		}
+	assetType = params_kw.assetType
+	if assetType is None:
+		typ = media_file.split('.')[-1]
+		if typ in ['png', 'webp', 'jpg', 'gif']:
+			assetType = 'Image'
+		elif typ in ['mp4', 'mov', 'avi']:
+			assetType = 'Video'
+		elif type in ['mp3', 'wav', 'aac']:
+			assetType = 'Audio'
+		else:
+			assetType = None
+	params_kw.assetType = assetType
 	b = await uapi.call(upappid, apiname, userid, params=params_kw)
 	if isinstance(b, bytes):
 		b = b.decode('utf-8')
