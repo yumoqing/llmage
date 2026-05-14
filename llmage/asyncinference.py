@@ -36,10 +36,10 @@ async def get_asynctask_status(request, taskid):
 		if recs:
 			r = recs[0]
 			output = await get_lastoutput(r.ioinfo)
-            t = timestampAdd(r.use_time, 600)
-            now = time.time()
-            if r.status not in ['FAILED', 'SUCCEEDED'] and now > t:
-                asyncio.create_task(query_task_status(request, r.id))
+			t = timestampAdd(r.use_time, 600)
+			now = time.time()
+			if r.status not in ['FAILED', 'SUCCEEDED'] and now > t:
+				asyncio.create_task(query_task_status(request, r.id))
 			return output
 		return {
 			'taskid': taskid,
