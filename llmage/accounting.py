@@ -37,6 +37,9 @@ async def llm_charging(ppid, llmusage):
 	})
 
 async def checkCustomerBalance(llmid, userorgid):
+	if llmid is None:
+		debug(f'checkCustomerBalance(): llmid is None')
+		return False
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
 		llms = await sor.R('llm', { 'id': llmid})

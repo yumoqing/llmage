@@ -1,5 +1,6 @@
 {% if get_user() %}
 {% set userorgid = get_userorgid() %}
+{% if params_kw.id %}
 {% if checkCustomerBalance(params_kw.id, userorgid) %}
 {% set llm = get_llm(params_kw.id) %}
 {% set kdbs = get_user_kdbs(request) %}
@@ -45,6 +46,15 @@
 	"widgettype":"Text",
 	"options":{
 		"otext":"Not enrogh balance to use llm",
+		"i18n":true
+	}
+}
+{% endif %}
+{% else %}
+{
+	"widgettype":"Text",
+	"options":{
+		"otext":"无效的参数，未找到模型ID",
 		"i18n":true
 	}
 }
