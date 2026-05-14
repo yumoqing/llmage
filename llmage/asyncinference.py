@@ -38,7 +38,7 @@ async def get_asynctask_status(request, taskid):
 			output = await get_lastoutput(r.ioinfo)
 			t = timestampAdd(r.use_time, 600)
 			now = time.time()
-			if r.status not in ['FAILED', 'SUCCEEDED'] and now > t:
+			if r.status not in ['UNKNOWN', 'FAILED', 'SUCCEEDED'] and now > t:
 				asyncio.create_task(query_task_status(request, r.id))
 			return output
 		return {
@@ -135,6 +135,8 @@ async def get_llm_llmusage(luid):
 			exception(f'{e}')
 			raise e
 		llmusage = recs[0]
+		if llmusage.status == 'UNKNOWN':
+			return
 		if llmusage.status == 'SUCCEEDED':
 			return
 		if llmusage.status == 'FAILED':
@@ -159,7 +161,7 @@ async def query_task_status(request, luid, onetime=False):
 	for apiname in apinames:
 		while True:
 			lastoutout = await get_lastoutput(llmusage.ioinfo)
-			if lastoutout['status'] in ['FAILED', 'SUCCEEDED']:
+			if lastoutout['status'] in ['UNKNOWN', 'FAILED', 'SUCCEEDED']:
 				critical(f"{lastoutout['status']=}")
 				return
 			ns = {'taskid': taskid}
@@ -189,7 +191,7 @@ async def query_task_status(request, luid, onetime=False):
 					ns['usages'] = json.dumps(new_output['usage'])
 				await append_new_llmoutput(llmusage.ioinfo, new_output)
 				await modify_llmusage(ns)
-			if  llmusage.status in ['FAILED', 'SUCCEEDED']:
+			if  llmusage.status in ['UNKNOWN', 'FAILED', 'SUCCEEDED']:
 				critical(f'finished .. {llmusage.status=}')
 				return
 
