@@ -8,7 +8,7 @@ from sqlor.dbpools import DBPools, get_sor_context
 from appPublic.log import debug, exception, error, critical
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
-from appPublic.timeUtils import curDateString, timestampstr
+from appPublic.timeUtils import curDateString, timestampstr, timestampAdd
 from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
