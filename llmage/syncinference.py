@@ -88,7 +88,7 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 			await llm_accounting(llmusage)
 		"""
 	except Exception as e:
-		exception(f'{e=},{format_exc()}')
+		exception(f'{e=},{format_exc()}, {b=}')
 		estr = erase_apikey(e)
 		ed = {"error": f"ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid}
 		s = json.dumps(ed, ensure_ascii=False)
