@@ -1,0 +1,16 @@
+{
+    "widgettype": "DataViewer",
+    "options": {
+        "url": "{{entire_url('/llmage/api/llmcatelog_list.dspy')}}",
+        "title": "模型类型管理",
+        "pageSize": 20,
+        "new_data_url": "{{entire_url('/llmage/api/llmcatelog_create.dspy')}}",
+        "update_data_url": "{{entire_url('/llmage/api/llmcatelog_update.dspy')}}",
+        "delete_data_url": "{{entire_url('/llmage/api/llmcatelog_delete.dspy')}}",
+        "fields": [
+            {"name": "id", "title": "ID", "hidden": true},
+            {"name": "name", "title": "类型名", "width": "200px", "editable": true},
+            {"name": "description", "title": "类型说明", "width": "50%", "editable": true}
+        ]
+    }
+}

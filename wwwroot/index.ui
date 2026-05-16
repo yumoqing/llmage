@@ -1,0 +1,177 @@
+{
+    "widgettype": "VBox",
+    "options": {
+        "width": "100%",
+        "height": "100%",
+        "padding": "20px",
+        "spacing": 16
+    },
+    "subwidgets": [
+        {
+            "widgettype": "Title2",
+            "options": {
+                "text": "LLM 模型管理",
+                "halign": "left"
+            }
+        },
+        {
+            "widgettype": "ResponsableBox",
+            "options": {
+                "gap": "16px",
+                "minWidth": "250px"
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "VBox",
+                    "options": {
+                        "backgroundColor": "#1e3a5f",
+                        "padding": "24px",
+                        "cursor": "pointer",
+                        "borderRadius": "8px"
+                    },
+                    "binds": [
+                        {
+                            "wid": "self",
+                            "event": "click",
+                            "actiontype": "urlwidget",
+                            "target": "app.llmage_content",
+                            "options": {
+                                "url": "{{entire_url('/llmage/llmcatelog_list.ui')}}"
+                            },
+                            "mode": "replace"
+                        }
+                    ],
+                    "subwidgets": [
+                        {
+                            "widgettype": "Svg",
+                            "options": {
+                                "svg": "<svg width=\"40\" height=\"40\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#90caf9\" stroke-width=\"2\"><path d=\"M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z\"/></svg>",
+                                "width": "40px",
+                                "height": "40px"
+                            }
+                        },
+                        {
+                            "widgettype": "Title4",
+                            "options": {
+                                "text": "模型类型管理",
+                                "color": "#ffffff",
+                                "marginTop": "12px"
+                            }
+                        },
+                        {
+                            "widgettype": "Text",
+                            "options": {
+                                "text": "管理模型的分类和类型",
+                                "color": "#90caf9",
+                                "fontSize": "14px"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "widgettype": "VBox",
+                    "options": {
+                        "backgroundColor": "#1e3a5f",
+                        "padding": "24px",
+                        "cursor": "pointer",
+                        "borderRadius": "8px"
+                    },
+                    "binds": [
+                        {
+                            "wid": "self",
+                            "event": "click",
+                            "actiontype": "urlwidget",
+                            "target": "app.llmage_content",
+                            "options": {
+                                "url": "{{entire_url('/llmage/llm_catalog_rel_manage.ui')}}"
+                            },
+                            "mode": "replace"
+                        }
+                    ],
+                    "subwidgets": [
+                        {
+                            "widgettype": "Svg",
+                            "options": {
+                                "svg": "<svg width=\"40\" height=\"40\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#ce93d8\" stroke-width=\"2\"><path d=\"M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25\"/></svg>",
+                                "width": "40px",
+                                "height": "40px"
+                            }
+                        },
+                        {
+                            "widgettype": "Title4",
+                            "options": {
+                                "text": "模型-类型关联",
+                                "color": "#ffffff",
+                                "marginTop": "12px"
+                            }
+                        },
+                        {
+                            "widgettype": "Text",
+                            "options": {
+                                "text": "管理模型与类型的多对多关系",
+                                "color": "#ce93d8",
+                                "fontSize": "14px"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "widgettype": "VBox",
+                    "options": {
+                        "backgroundColor": "#1e3a5f",
+                        "padding": "24px",
+                        "cursor": "pointer",
+                        "borderRadius": "8px"
+                    },
+                    "binds": [
+                        {
+                            "wid": "self",
+                            "event": "click",
+                            "actiontype": "urlwidget",
+                            "target": "app.llmage_content",
+                            "options": {
+                                "url": "{{entire_url('/llmage/llm')}}"
+                            },
+                            "mode": "replace"
+                        }
+                    ],
+                    "subwidgets": [
+                        {
+                            "widgettype": "Svg",
+                            "options": {
+                                "svg": "<svg width=\"40\" height=\"40\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#4caf50\" stroke-width=\"2\"><path d=\"M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15.75c-2.062 0-4.024-.614-5.67-1.757l-1.57-.393m15.04 0L12 21 5.25 13.893\"/></svg>",
+                                "width": "40px",
+                                "height": "40px"
+                            }
+                        },
+                        {
+                            "widgettype": "Title4",
+                            "options": {
+                                "text": "模型管理",
+                                "color": "#ffffff",
+                                "marginTop": "12px"
+                            }
+                        },
+                        {
+                            "widgettype": "Text",
+                            "options": {
+                                "text": "管理 LLM 模型配置",
+                                "color": "#4caf50",
+                                "fontSize": "14px"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "widgettype": "VBox",
+            "id": "llmage_content",
+            "options": {
+                "width": "100%",
+                "flex": "1",
+                "marginTop": "20px"
+            }
+        }
+    ]
+}

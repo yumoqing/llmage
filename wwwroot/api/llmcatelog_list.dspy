@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+import json
+
+result = {'success': False, 'rows': [], 'total': 0}
+
+try:
+    dbname = get_module_dbname('llmage')
+    page = int(params_kw.get('page', 1))
+    rows_per_page = int(params_kw.get('rows', 20))
+    offset = (page - 1) * rows_per_page
+
+    async with DBPools().sqlorContext(dbname) as sor:
+        # 获取总数
+        count_sql = "select count(*) as cnt from llmcatelog"
+        count_rows = await sor.sqlExe(count_sql, {})
+        total = count_rows[0]['cnt'] if count_rows else 0
+
+        # 获取分页数据
+        data_sql = "select id, name, description from llmcatelog order by name limit ${limit}$ offset ${offset}$"
+        rows = await sor.sqlExe(data_sql, {'limit': rows_per_page, 'offset': offset})
+        result['rows'] = [dict(r) for r in (rows or [])]
+        result['total'] = total
+        result['success'] = True
+
+except Exception as e:
+    result['error'] = str(e)
+
+return json.dumps(result, ensure_ascii=False, default=str)

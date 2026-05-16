@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+import json
+
+result = {'widgettype': 'Message', 'options': {'title': 'Error', 'message': 'Invalid', 'type': 'error'}}
+
+try:
+    dbname = get_module_dbname('llmage')
+    name = params_kw.get('name', '').strip()
+    description = params_kw.get('description', '').strip()
+
+    if not name:
+        result['options'] = {'title': '错误', 'message': '类型名不能为空', 'type': 'error'}
+    else:
+        async with DBPools().sqlorContext(dbname) as sor:
+            # 检查名称是否已存在
+            check_sql = "select id from llmcatelog where name=${name}$"
+            exists = await sor.sqlExe(check_sql, {'name': name})
+            if exists:
+                result['options'] = {'title': '提示', 'message': f'类型名「{name}」已存在', 'type': 'warning'}
+            else:
+                new_id = getID()
+                insert_sql = "insert into llmcatelog (id, name, description) values (${id}$, ${name}$, ${description}$)"
+                await sor.sqlExe(insert_sql, {'id': new_id, 'name': name, 'description': description})
+                result = {'widgettype': 'Message', 'options': {'title': '成功', 'message': f'类型「{name}」已创建', 'type': 'info'}}
+
+except Exception as e:
+    result['options'] = {'title': '错误', 'message': str(e), 'type': 'error'}
+
+return json.dumps(result, ensure_ascii=False)

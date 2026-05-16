@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+import json
+
+result = {'widgettype': 'Message', 'options': {'title': 'Error', 'message': 'Invalid', 'type': 'error'}}
+
+try:
+    dbname = get_module_dbname('llmage')
+    id = params_kw.get('id', '').strip()
+    name = params_kw.get('name', '').strip()
+    description = params_kw.get('description', '').strip()
+
+    if not id:
+        result['options'] = {'title': '错误', 'message': '记录ID不能为空', 'type': 'error'}
+    elif not name:
+        result['options'] = {'title': '错误', 'message': '类型名不能为空', 'type': 'error'}
+    else:
+        async with DBPools().sqlorContext(dbname) as sor:
+            # 检查名称是否已被其他记录使用
+            check_sql = "select id from llmcatelog where name=${name}$ and id != ${id}$"
+            exists = await sor.sqlExe(check_sql, {'name': name, 'id': id})
+            if exists:
+                result['options'] = {'title': '提示', 'message': f'类型名「{name}」已被其他记录使用', 'type': 'warning'}
+            else:
+                update_sql = "update llmcatelog set name=${name}$, description=${description}$ where id=${id}$"
+                await sor.sqlExe(update_sql, {'name': name, 'description': description, 'id': id})
+                result = {'widgettype': 'Message', 'options': {'title': '成功', 'message': f'类型「{name}」已更新', 'type': 'info'}}
+
+except Exception as e:
+    result['options'] = {'title': '错误', 'message': str(e), 'type': 'error'}
+
+return json.dumps(result, ensure_ascii=False)

@@ -1,15 +1,18 @@
 {
     "tblname": "llmcatelog",
-	"title":"模型类目",
+    "alias": "llmcatelog_list",
+    "title": "模型类型管理",
     "params": {
-		"sortby":"name",
+        "sortby": ["name"],
+        "editable": {
+            "new_data_url": "{{entire_url('../api/llmcatelog_create.dspy')}}",
+            "update_data_url": "{{entire_url('../api/llmcatelog_update.dspy')}}",
+            "delete_data_url": "{{entire_url('../api/llmcatelog_delete.dspy')}}"
+        },
         "browserfields": {
             "exclouded": ["id"],
             "alters": {}
         },
-        "editexclouded": [
-            "id"
-        ],
-        "record_toolbar": null
+        "editexclouded": ["id"]
     }
 }
