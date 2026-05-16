@@ -26,6 +26,12 @@
 				"response_mode": "{{llm.stream}}",
 				"icon":"{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}",
 				"url":"{{entire_url('/llmage/llminference.dspy')}}",
+{% if llm.llmcatelogid %}
+				"stream": true,
+{% endif %}
+{% if llm.stream =='async' %}
+				"query_url": "{{entire_url('/llmage/tasks')}}",
+{% endif %}
 				"model":"{{llm.model}}",
 				"modelname":"{{llm.name}}"
 			}
