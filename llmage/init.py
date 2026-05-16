@@ -1,7 +1,9 @@
 import asyncio
 from appPublic.registerfunction import RegisterFunction
 from ahserver.serverenv import ServerEnv
-from ahserver.configuredServer import add_cleanupctx
+# NOTE: add_cleanupctx(start_backend) 已移除。
+# backend_accounting 现在作为独立进程运行在 bin/backend_accounting.py 中，
+# 避免多进程 sage.py worker 模式下重复启动计费循环。
 from .keling import keling_token
 from .jimeng import jimeng_auth_headers
 from .utils import (
@@ -34,11 +36,6 @@ from .asyncinference import (
 	get_today_asynctask_list
 )
 
-async def start_backend(app):
-	task = asyncio.create_task(backend_accounting())
-	yield
-	task.cancel()
-
 def load_llmage():
 	env = ServerEnv()
 	env.llm_query_orders = llm_query_orders
@@ -62,4 +59,4 @@ def load_llmage():
 	env.llm_query_price = llm_query_price
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
-	add_cleanupctx(start_backend)
+	# add_cleanupctx(start_backend) 已移除，backend_accounting 改为独立进程
