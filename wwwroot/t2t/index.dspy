@@ -17,10 +17,11 @@ if not params_kw.prompt:
 	return json_response(d, status=400)
 env = request._run_ns
 async with get_sor_context(env, 'llmage') as sor:
-	sql = """select a.* from llm a, llmcatelog b 
-where a.llmcatelogid=b.id
-	and a.model=${model}$
-	and b.name = ${lctype}$"""
+	sql = """select a.* from llm a 
+join llm_catalog_rel rel on a.id = rel.llmid
+join llmcatelog b on rel.llmcatelogid = b.id
+where b.name = ${lctype}$
+	and a.model=${model}$"""
 	recs = await sor.sqlExe(sql, {
 		'lctype': lctype, 
 		'model': params_kw.model or 'qwen3-max'

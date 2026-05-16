@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+import json
+
+result = {'success': False, 'rows': [], 'total': 0}
+
+try:
+    dbname = get_module_dbname('llmage')
+    sql = """
+    select r.id, r.llmid, l.name as llm_name, r.llmcatelogid, c.name as catelog_name
+    from llm_catalog_rel r
+    join llm l on r.llmid = l.id
+    join llmcatelog c on r.llmcatelogid = c.id
+    order by l.name, c.name
+    """
+    
+    async with DBPools().sqlorContext(dbname) as sor:
+        rows = await sor.sqlExe(sql, {})
+        result['rows'] = [dict(r) for r in (rows or [])]
+        result['total'] = len(result['rows'])
+        result['success'] = True
+
+except Exception as e:
+    result['error'] = str(e)
+
+return json.dumps(result, ensure_ascii=False, default=str)

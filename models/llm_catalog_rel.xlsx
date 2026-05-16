@@ -1,0 +1,11 @@
+fields:
+name|title|type|length:int|dec:int|nullable|default|comments
+id|id|str|32|None|None|None|None
+llmid|模型id|str|32|None|None|None|None
+llmcatelogid|模型类型id|str|32|None|None|None|None
+
+indexes:
+name|fields|unique
+idx_llm|llmid|None
+idx_catelog|llmcatelogid|None
+uq_llm_catelog|llmid,llmcatelogid|1

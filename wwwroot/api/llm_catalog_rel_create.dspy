@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+import json
+
+result = {'widgettype': 'Message', 'options': {'title': 'Error', 'message': 'Invalid', 'type': 'error'}}
+
+try:
+    dbname = get_module_dbname('llmage')
+    llmid = params_kw.get('llmid', '')
+    catelogid = params_kw.get('llmcatelogid', '')
+    
+    if not llmid or not catelogid:
+        result['options'] = {'title': 'Error', 'message': '请选择模型和目录', 'type': 'error'}
+    else:
+        from appPublic.uniqueID import getID
+        new_id = getID()
+        
+        async with DBPools().sqlorContext(dbname) as sor:
+            # 检查是否已存在
+            check_sql = "select id from llm_catalog_rel where llmid = ${llmid}$ and llmcatelogid = ${catelogid}$"
+            exists = await sor.sqlExe(check_sql, {'llmid': llmid, 'catelogid': catelogid})
+            
+            if exists:
+                result['options'] = {'title': '提示', 'message': '该关联已存在', 'type': 'warning'}
+            else:
+                data = {'id': new_id, 'llmid': llmid, 'llmcatelogid': catelogid}
+                await sor.C('llm_catalog_rel', data)
+                result['options'] = {'title': 'Success', 'message': '添加成功', 'type': 'success'}
+
+except Exception as e:
+    result['options'] = {'title': 'Error', 'message': f'添加失败: {str(e)}', 'type': 'error'}
+
+return json.dumps(result, ensure_ascii=False)
