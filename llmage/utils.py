@@ -179,6 +179,13 @@ async def get_llms_by_catelog(catelogid=None):
 	
 class BufferedLLMs:
 	llms = {}
+	@classmethod
+	def clear_cache(cls, data=None):
+		"""Clear all cached LLM configurations.
+		Called as EventDispatcher handler, so accepts optional data param.
+		"""
+		cls.llms.clear()
+		debug('BufferedLLMs cache cleared')
 	async def get_llm(self, llmid):
 		today = curDateString()
 		k = f'{llmid}.{today}'

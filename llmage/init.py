@@ -1,16 +1,16 @@
 import asyncio
 from appPublic.registerfunction import RegisterFunction
+from sqlor.dbpools import DBPools
 from ahserver.serverenv import ServerEnv
-# NOTE: add_cleanupctx(start_backend) 已移除。
-# backend_accounting 现在作为独立进程运行在 bin/backend_accounting.py 中，
-# 避免多进程 sage.py worker 模式下重复启动计费循环。
+from appPublic.log import debug
 from .keling import keling_token
 from .jimeng import jimeng_auth_headers
 from .utils import (
 	llm_query_orders,
 	read_webpath,
 	llm_query_price,
-	get_llm_by_model
+	get_llm_by_model,
+	BufferedLLMs
 )
 
 from .llmclient import (
@@ -36,6 +36,26 @@ from .asyncinference import (
 	get_today_asynctask_list
 )
 
+def _bind_llmage_events(dbpools, dbname):
+	"""Bind database events to Llmage cache invalidation handlers."""
+	bindings = [
+		# llm 表增删改：清除 LLM 配置缓存
+		(f'{dbname}.llm:c:after', BufferedLLMs.clear_cache),
+		(f'{dbname}.llm:u:after', BufferedLLMs.clear_cache),
+		(f'{dbname}.llm:d:after', BufferedLLMs.clear_cache),
+		# llmcatelog 表变更：清除缓存
+		(f'{dbname}.llmcatelog:c:after', BufferedLLMs.clear_cache),
+		(f'{dbname}.llmcatelog:u:after', BufferedLLMs.clear_cache),
+		(f'{dbname}.llmcatelog:d:after', BufferedLLMs.clear_cache),
+		# llm_catalog_rel 关联表变更：清除缓存
+		(f'{dbname}.llm_catalog_rel:c:after', BufferedLLMs.clear_cache),
+		(f'{dbname}.llm_catalog_rel:u:after', BufferedLLMs.clear_cache),
+		(f'{dbname}.llm_catalog_rel:d:after', BufferedLLMs.clear_cache),
+	]
+	for event_name, handler in bindings:
+		dbpools.bind(event_name, handler)
+		debug(f'Llmage event bound: {event_name}')
+
 def load_llmage():
 	env = ServerEnv()
 	env.llm_query_orders = llm_query_orders
@@ -59,4 +79,12 @@ def load_llmage():
 	env.llm_query_price = llm_query_price
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
-	# add_cleanupctx(start_backend) 已移除，backend_accounting 改为独立进程
+
+	# Bind database events for automatic cache invalidation
+	dbpools = DBPools()
+	dbname = env.get_module_dbname('llmage')
+	if dbname:
+		_bind_llmage_events(dbpools, dbname)
+		debug(f'Llmage event listeners bound for database: {dbname}')
+	else:
+		debug('Llmage event listeners skipped: no database configured for llmage module')
