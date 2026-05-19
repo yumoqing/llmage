@@ -154,7 +154,7 @@ async def get_llms_by_catelog_to_customer(catelogid=None, orderby='providerid'):
 			and a.ppid is not null
 			and a.expired_date > ${today}$
 			"""
-		sortstr='catelog_id ' + orderby
+		sortstr='catelog_id, ' + orderby
 		params = {'today': today, 'sort': sortstr}
 		if catelogid:
 			sql += " and rel.llmcatelogid = ${catelogid}$"
