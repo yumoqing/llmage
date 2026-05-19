@@ -154,13 +154,15 @@ async def get_llms_by_catelog_to_customer(catelogid=None, orderby='providerid'):
 			and a.ppid is not null
 			and a.expired_date > ${today}$
 			"""
-		params = {'today': today, 'sort': orderby}
+		sortstr='catelog_id ' + orderby
+		params = {'today': today, 'sort': sortstr}
 		if catelogid:
 			sql += " and rel.llmcatelogid = ${catelogid}$"
 			params['catelogid'] = catelogid
 			
 		debug(f'{sql=}')
 		recs = await sor.sqlExe(sql, params)
+		debug(f'{sql=}, {recs=}')
 		d = []
 		cid = ''
 		x = None
