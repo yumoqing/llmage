@@ -78,6 +78,7 @@ def load_llmage():
 	env.get_llms_sort_by_provider = get_llms_sort_by_provider
 	env.keling_token = keling_token
 	env.llm_query_price = llm_query_price
+	env.get_llms_by_catelog_to_customer = get_llms_by_catelog_to_customer
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
 
