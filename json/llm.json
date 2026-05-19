@@ -49,9 +49,8 @@
 			{
 				"field":"llmid",
 				"title":"模型类型",
-				"subtable":"llmtype"
+				"subtable":"llm_catelog_rel"
 			}
-		],
-        "record_toolbar": null
+		]
     }
 }
