@@ -1,5 +1,5 @@
 env = request._run_ns
 async with get_sor_context(env, 'llmage') as sor:
 	recs = await sor.R('llmcatelog', {})
-	return recs[]
+	return recs
 return []
