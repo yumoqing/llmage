@@ -141,7 +141,45 @@ async def get_llmcatelogs():
 
 	return []
 
-async def get_llms_by_catelog(catelogid=None):
+async def get_llms_by_catelog_to_customer(catelogid=None, orderby='providerid'):
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		today = curDateString()
+		# Join with llm_catalog_rel to support multiple catalogs per LLM
+		sql = """select a.*, b.name as catelogname, rel.llmcatelogid as catelog_id 
+			from llm a 
+			join llm_catalog_rel rel on a.id = rel.llmid 
+			join llmcatelog b on rel.llmcatelogid = b.id
+			where a.enabled_date <= ${today}$
+			and a.ppid is not null
+			and a.expired_date > ${today}$
+			"""
+		params = {'today': today, 'sort': orderby}
+		if catelogid:
+			sql += " and rel.llmcatelogid = ${catelogid}$"
+			params['catelogid'] = catelogid
+			
+		sql += " order by rel.llmcatelogid, a.id"
+		
+		recs = await sor.sqlExe(sql, params)
+		d = []
+		cid = ''
+		x = None
+		for r in recs:
+			if cid != r.catelog_id:
+				x = {
+					'catelogid': r.catelog_id,
+					'catelogname': r.catelogname,
+					'llms': [r]
+				}
+				d.append(x)
+				cid = r.catelog_id
+			else:
+				x['llms'].append(r)
+		return d
+	return []
+
+async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
 		today = curDateString()
@@ -152,7 +190,7 @@ async def get_llms_by_catelog(catelogid=None):
 			join llmcatelog b on rel.llmcatelogid = b.id
 			where a.enabled_date <= ${today}$
 			and a.expired_date > ${today}$"""
-		params = {'today': today}
+		params = {'today': today, 'sort': orderby}
 		if catelogid:
 			sql += " and rel.llmcatelogid = ${catelogid}$"
 			params['catelogid'] = catelogid

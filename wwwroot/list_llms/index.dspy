@@ -1,0 +1,3 @@
+lctype=params_kw.lctype
+order_by=params_kw.orderby or 'providerid'
+return await get_llms_by_catelog_to_customer(catelogid=lctype, orderby=orderby)
