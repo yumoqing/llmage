@@ -161,8 +161,8 @@ async def get_llms_by_catelog_to_customer(catelogid=None, orderby='providerid'):
 			params['catelogid'] = catelogid
 			
 		debug(f'{sql=}')
-		recs = await sor.sqlExe(sql, params)
-		debug(f'{sql=}, {recs=}')
+		recs = await sor.sqlExe(sql, params.copy())
+		debug(f'{sql=}, {recs=}, {params=}')
 		d = []
 		cid = ''
 		x = None
