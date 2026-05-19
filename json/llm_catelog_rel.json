@@ -1,0 +1,15 @@
+{
+    "tblname": "llm_catelog_rel",
+    "title":"模型类型",
+    "params": {
+        "browserfields": {
+            "exclouded": ["id", "llmid"],
+            "alters": {}
+        },
+        "editexclouded": [
+            "id",
+            "llmid"
+        ]
+    }
+}
+
