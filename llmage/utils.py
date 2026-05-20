@@ -234,10 +234,9 @@ class BufferedLLMs:
 		env = ServerEnv()
 		async with get_sor_context(env, 'llmage') as sor:
 			sql = """select x.*,
-	z.input_fields
+z.input_fields
 from (
-select a.*, e.ioid, e.stream, e.callbackurl, f.input_fields as inputfields,
-       m.query_apiname, m.query_period, m.ppid
+select a.*, e.ioid, e.stream, e.callbackurl, f.input_fields as inputfields
 from llm a
 join llm_api_map m on a.id = m.llmid
 join upapp c on a.upappid = c.id
