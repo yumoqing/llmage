@@ -48,8 +48,8 @@
 		"subtables":[
 			{
 				"field":"llmid",
-				"title":"模型类型",
-				"subtable":"llm_catelog_rel"
+				"title":"能力映射",
+				"subtable":"llm_api_map"
 			}
 		]
     }

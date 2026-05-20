@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+import json
+
+result = {'success': False, 'data': []}
+
+try:
+    dbname = get_module_dbname('llmage')
+
+    async with DBPools().sqlorContext(dbname) as sor:
+        rows = await sor.sqlExe("select name, path from uapi order by name", {})
+        result['data'] = [{'id': r['name'], 'text': f"{r['name']} ({r['path']})"} for r in (rows or [])]
+        result['success'] = True
+
+except Exception as e:
+    result['error'] = str(e)
+
+return json.dumps(result, ensure_ascii=False, default=str)

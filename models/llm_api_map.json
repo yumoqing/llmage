@@ -1,0 +1,99 @@
+{
+    "table_name": "llm_api_map",
+    "summary": [
+        {
+            "name": "llm_api_map",
+            "title": "模型API映射表",
+            "primary": "id",
+            "catelog": "relation"
+        }
+    ],
+    "fields": [
+        {
+            "name": "id",
+            "type": "varchar(32)",
+            "not_null": true,
+            "comment": "主键ID"
+        },
+        {
+            "name": "llmid",
+            "type": "varchar(32)",
+            "not_null": true,
+            "comment": "模型ID，关联llm表"
+        },
+        {
+            "name": "llmcatelogid",
+            "type": "varchar(32)",
+            "not_null": true,
+            "comment": "模型分类ID，关联llmcatelog表"
+        },
+        {
+            "name": "apiname",
+            "type": "varchar(100)",
+            "not_null": true,
+            "comment": "推理接口名称，关联uapi表name字段"
+        },
+        {
+            "name": "query_apiname",
+            "type": "varchar(100)",
+            "comment": "异步任务结果查询接口名称，可逗号分隔多个"
+        },
+        {
+            "name": "query_period",
+            "type": "bigint",
+            "default": 30,
+            "comment": "异步任务查询轮询间隔（秒），默认30"
+        },
+        {
+            "name": "ppid",
+            "type": "varchar(32)",
+            "comment": "计费程序ID，关联pricing_program表"
+        }
+    ],
+    "indexes": [
+        {
+            "name": "idx_api_map_llmid",
+            "type": "normal",
+            "idxfields": ["llmid"],
+            "idxtype": "index"
+        },
+        {
+            "name": "idx_api_map_catelog",
+            "type": "normal",
+            "idxfields": ["llmcatelogid"],
+            "idxtype": "index"
+        },
+        {
+            "name": "idx_api_map_apiname",
+            "type": "normal",
+            "idxfields": ["apiname"],
+            "idxtype": "index"
+        },
+        {
+            "name": "uk_llmid_apiname",
+            "type": "unique",
+            "idxfields": ["llmid", "apiname"],
+            "idxtype": "unique"
+        }
+    ],
+    "codes": [
+        {
+            "field": "llmid",
+            "table": "llm",
+            "valuefield": "id",
+            "textfield": "name"
+        },
+        {
+            "field": "llmcatelogid",
+            "table": "llmcatelog",
+            "valuefield": "id",
+            "textfield": "name"
+        },
+        {
+            "field": "ppid",
+            "table": "pricing_program",
+            "valuefield": "id",
+            "textfield": "name"
+        }
+    ]
+}

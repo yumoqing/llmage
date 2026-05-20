@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+import json
+
+result = {'widgettype': 'Message', 'options': {'title': 'Error', 'message': 'Invalid', 'type': 'error'}}
+
+try:
+    dbname = get_module_dbname('llmage')
+    llmid = params_kw.get('llmid', '')
+    catelogid = params_kw.get('llmcatelogid', '')
+    apiname = params_kw.get('apiname', '')
+
+    if not llmid or not catelogid or not apiname:
+        result['options'] = {'title': 'Error', 'message': '模型、分类和API接口为必填项', 'type': 'error'}
+    else:
+        user_orgid = await get_userorgid()
+        from appPublic.uniqueID import getID
+        new_id = getID()
+
+        async with DBPools().sqlorContext(dbname) as sor:
+            # 验证模型属于当前用户的机构
+            check_llm = await sor.sqlExe(
+                "select id from llm where id = ${llmid}$ and ownerid = ${ownerid}$",
+                {'llmid': llmid, 'ownerid': user_orgid}
+            )
+            if not check_llm:
+                result['options'] = {'title': 'Error', 'message': '无权操作该模型', 'type': 'error'}
+            else:
+                # 检查是否已存在
+                check_sql = """select id from llm_api_map
+                               where llmid = ${llmid}$ and apiname = ${apiname}$"""
+                exists = await sor.sqlExe(check_sql, {'llmid': llmid, 'apiname': apiname})
+
+                if exists:
+                    result['options'] = {'title': '提示', 'message': '该模型的此API映射已存在', 'type': 'warning'}
+                else:
+                    data = {
+                        'id': new_id,
+                        'llmid': llmid,
+                        'llmcatelogid': catelogid,
+                        'apiname': apiname
+                    }
+                    query_apiname = params_kw.get('query_apiname', '').strip()
+                    if query_apiname:
+                        data['query_apiname'] = query_apiname
+                    query_period = params_kw.get('query_period', '').strip()
+                    if query_period:
+                        try:
+                            data['query_period'] = int(query_period)
+                        except ValueError:
+                            data['query_period'] = 30
+                    else:
+                        data['query_period'] = 30
+                    ppid = params_kw.get('ppid', '').strip()
+                    if ppid:
+                        data['ppid'] = ppid
+
+                    await sor.C('llm_api_map', data)
+                    result['options'] = {'title': 'Success', 'message': '添加成功', 'type': 'success'}
+
+except Exception as e:
+    result['options'] = {'title': 'Error', 'message': f'添加失败: {str(e)}', 'type': 'error'}
+
+return json.dumps(result, ensure_ascii=False)

@@ -1,17 +1,27 @@
 {
-    "summary": [{"name": "llm_api_map", "title": "模型能力映射表", "primary": ["id"], "catelog": "relation"}],
-    "fields": [
-        {"name": "id", "title": "主键", "type": "str", "length": 32, "nullable": "no"},
-        {"name": "llmid", "title": "模型ID", "type": "str", "length": 32, "nullable": "no"},
-        {"name": "llmcatelogid", "title": "类目ID", "type": "str", "length": 32, "nullable": "no"},
-        {"name": "apiname", "title": "API接口名", "type": "str", "length": 100, "nullable": "no"},
-        {"name": "query_apiname", "title": "结果查询API名", "type": "str", "length": 100},
-        {"name": "query_period", "title": "查询间隔(秒)", "type": "int"},
-        {"name": "ppid", "title": "定价项目ID", "type": "str", "length": 32}
-    ],
-    "indexes": [
-        {"name": "idx_llm_api_llm", "idxtype": "index", "idxfields": ["llmid"]},
-        {"name": "idx_llm_api_catelog", "idxtype": "unique", "idxfields": ["llmid", "llmcatelogid"]}
-    ],
-    "codes": []
+    "tblname": "llm_api_map",
+    "title": "模型能力映射",
+    "params": {
+        "browserfields": {
+            "exclouded": ["id", "llmid"],
+            "alters": {
+                "llmcatelogid": {
+                    "dataurl": "{{entire_url('../api/llm_catelog_options.dspy')}}",
+                    "textField": "name",
+                    "valueField": "id"
+                },
+                "apiname": {
+                    "dataurl": "{{entire_url('../api/uapi_options.dspy')}}",
+                    "textField": "name",
+                    "valueField": "name"
+                },
+                "ppid": {
+                    "dataurl": "{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
+                    "textField": "name",
+                    "valueField": "id"
+                }
+            }
+        },
+        "editexclouded": ["id", "llmid"]
+    }
 }
