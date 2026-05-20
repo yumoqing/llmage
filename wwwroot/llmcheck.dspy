@@ -10,22 +10,10 @@ async with get_sor_context(request._run_ns, 'llmage') as sor:
 	else:
 		msgs.append(f'llm not found: {llmid=}, {today=}')
 		return msgs
-	sql = """select a.* from llm a, upapp b 
-where a.id=${llmid}$ 
+	sql = """select a.* from llm a, upapp b
+where a.id=${llmid}$
 	and a.upappid = b.id
-	and a.enabled_date <= ${today}$ 
-	and a.expired_date > ${today}$"""
-	recs = await sor.sqlExe(sql, ns.copy())
-	if recs:
-		msgs.append('llm join upapp read ok')
-	else:
-		msgs.append('llm join upapp not found: {llmid=}, {today=}')
-		return msgs
-	sql = """select a.* from llm a, upapp b, uapiset c
-where a.id=${llmid}$ 
-	and a.upappid = b.id
-	and b.apisetid = c.id
-	and a.enabled_date <= ${today}$ 
+	and a.enabled_date <= ${today}$
 	and a.expired_date > ${today}$"""
 	recs = await sor.sqlExe(sql, ns.copy())
 	if recs:
@@ -35,12 +23,10 @@ where a.id=${llmid}$
 		return msgs
 
 	sql = """select a.*, e.ioid, e.stream
-from llm a, upapp c, uapiset d, uapi e
-where a.upappid = c.id
-	and c.apisetid = d.id
-	and e.apisetid = d.id
-	and a.apiname = e.name
-	and a.id=${llmid}$
+from llm a
+join upapp c on a.upappid = c.id
+join uapi e on c.apisetid = e.apisetid and a.apiname = e.name
+where a.id=${llmid}$
 	and a.expired_date > ${today}$
 	and a.enabled_date <= ${today}$"""
 	recs = await sor.sqlExe(sql, ns.copy())
@@ -51,13 +37,11 @@ where a.upappid = c.id
 		return msgs
 
 	sql = """select a.*, e.ioid, e.stream
-from llm a, upapp c, uapiset d, uapi e, uapiio b
-where a.upappid = c.id
-	and c.apisetid = d.id
-	and e.apisetid = d.id
-	and a.apiname = e.name
-	and e.ioid = b.id
-	and a.id=${llmid}$
+from llm a
+join upapp c on a.upappid = c.id
+join uapi e on c.apisetid = e.apisetid and a.apiname = e.name
+join uapiio b on e.ioid = b.id
+where a.id=${llmid}$
 	and a.expired_date > ${today}$
 	and a.enabled_date <= ${today}$"""
 	recs = await sor.sqlExe(sql, ns.copy())

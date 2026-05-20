@@ -350,7 +350,7 @@ llmage
 ## 开发注意事项
 
 1. **llm.stream 字段**：控制推理模式 — `'async'` 为异步任务、`False` 为同步、`True` 为流式
-2. **llm 表关联链**：llm → upapp → uapiset → uapi + uapiio，新增模型需在 uapi 模块中先配置好 API 定义
+2. **llm 表关联链**：llm → upapp → uapi + uapiio，新增模型需在 uapi 模块中先配置好 API 定义。模型能力字段（apiname, query_apiname, query_period, ppid）已拆分到 llm_api_map 表。
 3. **input_fields**：模型的输入字段定义存储在 uapiio 表中，BufferedLLMs 加载时自动关联
 4. **计费开关**：目前联机不调账（代码中已注释），所有 amount/cost 为 0，由后台任务统一处理
 5. **异步任务 query_apiname**：支持多个 API 名称逗号分隔，逐个轮询直到状态变为 SUCCEEDED/FAILED

@@ -235,19 +235,19 @@ class BufferedLLMs:
 		async with get_sor_context(env, 'llmage') as sor:
 			sql = """select x.*,
 	z.input_fields
-	from (
-	select a.*, e.ioid, e.stream, e.callbackurl, f.input_fields as inputfields
-	from llm a, upapp c, uapiset d, uapi e, uapiio f
-	where a.upappid = c.id
-		and c.apisetid = d.id
-		and e.apisetid = d.id
-		and e.ioid = f.id
-		and a.apiname = e.name
-		and a.expired_date > ${today}$
-		and a.enabled_date <= ${today}$
-	) x left join uapiio z on x.ioid = z.id
-	where x.id = ${llmid}$  
-	"""
+from (
+select a.*, e.ioid, e.stream, e.callbackurl, f.input_fields as inputfields,
+       m.query_apiname, m.query_period, m.ppid
+from llm a
+join llm_api_map m on a.id = m.llmid
+join upapp c on a.upappid = c.id
+join uapi e on c.apisetid = e.apisetid and m.apiname = e.name
+join uapiio f on e.ioid = f.id
+where a.expired_date > ${today}$
+	and a.enabled_date <= ${today}$
+) x left join uapiio z on x.ioid = z.id
+where x.id = ${llmid}$
+"""
 			ns = {'llmid': llmid, 'today': today}
 			recs = await sor.sqlExe(sql, ns.copy())
 			if len(recs) > 0:
