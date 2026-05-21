@@ -14,101 +14,106 @@
       }
     },
     {
-      "widgettype": "VBox",
+      "widgettype": "VScrollPanel",
       "options": {
-        "width": "calc(100% - 40px)",
-        "margin": "0 20px",
-        "padding": "16px",
-        "bgcolor": "#f5f5f5",
-        "spacing": 12
+        "height": "500px"
       },
       "subwidgets": [
         {
-          "widgettype": "Text",
+          "widgettype": "VBox",
           "options": {
-            "text": "添加新映射",
-            "fontSize": "16px",
-            "fontWeight": "bold"
-          }
-        },
-        {
-          "widgettype": "Form",
-          "id": "add_form",
-          "options": {
-            "layout": "horizontal",
-            "cols": 3,
-            "fields": [
-              {
-                "name": "llmid",
-                "label": "选择模型",
-                "uitype": "select",
-                "dataurl": "{{entire_url('./api/llm_api_map_options.dspy')}}",
-                "data_field": "llms",
-                "placeholder": "请选择模型"
-              },
-              {
-                "name": "llmcatelogid",
-                "label": "选择分类",
-                "uitype": "select",
-                "dataurl": "{{entire_url('./api/llm_api_map_options.dspy')}}",
-                "data_field": "catelogs",
-                "placeholder": "请选择分类"
-              },
-              {
-                "name": "apiname",
-                "label": "API接口",
-                "uitype": "select",
-                "dataurl": "{{entire_url('./api/llm_api_map_options.dspy')}}",
-                "data_field": "apis",
-                "placeholder": "请选择API接口"
-              },
-              {
-                "name": "query_apiname",
-                "label": "查询API",
-                "uitype": "text",
-                "placeholder": "异步查询API名，多个用逗号分隔"
-              },
-              {
-                "name": "query_period",
-                "label": "查询间隔(秒)",
-                "uitype": "number",
-                "placeholder": "默认30"
-              },
-              {
-                "name": "ppid",
-                "label": "计费项目",
-                "uitype": "select",
-                "dataurl": "{{entire_url('./api/llm_api_map_options.dspy')}}",
-                "data_field": "ppids",
-                "placeholder": "请选择计费项目"
-              }
-            ],
-            "buttons": [
-              {
-                "name": "add_btn",
-                "label": "添加映射",
-                "variant": "primary"
-              }
-            ]
+            "width": "calc(100% - 40px)",
+            "margin": "0 20px",
+            "padding": "16px",
+            "bgcolor": "#f5f5f5",
+            "spacing": 12
           },
-          "binds": [
+          "subwidgets": [
             {
-              "wid": "add_btn",
-              "event": "click",
-              "actiontype": "urlwidget",
-              "target": "PopupWindow",
-              "popup_options": {"archor": "cc", "width": "30%", "height": "20%"},
+              "widgettype": "Text",
               "options": {
-                "url": "{{entire_url('./api/llm_api_map_create.dspy')}}",
-                "params": {
-                  "llmid": "$[add_form.llmid]$",
-                  "llmcatelogid": "$[add_form.llmcatelogid]$",
-                  "apiname": "$[add_form.apiname]$",
-                  "query_apiname": "$[add_form.query_apiname]$",
-                  "query_period": "$[add_form.query_period]$",
-                  "ppid": "$[add_form.ppid]$"
-                }
+                "text": "添加新映射",
+                "fontSize": "16px",
+                "fontWeight": "bold"
               }
+            },
+            {
+              "widgettype": "Form",
+              "id": "add_form",
+              "options": {
+                "layout": "horizontal",
+                "cols": 3,
+                "fields": [
+                  {
+                    "name": "llmid",
+                    "uitype": "hidden",
+                    "value": "{{params_kw.llmid}}"
+                  },
+                  {
+                    "name": "llmcatelogid",
+                    "label": "选择分类",
+                    "uitype": "code",
+                    "dataurl": "{{entire_url('./api/llm_api_map_options.dspy')}}",
+                    "data_field": "catelogs",
+                    "placeholder": "请选择分类"
+                  },
+                  {
+                    "name": "apiname",
+                    "label": "API接口",
+                    "uitype": "code",
+                    "dataurl": "{{entire_url('./api/llm_api_map_options.dspy')}}",
+                    "data_field": "apis",
+                    "placeholder": "请选择API接口"
+                  },
+                  {
+                    "name": "query_apiname",
+                    "label": "查询API",
+                    "uitype": "str",
+                    "placeholder": "异步查询API名，多个用逗号分隔"
+                  },
+                  {
+                    "name": "query_period",
+                    "label": "查询间隔(秒)",
+                    "uitype": "int",
+                    "placeholder": "默认30"
+                  },
+                  {
+                    "name": "ppid",
+                    "label": "计费项目",
+                    "uitype": "code",
+                    "dataurl": "{{entire_url('./api/llm_api_map_options.dspy')}}",
+                    "data_field": "ppids",
+                    "placeholder": "请选择计费项目"
+                  }
+                ],
+                "buttons": [
+                  {
+                    "name": "add_btn",
+                    "label": "添加映射",
+                    "variant": "primary"
+                  }
+                ]
+              },
+              "binds": [
+                {
+                  "wid": "add_btn",
+                  "event": "click",
+                  "actiontype": "urlwidget",
+                  "target": "PopupWindow",
+                  "popup_options": {"archor": "cc", "width": "30%", "height": "20%"},
+                  "options": {
+                    "url": "{{entire_url('./api/llm_api_map_create.dspy')}}",
+                    "params": {
+                      "llmid": "$[add_form.llmid]$",
+                      "llmcatelogid": "$[add_form.llmcatelogid]$",
+                      "apiname": "$[add_form.apiname]$",
+                      "query_apiname": "$[add_form.query_apiname]$",
+                      "query_period": "$[add_form.query_period]$",
+                      "ppid": "$[add_form.ppid]$"
+                    }
+                  }
+                }
+              ]
             }
           ]
         }
