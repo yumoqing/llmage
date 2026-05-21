@@ -1,0 +1,128 @@
+{
+    "summary": [
+        {
+            "name": "llmusage",
+            "title": "模型使用",
+            "primary": [
+                "id"
+            ],
+            "catelog": "entity"
+        }
+    ],
+    "fields": [
+        {
+            "name": "id",
+            "title": "id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "llmid",
+            "title": "模型id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "use_date",
+            "title": "使用日期",
+            "type": "date"
+        },
+        {
+            "name": "use_time",
+            "title": "使用时间",
+            "type": "timestamp"
+        },
+        {
+            "name": "userid",
+            "title": "用户id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "usages",
+            "title": "使用信息",
+            "type": "text"
+        },
+        {
+            "name": "ioinfo",
+            "title": "交互内容",
+            "type": "text"
+        },
+        {
+            "name": "transno",
+            "title": "交易号",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "responsed_seconds",
+            "title": "响应时间",
+            "type": "float",
+            "length": 18
+        },
+        {
+            "name": "finish_seconds",
+            "title": "结束时间",
+            "type": "float",
+            "length": 18
+        },
+        {
+            "name": "status",
+            "title": "状态",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "taskid",
+            "title": "任务号",
+            "type": "str",
+            "length": 256
+        },
+        {
+            "name": "amount",
+            "title": "交易金额",
+            "type": "float",
+            "length": 18
+        },
+        {
+            "name": "cost",
+            "title": "交易成本",
+            "type": "float",
+            "length": 18
+        },
+        {
+            "name": "userorgid",
+            "title": "用户机构id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "ownerid",
+            "title": "模型机构id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "accounting_status",
+            "title": "记账状态",
+            "type": "str",
+            "length": 32
+        }
+    ],
+    "indexes": [
+        {
+            "name": "idx1",
+            "idxtype": "unique",
+            "idxfields": [
+                "taskid"
+            ]
+        },
+        {
+            "name": "idx2",
+            "idxtype": "index",
+            "idxfields": [
+                "userid"
+            ]
+        }
+    ]
+}

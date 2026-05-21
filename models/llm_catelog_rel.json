@@ -1,0 +1,56 @@
+{
+    "summary": [
+        {
+            "name": "llm_catelog_rel",
+            "title": "模型分类对照表",
+            "primary": [
+                "id"
+            ],
+            "catelog": "relation"
+        }
+    ],
+    "fields": [
+        {
+            "name": "id",
+            "title": "id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "llmid",
+            "title": "模型id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "llmcatelogid",
+            "title": "模型分类id",
+            "type": "str",
+            "length": 32
+        }
+    ],
+    "indexes": [
+        {
+            "name": "idx_uniue_llm_catelogid",
+            "idxtype": "unique",
+            "idxfields": [
+                "llmid",
+                "llmcatelogid"
+            ]
+        }
+    ],
+    "codes": [
+        {
+            "field": "llmid",
+            "table": "llm",
+            "valuefield": "id",
+            "textfield": "name"
+        },
+        {
+            "field": "llmcatelogid",
+            "table": "llmcatelog",
+            "valuefield": "id",
+            "textfield": "name"
+        }
+    ]
+}

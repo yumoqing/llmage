@@ -1,0 +1,30 @@
+{
+    "summary": [
+        {
+            "name": "llmcatelog",
+            "title": "模型类目",
+            "primary": [
+                "id"
+            ]
+        }
+    ],
+    "fields": [
+        {
+            "name": "id",
+            "title": "id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "name",
+            "title": "类型名",
+            "type": "str",
+            "length": 100
+        },
+        {
+            "name": "description",
+            "title": "类型说明",
+            "type": "text"
+        }
+    ]
+}

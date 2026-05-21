@@ -1,0 +1,135 @@
+{
+    "summary": [
+        {
+            "name": "llm",
+            "title": "大语言模型",
+            "primary": [
+                "id"
+            ]
+        }
+    ],
+    "fields": [
+        {
+            "name": "id",
+            "title": "id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "name",
+            "title": "名称",
+            "type": "str",
+            "length": 100
+        },
+        {
+            "name": "model",
+            "title": "识别名",
+            "type": "str",
+            "length": 100
+        },
+        {
+            "name": "description",
+            "title": "说明",
+            "type": "text",
+            "length": 500
+        },
+        {
+            "name": "iconid",
+            "title": "图标id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "upappid",
+            "title": "上位系统id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "apiname",
+            "title": "接口名称",
+            "type": "str",
+            "length": 100
+        },
+        {
+            "name": "providerid",
+            "title": "供应商id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "ownerid",
+            "title": "所属机构id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "enabled_date",
+            "title": "启用日期",
+            "type": "date"
+        },
+        {
+            "name": "expired_date",
+            "title": "失效日期",
+            "type": "date"
+        },
+        {
+            "name": "query_apiname",
+            "title": "结果查询接口名称",
+            "type": "str",
+            "length": 100
+        },
+        {
+            "name": "query_period",
+            "title": "查询间隔",
+            "type": "long",
+            "default": 30
+        },
+        {
+            "name": "ppid",
+            "title": "计费项目id",
+            "type": "str",
+            "length": 32,
+            "nullable": "yes"
+        },
+        {
+            "name": "min_balance",
+            "title": "最低余额",
+            "type": "float",
+            "length": 20,
+            "default": 10
+        }
+    ],
+    "codes": [
+        {
+            "field": "providerid",
+            "table": "organization",
+            "valuefield": "id",
+            "textfield": "orgname"
+        },
+        {
+            "field": "iconid",
+            "table": "svgicon",
+            "valuefield": "id",
+            "textfield": "id"
+        },
+        {
+            "field": "upappid",
+            "table": "upapp",
+            "valuefield": "id",
+            "textfield": "name"
+        },
+        {
+            "field": "ownerid",
+            "table": "organization",
+            "valuefield": "id",
+            "textfield": "orgname"
+        },
+        {
+            "field": "ppid",
+            "table": "pricing_program",
+            "valuefield": "id",
+            "textfield": "name"
+        }
+    ]
+}
