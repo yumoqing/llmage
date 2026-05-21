@@ -34,7 +34,7 @@ async def get_tpac_balance(apikey, userid):
 	url = config.tpac.get_user_balance_url
 	hc = StreamHttpClient()
 	try:
-		b = hc.request('GET', url, params={"apikey": apikey, 'userid': userid})
+		b = await hc.request('GET', url, params={"apikey": apikey, 'userid': userid})
 		if b:
 			d = json.loads(b.decode('utf-8'))
 			if d['status'] == 'ok':
@@ -60,7 +60,7 @@ async def tpac_accounting(apikey, userid, llmid, amount, usage):
 	hc = StreamHttpClient()
 	status = 'failed'
 	try:
-		b = hc.request('POST', url, data=d)
+		b = await hc.request('POST', url, data=d)
 		d = json.loads(b.decode('utf-8'))
 		if d['status'] == 'ok':
 			status = 'accounted'
