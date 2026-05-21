@@ -12,7 +12,7 @@ try:
     else:
         async with DBPools().sqlorContext(dbname) as sor:
             # 检查是否有模型关联此类型
-            check_sql = "select count(*) as cnt from llm_catalog_rel where llmcatelogid=${id}$"
+            check_sql = "select count(*) as cnt from llm_api_map where llmcatelogid=${id}$"
             rel_count = await sor.sqlExe(check_sql, {'id': id})
             cnt = rel_count[0]['cnt'] if rel_count else 0
             if cnt > 0:

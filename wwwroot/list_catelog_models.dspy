@@ -1,9 +1,9 @@
 dbname = get_module_dbname('llmage')
 db = DBPools()
 async with db.sqlorContext(dbname) as sor:
-	sql = """select * from llm a
-join llm_catalog_rel rel on a.id = rel.llmid
-where rel.llmcatelogid = ${llmcatelogid}$ and a.id != ${llmid}$"""
+	sql = """select distinct a.* from llm a
+join llm_api_map m on a.id = m.llmid
+where m.llmcatelogid = ${llmcatelogid}$ and a.id != ${llmid}$"""
 	ns = params_kw.copy()
 	recs = await sor.sqlExe(sql, ns)
 	for r in recs.get('rows', []):

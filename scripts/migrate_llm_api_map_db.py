@@ -4,7 +4,7 @@ llm_api_map 数据库迁移脚本
 直接操作数据库，完成以下任务：
   1. 创建 llm_api_map 表（如不存在）
   2. 从 llm 表迁移 apiname/query_apiname/query_period/ppid 到 llm_api_map
-  3. 关联 llm_catalog_rel 获取 llmcatelogid
+  3. 分类关系已从 llm 表迁移（llmcatelogid 字段已移除）
   4. 可选：删除 llm 表中的旧字段（需用户确认）
 
 运行位置：Sage 虚拟环境
@@ -126,7 +126,12 @@ CREATE TABLE IF NOT EXISTS llm_api_map (
             return True
         
         # Build catalog_rel lookup
-        rels = await sor.sqlExe("SELECT llmid, llmcatelogid FROM llm_catalog_rel", {})
+        # NOTE: llm_catalog_rel has been deprecated; catalog relationship is now in llm_api_map.
+        # This lookup is kept for backward compatibility with old migrations.
+        try:
+            rels = await sor.sqlExe("SELECT llmid, llmcatelogid FROM llm_catalog_rel", {})
+        except Exception:
+            rels = []
         catelog_map = {}
         for r in (rels or []):
             catelog_map.setdefault(r['llmid'], []).append(r['llmcatelogid'])
@@ -140,7 +145,7 @@ CREATE TABLE IF NOT EXISTS llm_api_map (
             catelog_ids = catelog_map.get(llmid)
             
             if not catelog_ids:
-                print(f"  [SKIP] llm '{llm.get('name', llmid)}' has no catalog_rel entry")
+                print(f"  [SKIP] llm '{llm.get('name', llmid)}' has no catalog entry (llm_catalog_rel deprecated)")
                 skipped += 1
                 continue
             

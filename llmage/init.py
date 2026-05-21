@@ -51,10 +51,10 @@ def _bind_llmage_events(dbpools, dbname):
 		(f'{dbname}.llmcatelog:c:after', BufferedLLMs.clear_cache),
 		(f'{dbname}.llmcatelog:u:after', BufferedLLMs.clear_cache),
 		(f'{dbname}.llmcatelog:d:after', BufferedLLMs.clear_cache),
-		# llm_catalog_rel 关联表变更：清除缓存
-		(f'{dbname}.llm_catalog_rel:c:after', BufferedLLMs.clear_cache),
-		(f'{dbname}.llm_catalog_rel:u:after', BufferedLLMs.clear_cache),
-		(f'{dbname}.llm_catalog_rel:d:after', BufferedLLMs.clear_cache),
+		# llm_api_map 关联表变更：清除缓存
+		(f'{dbname}.llm_api_map:c:after', BufferedLLMs.clear_cache),
+		(f'{dbname}.llm_api_map:u:after', BufferedLLMs.clear_cache),
+		(f'{dbname}.llm_api_map:d:after', BufferedLLMs.clear_cache),
 	]
 	for event_name, handler in bindings:
 		dbpools.bind(event_name, handler)

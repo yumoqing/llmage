@@ -12,15 +12,15 @@ y.system_message,
 y.user_message,
 y.assisant_message
 from (
-select a.*, b.hfid, e.ioid, e.stream
+select distinct a.*, b.hfid, e.ioid, e.stream
 from llm a 
-join llm_catalog_rel rel on a.id = rel.llmid
-join llmcatelog b on rel.llmcatelogid = b.id
+join llm_api_map m on a.id = m.llmid
+join llmcatelog b on m.llmcatelogid = b.id
 join upapp c on a.upappid = c.id
 join uapi e on c.apisetid = e.apisetid and a.apiname = e.name
 ) x left join historyformat y on x.hfid = y.id
     left join uapiio z on x.ioid = z.id
-where rel.llmcatelogid = ${llmcatelogid}$
+where m.llmcatelogid = ${llmcatelogid}$
 	and x.id != ${llmid}$
 """
 	ns = params_kw.copy()

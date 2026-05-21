@@ -83,53 +83,6 @@
                             "actiontype": "urlwidget",
                             "target": "app.llmage_content",
                             "options": {
-                                "url": "{{entire_url('/llmage/llm_catalog_rel_manage.ui')}}"
-                            },
-                            "mode": "replace"
-                        }
-                    ],
-                    "subwidgets": [
-                        {
-                            "widgettype": "Svg",
-                            "options": {
-                                "svg": "<svg width=\"40\" height=\"40\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#ce93d8\" stroke-width=\"2\"><path d=\"M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25\"/></svg>",
-                                "width": "40px",
-                                "height": "40px"
-                            }
-                        },
-                        {
-                            "widgettype": "Title4",
-                            "options": {
-                                "text": "模型-类型关联",
-                                "color": "#ffffff",
-                                "marginTop": "12px"
-                            }
-                        },
-                        {
-                            "widgettype": "Text",
-                            "options": {
-                                "text": "管理模型与类型的多对多关系",
-                                "color": "#ce93d8",
-                                "fontSize": "14px"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "widgettype": "VBox",
-                    "options": {
-                        "backgroundColor": "#1e3a5f",
-                        "padding": "24px",
-                        "cursor": "pointer",
-                        "borderRadius": "8px"
-                    },
-                    "binds": [
-                        {
-                            "wid": "self",
-                            "event": "click",
-                            "actiontype": "urlwidget",
-                            "target": "app.llmage_content",
-                            "options": {
                                 "url": "{{entire_url('/llmage/llm')}}"
                             },
                             "mode": "replace"

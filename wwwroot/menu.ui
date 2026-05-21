@@ -31,11 +31,6 @@
 			"name":"llm",
 			"label":"模型",
 			"url":"{{entire_url('/llmage/llm')}}"
-		},
-		{
-			"name":"llmcatelog_rel",
-			"label":"类型关联",
-			"url":"{{entire_url('/llmage/llm_catalog_rel_manage.ui')}}"
 		}
 		]
 	}

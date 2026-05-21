@@ -20,8 +20,11 @@ def generate_migration_sql(llm_records, catalog_rel_records=None):
     Generate INSERT statements for llm_api_map from existing llm data.
     
     For each llm record:
-    - If llm_catalog_rel exists: create one llm_api_map per (llmid, llmcatelogid)
-    - If no catalog_rel: create one llm_api_map with the llm's default catalog
+    - If catalog info provided: create one llm_api_map per (llmid, llmcatelogid)
+    - If no catalog info: use llm's llmcatelogid field (legacy)
+    
+    NOTE: llm_catalog_rel has been deprecated. Catalog relationship is now
+    maintained directly in llm_api_map table.
     """
     inserts = []
     
@@ -97,7 +100,7 @@ def main():
     parser.add_argument('--input', '-i', 
                         help='Input JSON file with llm records (for offline mode)')
     parser.add_argument('--catalog-rel', '-c',
-                        help='Input JSON file with llm_catalog_rel records')
+                        help='Input JSON file with catalog records (deprecated, use llm_api_map instead)')
     parser.add_argument('--output', '-o', default='-',
                         help='Output file for SQL statements (default: stdout)')
     parser.add_argument('--dry-run', action='store_true',

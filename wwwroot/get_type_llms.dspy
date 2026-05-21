@@ -3,9 +3,9 @@ lt = '文生视频'
 if params_kw.type in ['文生视频', '参考生视频', '图生视频']:
 	lt = params_kw.type
 async with get_sor_context(request._run_ns, 'llmage') as sor:
-	sql = '''select a.*, e.input_fields from llm a 
-join llm_catalog_rel rel on a.id = rel.llmid
-join llmcatelog b on rel.llmcatelogid = b.id
+	sql = '''select distinct a.*, e.input_fields from llm a 
+join llm_api_map m on a.id = m.llmid
+join llmcatelog b on m.llmcatelogid = b.id
 join upapp c on a.upappid = c.id
 join uapi d on c.apisetid = d.apisetid and a.apiname = d.name
 join uapiio e on d.ioid = e.id
