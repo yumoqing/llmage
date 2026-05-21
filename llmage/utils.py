@@ -58,7 +58,7 @@ async def tpac_accounting(apikey, userid, llmid, amount, usage):
 		'usage': usage
 	}
 	url = config.thirdparty_accounting_center.get_user_balance_url
-    hc = StreamHttpClient()
+	hc = StreamHttpClient()
 	try:
 		b = hc.request('POST', url, data=d):
 		d = json.loads(b.decode('utf-8'))
@@ -70,8 +70,8 @@ async def tpac_accounting(apikey, userid, llmid, amount, usage):
 		exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=}  tpac accounting error')
 		return
 	except Exception as e:
-        exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=}  tpac accounting error:{e}')
-        return
+		exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=}  tpac accounting error:{e}')
+		return
 
 async def append_new_llmoutput(webpath, output):
 	fs = FileStorage()
