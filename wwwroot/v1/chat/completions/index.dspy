@@ -44,7 +44,7 @@ where b.name = ${lctype}$
 		return openai_400()
 	params_kw.llmid = recs[0].id
 
-f = await checkCustomerBalance(params_kw.llmid, userorgid)
+f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
 if not f:
 	debug(f'{userid=} balance not enough')
 	return openai_429()

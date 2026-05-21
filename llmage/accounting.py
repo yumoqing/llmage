@@ -36,7 +36,7 @@ async def llm_charging(ppid, llmusage):
 		'cost': cost
 	})
 
-async def checkCustomerBalance(llmid, userorgid):
+async def checkCustomerBalance(llmid, userid, userorgid):
 	if llmid is None:
 		debug(f'checkCustomerBalance(): llmid is None')
 		return False
@@ -51,7 +51,12 @@ async def checkCustomerBalance(llmid, userorgid):
 		if llm.ownerid == userorgid:
 			debug(f'self orgid user')
 			return True
-		balance = await getCustomerBalance(sor, userorgid)
+		apikey = await get_user_tpac_apikey(userid)
+		balance = 0.00
+		if apikey:
+			balance = await get_tpac_balance(apikey, userid)
+		else:
+			balance = await getCustomerBalance(sor, userorgid)
 		bal = 0 if balance is None else balance
 		if llm.min_balance is None:
 			llm.min_balance = 0.00
@@ -229,7 +234,11 @@ async def backend_accounting():
 		for lu in lus:
 			try:
 				debug(f'backend_accounting(): {lu.id=} handleing...')
-				await llm_accounting(lu)
+				apikey = await get_user_tpac_apikey(lu.userid)
+				if apikey:
+					await tpac_accounting(apikey, lu.userid, lu.llmid, lu.amount, lu.usages)
+				else:
+					await llm_accounting(lu)
 			except Exception as e:
 				exception(f'{e}, {lu.id=}')
 				await llm_accoung_failed(lu.id)

@@ -13,6 +13,65 @@ from appPublic.timeUtils import curDateString, timestampstr
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
+from appPublic.jsonConfig import getConfig
+from appPublic.streamhttpclient import StreamHttpClient
+
+async def get_user_tpac_apikey(userid):
+	env = ServerEnv()
+	config = getConfig()
+	if not config.tpac:
+		return None
+	apikey = await env.get_user_dapp_apikey(config.tpac.dappid, userid)
+	if apikey is None:
+		return None
+	return apikey
+
+async def get_tpac_balance(apikey, userid):
+	config = getConfig()
+	if apikey is None:
+		return None
+
+	url = config.tpac.get_user_balance_url
+	hc = StreamHttpClient()
+	try:
+		b = hc.request('GET', url, params={"apikey": apikey, 'userid': userid})
+		if b:
+			d = json.loads(b.decode('utf-8'))
+			if d['status'] == 'ok':
+				return d['balance']
+		exception(f'{url=}, {userid=}, {apikey=}, error')
+		return None
+	except Exception as e:
+		exception(f'{url=}, {userid=}, {apikey=}, error:{e}')
+		return None
+
+async def tpac_accounting(apikey, userid, llmid, amount, usage):
+	if apikey is None:
+		return
+	config = getConfig()
+	url = config.tpac.accounting_url
+	d = {
+		'apikey': apikey, 
+		'userid': userid,  
+		'llmid': llmid, 
+		'amount': amount, 
+		'usage': usage
+	}
+	url = config.thirdparty_accounting_center.get_user_balance_url
+    hc = StreamHttpClient()
+	try:
+		b = hc.request('POST', url, data=d):
+		d = json.loads(b.decode('utf-8'))
+		if d['status'] == 'ok':
+			env = ServerEnv()
+			async with get_sor_context(env, 'llmage') as sor:
+				await sor.U('llmusage', {'id': llmid, 'tpac_accounting_status': 'accounted')
+			return
+		exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=}  tpac accounting error')
+		return
+	except Exception as e:
+        exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=}  tpac accounting error:{e}')
+        return
 
 async def append_new_llmoutput(webpath, output):
 	fs = FileStorage()

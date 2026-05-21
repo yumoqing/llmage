@@ -10,7 +10,7 @@ userid = await get_user()
 userorgid = await get_userorgid()
 if userid is None:
 	return UiError(title='llm inference', message='Please login first')
-f = await checkCustomerBalance(params_kw.llmid, userorgid)
+f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
 if not f:
 	return {
 		"status": "error",

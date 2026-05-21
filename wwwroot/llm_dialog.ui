@@ -1,7 +1,8 @@
 {% if get_user() %}
+{% set userid = get_user() %}
 {% set userorgid = get_userorgid() %}
 {% if params_kw.id %}
-{% if checkCustomerBalance(params_kw.id, userorgid) %}
+{% if checkCustomerBalance(params_kw.id, userid, userorgid) %}
 {% set llm = get_llm(params_kw.id) %}
 {% set kdbs = get_user_kdbs(request) %}
 {% if llm %}
