@@ -39,7 +39,7 @@ async def get_tpac_balance(apikey, userid):
 			d = json.loads(b.decode('utf-8'))
 			if d['status'] == 'ok':
 				return d['balance']
-		exception(f'{url=}, {userid=}, {apikey=}, error')
+		exception(f'{url=}, {userid=}, {apikey=}, {b} error')
 		return None
 	except Exception as e:
 		exception(f'{url=}, {userid=}, {apikey=}, error:{e}')
