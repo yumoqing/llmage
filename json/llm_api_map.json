@@ -5,21 +5,6 @@
         "browserfields": {
             "exclouded": ["id", "llmid"],
             "alters": {
-                "llmcatelogid": {
-                    "dataurl": "{{entire_url('../api/llm_catelog_options.dspy')}}",
-                    "textField": "name",
-                    "valueField": "id"
-                },
-                "apiname": {
-                    "dataurl": "{{entire_url('../api/uapi_options.dspy')}}",
-                    "textField": "name",
-                    "valueField": "name"
-                },
-                "ppid": {
-                    "dataurl": "{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
-                    "textField": "name",
-                    "valueField": "id"
-                }
             }
         },
         "editexclouded": ["id", "llmid"]
