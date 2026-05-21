@@ -57,21 +57,24 @@ async def tpac_accounting(apikey, userid, llmid, amount, usage):
 		'amount': amount, 
 		'usage': usage
 	}
-	url = config.thirdparty_accounting_center.get_user_balance_url
 	hc = StreamHttpClient()
+	status = 'failed'
 	try:
 		b = hc.request('POST', url, data=d):
 		d = json.loads(b.decode('utf-8'))
 		if d['status'] == 'ok':
-			env = ServerEnv()
-			async with get_sor_context(env, 'llmage') as sor:
-				await sor.U('llmusage', {'id': llmid, 'tpac_accounting_status': 'accounted')
-			return
+			status = 'accounted'
 		exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=}  tpac accounting error')
-		return
 	except Exception as e:
 		exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=}  tpac accounting error:{e}')
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		await sor.U('llmusage', {
+			'id': llmid, 
+			'accounting_status': status
+		})
 		return
+	exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=} tpac_accounting error:update llmusage error')
 
 async def append_new_llmoutput(webpath, output):
 	fs = FileStorage()
