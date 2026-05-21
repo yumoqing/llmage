@@ -60,7 +60,7 @@ async def tpac_accounting(apikey, userid, llmid, amount, usage):
 	hc = StreamHttpClient()
 	status = 'failed'
 	try:
-		b = hc.request('POST', url, data=d):
+		b = hc.request('POST', url, data=d)
 		d = json.loads(b.decode('utf-8'))
 		if d['status'] == 'ok':
 			status = 'accounted'
