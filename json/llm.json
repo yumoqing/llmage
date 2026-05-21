@@ -49,7 +49,6 @@
 			{
 				"field":"llmid",
 				"title":"能力映射",
-				"url":"{{entire_url('../llm_api_map_manage.ui')}}",
 				"subtable":"llm_api_map"
 			}
 		]
