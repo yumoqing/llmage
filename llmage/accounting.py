@@ -70,7 +70,11 @@ async def llm_accounting(llmusage):
 	env = ServerEnv()
 	llmid = llmusage.llmid
 	async with get_sor_context(env, 'llmage') as sor:
-		sql = "select * from llm where id=${llmid}$"
+		sql = """select a.*, b.ppid from llm a, llm_api_map b 
+where id=${llmid}$ 
+	and a.id = b.llmid 
+	and b.isdefaultcatelog is '1'
+"""
 		recs = await sor.sqlExe(sql, {'llmid': llmusage.llmid})
 		if len(recs) == 0:
 			ns = {
