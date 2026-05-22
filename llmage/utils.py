@@ -60,7 +60,7 @@ async def tpac_accounting(tpac, userid, llmid, amount, usage, luid):
 		b = await hc.request('POST', url, data=d)
 		d = json.loads(b.decode('utf-8'))
 		if d['status'] == 'ok':
-			debug(f'{d=}'
+			debug(f'{d=}')
 			await update_llmusage({'id': luid, 'accounting_status': 'accounted'})
 			return
 		raise Exception(f'{d} tpac accounting error')
