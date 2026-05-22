@@ -32,7 +32,7 @@ async def get_user_tpac(userid):
 	return None
 
 async def get_tpac_balance(tpac, userid):
-	url = tpac.get_user_balance_url
+	url = tpac.get_tpac_balance_url
 	hc = StreamHttpClient()
 	try:
 		b = await hc.request('GET', url, params={'userid': userid})
@@ -47,7 +47,7 @@ async def get_tpac_balance(tpac, userid):
 		return None
 
 async def tpac_accounting(tpac, userid, llmid, amount, usage, luid):
-	url = tpac.accounting_url
+	url = tpac.tpac_accounting_url
 	hc = StreamHttpClient()
 	d = {
 		'userid': userid,  
