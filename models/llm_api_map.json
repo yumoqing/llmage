@@ -13,47 +13,47 @@
             "name": "id",
             "type": "varchar(32)",
             "not_null": true,
-            "comment": "主键ID"
+            "title": "主键ID"
         },
         {
             "name": "llmid",
             "type": "varchar(32)",
             "not_null": true,
-            "comment": "模型ID，关联llm表"
+            "title": "模型ID"
         },
         {
             "name": "llmcatelogid",
             "type": "varchar(32)",
             "not_null": true,
-            "comment": "模型分类ID，关联llmcatelog表"
+            "title": "模型分类ID"
         },
         {
             "name": "apiname",
             "type": "varchar(100)",
             "not_null": true,
-            "comment": "推理接口名称，关联uapi表name字段"
+            "title": "接口名称"
         },
         {
             "name": "query_apiname",
             "type": "varchar(100)",
-            "comment": "异步任务结果查询接口名称，可逗号分隔多个"
+            "title": "任务结果查询接口名称"
         },
         {
             "name": "query_period",
             "type": "bigint",
             "default": 30,
-            "comment": "异步任务查询轮询间隔（秒），默认30"
+            "title": "任务查询间隔（秒）"
         },
         {
             "name": "ppid",
             "type": "varchar(32)",
-            "comment": "计费程序ID，关联pricing_program表"
+            "title": "定价ID"
         },
         {
             "name": "isdefaultcatelog",
             "type": "varchar(1)",
             "not_null": true,
-            "comment": "缺省分类"
+            "title": "缺省分类"
         }
     ],
     "indexes": [

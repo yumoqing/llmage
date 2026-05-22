@@ -304,12 +304,13 @@ lc.name as catelogname
 from llm a
 ,llm_api_map m
 ,llmcatelog lc
-,upapp c on a.upappid = c.id
-,uapi e on c.apisetid = e.apisetid and m.apiname = e.name
+,upapp c
+,uapi e
 ,uapiio f on e.ioid = f.id
 where a.id = m.llmid
 and a.upappid = c.id
-and c.apisetid = e.apisetid and m.apiname = e.name
+and c.id = e.upappid 
+and m.apiname = e.name
 and e.ioid = f.id
 and a.id = ${llmid}$
 and a.expired_date > ${today}$
@@ -320,7 +321,7 @@ and a.enabled_date <= ${today}$
 			sql += ' and m.llmcatelogid = ${catelogid}$ '
 			ns['catelogid'] = catelogid
 		else:
-			sql += ' and a.llmcatelogid = lc.id '
+			sql += ' and m.isdefaultcatelog = lc.id '
 		recs = await sor.sqlExe(sql, ns.copy())
 		if len(recs) > 0:
 			r = recs[0]
