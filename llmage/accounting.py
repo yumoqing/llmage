@@ -169,9 +169,11 @@ async def get_accounting_llmusages(luid=None):
 	dt = datetime.fromtimestamp(t)
 	tsstr = dt.strftime('%Y-%m-%d %H:%M:%S.') + f'{dt.microsecond // 1000:03d}'
 	async with get_sor_context(env, 'llmage') as sor:
-		sql = """select a.*, b.ppid 
-from llmusage a, llm b 
+		sql = """select a.*, c.ppid 
+from llmusage a, llm b, llm_api_map c
 where a.llmid = b.id 
+	and a.llmid = c.llmid
+	and c.isdefaultcatelog = '1'
 	and a.status = 'SUCCEEDED'
 	and a.use_time < ${tsstr}$
 	and a.accounting_status='created'"""
