@@ -40,26 +40,6 @@ from .asyncinference import (
 	get_today_asynctask_list
 )
 
-def _bind_llmage_events(dbpools, dbname):
-	"""Bind database events to Llmage cache invalidation handlers."""
-	bindings = [
-		# llm 表增删改：清除 LLM 配置缓存
-		(f'{dbname}.llm:c:after', BufferedLLMs.clear_cache),
-		(f'{dbname}.llm:u:after', BufferedLLMs.clear_cache),
-		(f'{dbname}.llm:d:after', BufferedLLMs.clear_cache),
-		# llmcatelog 表变更：清除缓存
-		(f'{dbname}.llmcatelog:c:after', BufferedLLMs.clear_cache),
-		(f'{dbname}.llmcatelog:u:after', BufferedLLMs.clear_cache),
-		(f'{dbname}.llmcatelog:d:after', BufferedLLMs.clear_cache),
-		# llm_api_map 关联表变更：清除缓存
-		(f'{dbname}.llm_api_map:c:after', BufferedLLMs.clear_cache),
-		(f'{dbname}.llm_api_map:u:after', BufferedLLMs.clear_cache),
-		(f'{dbname}.llm_api_map:d:after', BufferedLLMs.clear_cache),
-	]
-	for event_name, handler in bindings:
-		dbpools.bind(event_name, handler)
-		debug(f'Llmage event bound: {event_name}')
-
 def load_llmage():
 	env = ServerEnv()
 	env.llm_query_orders = llm_query_orders
@@ -88,11 +68,3 @@ def load_llmage():
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
 
-	# Bind database events for automatic cache invalidation
-	dbpools = DBPools()
-	dbname = env.get_module_dbname('llmage')
-	if dbname:
-		_bind_llmage_events(dbpools, dbname)
-		debug(f'Llmage event listeners bound for database: {dbname}')
-	else:
-		debug('Llmage event listeners skipped: no database configured for llmage module')
