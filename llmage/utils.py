@@ -287,32 +287,61 @@ class BufferedLLMs:
 		"""
 		cls.llms.clear()
 		debug('BufferedLLMs cache cleared')
-	async def get_llm(self, llmid):
+	async def get_llm(self, llmid, catelogid=None):
 		today = curDateString()
+		"""
+		暂时不要buffered
 		k = f'{llmid}.{today}'
 		d = BufferedLLMs.llms.get(k)
 		if d:
 			return d
+		"""
 		env = ServerEnv()
 		async with get_sor_context(env, 'llmage') as sor:
-			sql = """select x.*,
-z.input_fields
-from (
-select a.*, e.ioid, e.stream, e.callbackurl, f.input_fields as inputfields
+			sql = """select a.id,
+a.name,
+a.model,
+a.providerid,
+a.description,
+a.iconid,
+a.upappid,
+a.ownerid,
+a.min_balance,
+m.llmcatelogid,
+m.apiname,
+m.query_apiname,
+m.query_period,
+m.ppid,
+e.ioid, 
+e.stream, 
+e.callbackurl, 
+f.input_fields,
+lc.name as catelogname
 from llm a
-join llm_api_map m on a.id = m.llmid
-join upapp c on a.upappid = c.id
-join uapi e on c.apisetid = e.apisetid and m.apiname = e.name
-join uapiio f on e.ioid = f.id
-where a.expired_date > ${today}$
+,llm_api_map m
+,llmcatelog lc
+,upapp c on a.upappid = c.id
+,uapi e on c.apisetid = e.apisetid and m.apiname = e.name
+,uapiio f on e.ioid = f.id
+where a.id = m.llmid
+	and a.upappid = c.id
+	and c.apisetid = e.apisetid and m.apiname = e.name
+	and e.ioid = f.id
+	and a.id = ${llmid}$
+	and a.expired_date > ${today}$
 	and a.enabled_date <= ${today}$
-) x left join uapiio z on x.ioid = z.id
-where x.id = ${llmid}$
 """
 			ns = {'llmid': llmid, 'today': today}
+			if catelogid:
+				sql += ' and m.llmcatelogid = ${catelogid}$ '
+				ns['catelogid'] = catelogid
+			else:
+				sql += ' and a.llmcatelogid = lc.id '
 			recs = await sor.sqlExe(sql, ns.copy())
 			if len(recs) > 0:
 				r = recs[0]
+				return r
+				# 暂时不buffer
 				dates = BufferedLLMs.llms.get(llmid, [])
 				dates.append(today)
 				cnt = len(dates)
@@ -330,9 +359,9 @@ where x.id = ${llmid}$
 		exception(f'Error: {format_exc()}')
 		return None
 
-async def get_llm(llmid):
+async def get_llm(llmid, catelogid=None):
 	bllms = BufferedLLMs()
-	return await bllms.get_llm(llmid)
+	return await bllms.get_llm(llmid, catelogid=catelogid)
 
 async def write_llmusage(llmusage):
 	env = ServerEnv()
