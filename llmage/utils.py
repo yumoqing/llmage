@@ -21,7 +21,7 @@ async def update_llmusage(ns):
 	async with get_sor_context(env, 'llmage') as sor:
 		await sor.U('llmusage', ns)
 
-async def get_user_tpac(userid)
+async def get_user_tpac(userid):
 	env = ServerEnv()
 	config = getConfig()
 	async with get_sor_context(env, 'rbac') as sor:
