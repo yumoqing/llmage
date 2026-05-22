@@ -321,7 +321,7 @@ and a.enabled_date <= ${today}$
 			sql += ' and m.llmcatelogid = ${catelogid}$ '
 			ns['catelogid'] = catelogid
 		else:
-			sql += ' and m.isdefaultcatelog = lc.id '
+			sql += " and m.isdefaultcatelog = '1'"
 		recs = await sor.sqlExe(sql, ns.copy())
 		if len(recs) > 0:
 			r = recs[0]
