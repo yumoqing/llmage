@@ -73,7 +73,7 @@ async def llm_accounting(llmusage):
 		sql = """select a.*, b.ppid from llm a, llm_api_map b 
 where id=${llmid}$ 
 	and a.id = b.llmid 
-	and b.isdefaultcatelog is '1'
+	and b.isdefaultcatelog = '1'
 """
 		recs = await sor.sqlExe(sql, {'llmid': llmusage.llmid})
 		if len(recs) == 0:
