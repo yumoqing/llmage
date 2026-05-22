@@ -229,8 +229,8 @@ async def backend_accounting():
 		for lu in lus:
 			try:
 				debug(f'backend_accounting(): {lu.id=} handleing...')
-				# apikey = await get_user_tpac_apikey(lu.userid)
 				tpac = await get_user_tpac(lu.userid)
+				debug(f'{lu.userid=}, {tpac=}')
 				if tpac:
 					await tpac_accounting(tpac, lu.userid, lu.llmid, lu.amount, lu.usages, lu.id)
 				else:
