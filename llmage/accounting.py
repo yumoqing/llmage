@@ -48,6 +48,7 @@ async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
 	balance = 0.00
 	tpac = await get_user_tpac(userid)
 	if tpac:
+		debug(f'{tpac=}')
 		balance = await get_tpac_balance(tpac, userid)
 	else:
 		async with get_sor_context(env, 'accounting') as sor:
