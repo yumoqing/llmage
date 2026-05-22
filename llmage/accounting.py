@@ -46,7 +46,7 @@ async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
 		debug(f'self orgid user')
 		return True
 	balance = 0.00
-	tpac = await get_user_tpac(lu.userid)
+	tpac = await get_user_tpac(userid)
 	if tpac:
 		balance = await get_tpac_balance(tpac, userid)
 	else:
