@@ -16,65 +16,57 @@ from ahserver.filestorage import FileStorage
 from appPublic.jsonConfig import getConfig
 from appPublic.streamhttpclient import StreamHttpClient
 
-async def get_user_tpac_apikey(userid):
+async def update_llmusage(ns):
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		await sor.U('llmusage', ns)
+
+async def get_user_tpac(userid)
 	env = ServerEnv()
 	config = getConfig()
-	if not config.tpac:
-		return None
-	apikey = await env.get_user_dapp_apikey(config.tpac.dappid, userid)
-	if apikey is None:
-		return None
-	return apikey
+	async with get_sor_context(env, 'rbac') as sor:
+		recs = await sor.R('users', {'id': userid})
+		if recs:
+			tpac = config.tpacs.get(recs[0].sync_from)
+			return tpac
+	return None
 
-async def get_tpac_balance(apikey, userid):
-	config = getConfig()
-	if apikey is None:
-		return None
-
-	url = config.tpac.get_user_balance_url
+async def get_tpac_balance(tpac, userid):
+	url = tpac.get_user_balance_url
 	hc = StreamHttpClient()
 	try:
-		b = await hc.request('GET', url, params={"apikey": apikey, 'userid': userid})
+		b = await hc.request('GET', url, params={'userid': userid})
 		if b:
 			d = json.loads(b.decode('utf-8'))
 			if d['status'] == 'ok':
 				return d['balance']
-		exception(f'{url=}, {userid=}, {apikey=}, {b} error')
+		exception(f'{url=}, {userid=}, {b} error')
 		return None
 	except Exception as e:
-		exception(f'{url=}, {userid=}, {apikey=}, error:{e}')
+		exception(f'{url=}, {userid=}, error:{e}')
 		return None
 
-async def tpac_accounting(apikey, userid, llmid, amount, usage):
-	if apikey is None:
-		return
-	config = getConfig()
-	url = config.tpac.accounting_url
+async def tpac_accounting(tpac, userid, llmid, amount, usage, luid):
+	url = tpac.accounting_url
+	hc = StreamHttpClient()
 	d = {
-		'apikey': apikey, 
 		'userid': userid,  
 		'llmid': llmid, 
 		'amount': amount, 
 		'usage': usage
 	}
-	hc = StreamHttpClient()
 	status = 'failed'
 	try:
 		b = await hc.request('POST', url, data=d)
 		d = json.loads(b.decode('utf-8'))
 		if d['status'] == 'ok':
-			status = 'accounted'
-		exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=}  tpac accounting error')
+			debug(f'{d=}'
+			await update_llmusage({'id': luid, 'accounting_status': 'accounted'})
+			return
+		raise Exception(f'{d} tpac accounting error')
 	except Exception as e:
-		exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=}  tpac accounting error:{e}')
-	env = ServerEnv()
-	async with get_sor_context(env, 'llmage') as sor:
-		await sor.U('llmusage', {
-			'id': llmid, 
-			'accounting_status': status
-		})
-		return
-	exception(f'{apikey=}, {userid=}, {llmid=}, {amount=}, {usage=} tpac_accounting error:update llmusage error')
+		exception(f'{userid=}, {llmid=}, {amount=}, {usage=}  tpac accounting error:{e}')
+		raise e
 
 async def append_new_llmoutput(webpath, output):
 	fs = FileStorage()

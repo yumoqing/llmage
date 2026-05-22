@@ -46,9 +46,9 @@ async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
 		debug(f'self orgid user')
 		return True
 	balance = 0.00
-	apikey = await get_user_tpac_apikey(userid)
-	if apikey:
-		balance = await get_tpac_balance(apikey, userid)
+	tpac = await get_user_tpac(lu.userid)
+	if tpac:
+		balance = await get_tpac_balance(tpac, userid)
 	else:
 		async with get_sor_context(env, 'accounting') as sor:
 			balance = await getCustomerBalance(sor, userorgid)
@@ -154,11 +154,6 @@ where a.id=${llmid}$
 		}
 		await sor.U('llmusage', ns)
 
-async def update_llmusage(ns):
-	env = ServerEnv()
-	async with get_sor_context(env, 'llmage') as sor:
-		await sor.U('llmusage', ns)
-
 async def get_accounting_llmusages(luid=None):
 	env = ServerEnv()
 	lus = []
@@ -233,9 +228,10 @@ async def backend_accounting():
 		for lu in lus:
 			try:
 				debug(f'backend_accounting(): {lu.id=} handleing...')
-				apikey = await get_user_tpac_apikey(lu.userid)
-				if apikey:
-					await tpac_accounting(apikey, lu.userid, lu.llmid, lu.amount, lu.usages)
+				# apikey = await get_user_tpac_apikey(lu.userid)
+				tpac = await get_user_tpac(lu.userid)
+				if tpac:
+					await tpac_accounting(tpac, lu.userid, lu.llmid, lu.amount, lu.usages, lu.id)
 				else:
 					await llm_accounting(lu)
 			except Exception as e:
