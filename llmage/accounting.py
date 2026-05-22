@@ -198,7 +198,7 @@ where a.llmid = b.id
 			try:
 				if isinstance(r.usages, str):
 					r.usages = json.loads(r.usages)
-				d = await env.buffered_charging(r.ppid, r.usages)
+				d = await llm_charging(r.ppid, r)
 			except Exception as e:
 				await llm_accoung_failed(r.id)
 				exception(f'{r.ppid=}, {r.usages=} llm_charging() failed,{e}')
