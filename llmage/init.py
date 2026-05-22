@@ -54,9 +54,6 @@ def load_llmage():
 	env.get_llmcatelogs = get_llmcatelogs
 	env.checkCustomerBalance = checkCustomerBalance
 	env.get_llmproviders = get_llmproviders
-	env.get_user_tpac_apikey = get_user_tpac_apikey
-	env.get_tpac_balance = get_tpac_balance
-	env.tpac_accounting = tpac_accounting
 	env.get_llms_sort_by_provider = get_llms_sort_by_provider
 	env.keling_token = keling_token
 	env.llm_query_price = llm_query_price
