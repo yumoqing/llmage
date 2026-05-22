@@ -4,6 +4,7 @@
 {% if params_kw.id %}
 {% if checkCustomerBalance(params_kw.id, userid, userorgid) %}
 {% set llm = get_llm(params_kw.id) %}
+{% set oops=debug(json.dumps(llm, ensure_ascii=Fasle) %}
 {% set kdbs = get_user_kdbs(request) %}
 {% if llm %}
 {
