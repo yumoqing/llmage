@@ -48,6 +48,12 @@
             "name": "ppid",
             "type": "varchar(32)",
             "comment": "计费程序ID，关联pricing_program表"
+        },
+        {
+            "name": "isdefaultcatelog",
+            "type": "varchar(1)",
+            "not_null": true,
+            "comment": "缺省分类"
         }
     ],
     "indexes": [

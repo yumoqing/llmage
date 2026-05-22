@@ -278,27 +278,11 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 		return d
 	return []
 	
-class BufferedLLMs:
-	llms = {}
-	@classmethod
-	def clear_cache(cls, data=None):
-		"""Clear all cached LLM configurations.
-		Called as EventDispatcher handler, so accepts optional data param.
-		"""
-		cls.llms.clear()
-		debug('BufferedLLMs cache cleared')
-	async def get_llm(self, llmid, catelogid=None):
-		today = curDateString()
-		"""
-		暂时不要buffered
-		k = f'{llmid}.{today}'
-		d = BufferedLLMs.llms.get(k)
-		if d:
-			return d
-		"""
-		env = ServerEnv()
-		async with get_sor_context(env, 'llmage') as sor:
-			sql = """select a.id,
+async def get_llm(llmid, catelogid=None):
+	today = curDateString()
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		sql = """select a.id,
 a.name,
 a.model,
 a.providerid,
@@ -324,44 +308,29 @@ from llm a
 ,uapi e on c.apisetid = e.apisetid and m.apiname = e.name
 ,uapiio f on e.ioid = f.id
 where a.id = m.llmid
-	and a.upappid = c.id
-	and c.apisetid = e.apisetid and m.apiname = e.name
-	and e.ioid = f.id
-	and a.id = ${llmid}$
-	and a.expired_date > ${today}$
-	and a.enabled_date <= ${today}$
+and a.upappid = c.id
+and c.apisetid = e.apisetid and m.apiname = e.name
+and e.ioid = f.id
+and a.id = ${llmid}$
+and a.expired_date > ${today}$
+and a.enabled_date <= ${today}$
 """
-			ns = {'llmid': llmid, 'today': today}
-			if catelogid:
-				sql += ' and m.llmcatelogid = ${catelogid}$ '
-				ns['catelogid'] = catelogid
-			else:
-				sql += ' and a.llmcatelogid = lc.id '
-			recs = await sor.sqlExe(sql, ns.copy())
-			if len(recs) > 0:
-				r = recs[0]
-				return r
-				# 暂时不buffer
-				dates = BufferedLLMs.llms.get(llmid, [])
-				dates.append(today)
-				cnt = len(dates)
-				if cnt > 2:
-					for i in range(0, cnt -2):
-						dat = dates[i]
-						del BufferedLLMs.llms[f'{llmid}.{dat}']
-					dates = dates[-2:]
-					BufferedLLMs.llms[llmid] = dates
-				BufferedLLMs.llms[k] = r
-				return r
-			else:
-				debug(f'{llmid=} not found, {ns=}, {sql=}')
-				return None
-		exception(f'Error: {format_exc()}')
-		return None
+		ns = {'llmid': llmid, 'today': today}
+		if catelogid:
+			sql += ' and m.llmcatelogid = ${catelogid}$ '
+			ns['catelogid'] = catelogid
+		else:
+			sql += ' and a.llmcatelogid = lc.id '
+		recs = await sor.sqlExe(sql, ns.copy())
+		if len(recs) > 0:
+			r = recs[0]
+			return r
+		else:
+			debug(f'{llmid=} not found, {ns=}, {sql=}')
+			return None
+	exception(f'Error: {format_exc()}')
+	return None
 
-async def get_llm(llmid, catelogid=None):
-	bllms = BufferedLLMs()
-	return await bllms.get_llm(llmid, catelogid=catelogid)
 
 async def write_llmusage(llmusage):
 	env = ServerEnv()
