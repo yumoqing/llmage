@@ -71,7 +71,7 @@ async def llm_accounting(llmusage):
 	llmid = llmusage.llmid
 	async with get_sor_context(env, 'llmage') as sor:
 		sql = """select a.*, b.ppid from llm a, llm_api_map b 
-where id=${llmid}$ 
+where a.id=${llmid}$ 
 	and a.id = b.llmid 
 	and b.isdefaultcatelog = '1'
 """
