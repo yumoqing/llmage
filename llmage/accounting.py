@@ -51,7 +51,7 @@ async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
 		balance = await get_tpac_balance(apikey, userid)
 	else:
 		async with get_sor_context(env, 'accounting') as sor:
-			balance = await getCustomerBalance(userorgid)
+			balance = await getCustomerBalance(sor, userorgid)
 	bal = 0 if balance is None else balance
 	if llm.min_balance is None:
 		llm.min_balance = 0.00
