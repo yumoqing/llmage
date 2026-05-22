@@ -306,7 +306,7 @@ from llm a
 ,llmcatelog lc
 ,upapp c
 ,uapi e
-,uapiio
+,uapiio f
 where a.id = m.llmid
 and a.upappid = c.id
 and c.id = e.upappid 
