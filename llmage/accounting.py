@@ -36,35 +36,28 @@ async def llm_charging(ppid, llmusage):
 		'cost': cost
 	})
 
-async def checkCustomerBalance(llmid, userid, userorgid):
+async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
 	if llmid is None:
 		debug(f'checkCustomerBalance(): llmid is None')
 		return False
 	env = ServerEnv()
-	async with get_sor_context(env, 'llmage') as sor:
-		llms = await sor.R('llm', { 'id': llmid})
-		if len(llms) < 1:
-			e = Exception(f'llm({llmid}) not exists')
-			exception(f'{e}')
-			raise e
-		llm = llms[0].copy()
-		if llm.ownerid == userorgid:
-			debug(f'self orgid user')
-			return True
-		apikey = await get_user_tpac_apikey(userid)
-		balance = 0.00
-		if apikey:
-			balance = await get_tpac_balance(apikey, userid)
-		else:
-			balance = await getCustomerBalance(sor, userorgid)
-		bal = 0 if balance is None else balance
-		if llm.min_balance is None:
-			llm.min_balance = 0.00
-		# debug(f'{userorgid=}, {balance=}, {llm.min_balance=}, {llm.ppid=}')
-		ret = llm.ppid and llm.min_balance < bal
-		return ret
-	debug(f'{userorgid=} checkCustomerBalance() failed')
-	return False
+	llm = await get_llm(llm)
+	if llm.ownerid == userorgid:
+		debug(f'self orgid user')
+		return True
+	balance = 0.00
+	apikey = await get_user_tpac_apikey(userid)
+	if apikey:
+		balance = await get_tpac_balance(apikey, userid)
+	else:
+		async with get_sor_context(env, 'accounting') as sor:
+			balance = await getCustomerBalance(userorgid)
+	bal = 0 if balance is None else balance
+	if llm.min_balance is None:
+		llm.min_balance = 0.00
+	ret = llm.ppid and llm.min_balance < bal
+	debug(f'{llm.ppid=}, {llm.min_balance=}, {bal=}')
+	return ret
 
 async def llm_accounting(llmusage):
 	env = ServerEnv()
