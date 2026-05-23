@@ -1,0 +1,27 @@
+# get all model
+def get_time_in_seconds(datestr):
+	datetime = datetime.datetime
+	date_str = "2026-05-23"
+	dt_obj = datetime.strptime(date_str, "%Y-%m-%d")
+	timestamp = dt_obj.timestamp()
+	return timestamp
+
+print(timestamp)
+lctype=params_kw.lctype
+orderby=params_kw.orderby or 'model'
+llms = await get_llms_by_catelog_to_customer(catelogid=lctype, orderby=orderby)
+ret = {
+	"object": "list",
+	"data": []
+}
+for llm in llms:
+	d = {
+		"id": llm.model,
+		"object": "model",
+		"created": get_time_in_seconds(llm.enabled_date),
+		"owned_by": "opencomputing.ai"
+	}
+	ret['data'].append(d)
+  ]
+}
+return ret
