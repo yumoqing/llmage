@@ -47,10 +47,11 @@ async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
 		return True
 	balance = 0.00
 	tpac = await get_user_tpac(userid)
-	debug(f'{tpac=}')
 	if tpac:
+		debug(f'{tpac=}, get tpac balance')
 		balance = await get_tpac_balance(tpac, userid)
 	else:
+		debug(f'{tpac=}, get local balance')
 		async with get_sor_context(env, 'accounting') as sor:
 			balance = await getCustomerBalance(sor, userorgid)
 	bal = 0 if balance is None else balance
@@ -228,12 +229,12 @@ async def backend_accounting():
 		# debug(f'{len(lus)=} need to accounting........')
 		for lu in lus:
 			try:
-				debug(f'backend_accounting(): {lu.id=} handleing...')
 				tpac = await get_user_tpac(lu.userid)
-				debug(f'{lu.userid=}, {tpac=}')
 				if tpac:
+					debug(f'{lu.id=},{lu.userid=}, {tpac=}, go tpac')
 					await tpac_accounting(tpac, lu.userid, lu.llmid, lu.amount, lu.usages, lu.id)
 				else:
+					debug(f'{lu.id=},{lu.userid=}, {tpac=}, go local')
 					await llm_accounting(lu)
 			except Exception as e:
 				exception(f'{e}, {lu.id=}')
