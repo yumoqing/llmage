@@ -185,8 +185,8 @@ where a.llmid = b.id
 					continue
 				r.usages = output.get('usage')
 			if r.usages is None:
+				debug(f'{r.usages=} is None, accoiunting failed')
 				await llm_accoung_failed(r.id)
-				debug(f'{r.usages=} is None')
 				continue
 			d = None
 			try:
@@ -194,8 +194,8 @@ where a.llmid = b.id
 				d = await llm_charging(r.ppid, r)
 
 			except Exception as e:
-				await llm_accoung_failed(r.id)
 				exception(f'{r.ppid=}, {r.usages=} llm_charging() failed,{e}')
+				await llm_accoung_failed(r.id)
 				continue
 			r.amount = d.amount
 			r.cost = d.cost
