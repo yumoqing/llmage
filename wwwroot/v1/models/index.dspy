@@ -8,18 +8,20 @@ def get_time_in_seconds(datestr):
 
 lctype=params_kw.lctype
 orderby=params_kw.orderby or 'model'
-llms = await get_llms_by_catelog_to_customer(catelogid=lctype, orderby=orderby)
+rets = await get_llms_by_catelog_to_customer(catelogid=lctype, orderby=orderby)
 ret = {
 	"object": "list",
 	"data": []
 }
 debug(f'{llms=}')
-for llm in llms:
-	d = {
-		"id": llm['model'],
-		"object": "model",
-		"created": get_time_in_seconds(llm['enabled_date']),
-		"owned_by": "opencomputing.ai"
-	}
-	ret['data'].append(d)
+for r in rets:
+	llms = r['llms']
+	for llm in llms:
+		d = {
+			"id": llm['model'],
+			"object": "model",
+			"created": get_time_in_seconds(llm['enabled_date']),
+			"owned_by": "opencomputing.ai"
+		}
+		ret['data'].append(d)
 return ret
