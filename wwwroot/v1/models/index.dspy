@@ -22,6 +22,4 @@ for llm in llms:
 		"owned_by": "opencomputing.ai"
 	}
 	ret['data'].append(d)
-  ]
-}
 return ret
