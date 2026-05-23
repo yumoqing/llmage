@@ -13,6 +13,7 @@ ret = {
 	"object": "list",
 	"data": []
 }
+debug(f'{llms=}')
 for llm in llms:
 	d = {
 		"id": llm['model'],
