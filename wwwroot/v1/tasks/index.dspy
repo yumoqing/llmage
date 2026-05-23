@@ -1,0 +1,16 @@
+taskid = params_kw.taskid
+try:
+	s = await get_asynctask_status(request, taskid)
+	return {
+		'status': 'ok',
+		'data': s,
+	}
+except Exception as e:
+	err = Exception(f'{taskid} get task info error({e})')
+	exception(f'{err}')
+	return {
+		"status": "error",
+		"data": {
+			"message": str(err)
+		}
+	}
