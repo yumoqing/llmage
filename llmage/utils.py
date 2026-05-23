@@ -28,7 +28,6 @@ async def get_user_tpac(userid):
 		recs = await sor.R('users', {'id': userid})
 		if recs:
 			tpac = config.tpacs.get(recs[0].sync_from)
-			debug(f'{userid=},{recs[0].sync_from=},{tpac=},{config.tpacs=}')
 			return tpac
 	return None
 
