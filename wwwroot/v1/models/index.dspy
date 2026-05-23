@@ -15,9 +15,9 @@ ret = {
 }
 for llm in llms:
 	d = {
-		"id": llm.model,
+		"id": llm['model'],
 		"object": "model",
-		"created": get_time_in_seconds(llm.enabled_date),
+		"created": get_time_in_seconds(llm['enabled_date']),
 		"owned_by": "opencomputing.ai"
 	}
 	ret['data'].append(d)
