@@ -200,12 +200,18 @@ async def get_llms_by_catelog_to_customer(catelogid=None, orderby='providerid'):
 	async with get_sor_context(env, 'llmage') as sor:
 		today = curDateString()
 		# Join with llm_api_map to get catalog relationship
-		sql = """select distinct a.*, b.name as catelogname, m.llmcatelogid as catelog_id 
+		sql = """select distinct a.*, 
+b.name as catelogname, 
+m.llmcatelogid as catelog_id,
+m.apiname,
+m.query_apiname,
+m.query_period,
+m.ppid
 			from llm a 
 			join llm_api_map m on a.id = m.llmid 
 			join llmcatelog b on m.llmcatelogid = b.id
 			where a.enabled_date <= ${today}$
-			and a.ppid is not null
+			and m.ppid is not null
 			and a.expired_date > ${today}$
 			"""
 		sortstr='catelog_id, ' + orderby
