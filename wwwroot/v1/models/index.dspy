@@ -1,8 +1,8 @@
 # get all model
 def get_time_in_seconds(datestr):
-	datetime = datetime.datetime
+	mydt = datetime.datetime
 	date_str = "2026-05-23"
-	dt_obj = datetime.strptime(date_str, "%Y-%m-%d")
+	dt_obj = mydt.strptime(date_str, "%Y-%m-%d")
 	timestamp = dt_obj.timestamp()
 	return timestamp
 
