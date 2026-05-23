@@ -13,7 +13,7 @@ ret = {
 	"object": "list",
 	"data": []
 }
-debug(f'{llms=}')
+
 for r in rets:
 	llms = r['llms']
 	for llm in llms:
