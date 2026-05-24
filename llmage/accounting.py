@@ -1,7 +1,7 @@
 import asyncio
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from appPublic.log import exception, debug
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
@@ -239,20 +239,18 @@ async def llm_accoung_failed(luid, reason=None):
 			await sor.C('llmusage_accounting_failed', failed_rec)
 
 
-async def backup_accounted_llmusage():
-	"""Backup accounted records with use_date before today to history table."""
+async def backup_accounted_llmusage(cutoff_date):
+	"""Backup accounted records with use_date < cutoff_date to history table."""
 	env = ServerEnv()
-	today = datetime.now().strftime('%Y-%m-%d')
 	ts = env.timestampstr()
 	batched = 0
 	async with get_sor_context(env, 'llmage') as sor:
-		# Select records with use_date < today (i.e. yesterday and earlier)
 		sql = """select * from llmusage 
 where accounting_status='accounted' 
-	and use_date < ${today}$"""
-		recs = await sor.sqlExe(sql, {'today': today})
+	and use_date < ${cutoff_date}$"""
+		recs = await sor.sqlExe(sql, {'cutoff_date': cutoff_date})
 		if not recs:
-			debug(f'backup_accounted_llmusage: no records to backup for use_date < {today}')
+			debug(f'backup_accounted_llmusage: no records to backup for use_date < {cutoff_date}')
 			return 0
 		debug(f'backup_accounted_llmusage: {len(recs)} records to backup')
 		for r in recs:
@@ -280,7 +278,7 @@ where accounting_status='accounted'
 			# Delete from main table
 			await sor.D('llmusage', {'id': r.id})
 			batched += 1
-	debug(f'backup_accounted_llmusage: backed up {batched} records')
+	debug(f'backup_accounted_llmusage: backed up {batched} records for use_date < {cutoff_date}')
 	return batched
 
 
@@ -335,14 +333,13 @@ order by failed_time desc limit {page_size} offset {offset}"""
 async def backend_accounting():
 	env = ServerEnv()
 	debug(f'backend accounting started ...')
-	backup_counter = 0
+	last_backup_date = None
 	while True:
 		try:
 			lus = await get_accounting_llmusages()
 		except Exception as e:
 			exception(f'{e}')
 			lus = []
-		# debug(f'{len(lus)=} need to accounting........')
 		for lu in lus:
 			try:
 				tpac = await get_user_tpac(lu.userid)
@@ -356,12 +353,14 @@ async def backend_accounting():
 				exception(f'{e}, {lu.id=}')
 				await llm_accoung_failed(lu.id, reason=str(e))
 
-		# Run backup every 30 iterations (~5 minutes)
-		backup_counter += 1
-		if backup_counter >= 30:
-			backup_counter = 0
+		# Check if date changed, trigger backup once per day
+		today = datetime.now().strftime('%Y-%m-%d')
+		if today != last_backup_date:
+			yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+			last_backup_date = today
 			try:
-				await backup_accounted_llmusage()
+				debug(f'date changed to {today}, triggering backup for use_date < {yesterday}')
+				await backup_accounted_llmusage(yesterday)
 			except Exception as e:
 				exception(f'backup_accounted_llmusage failed: {e}')
 

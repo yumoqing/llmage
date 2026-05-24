@@ -69,6 +69,9 @@ CREATE INDEX idx_laf_llmid ON llmusage_accounting_failed(llmid);
 CREATE INDEX idx_laf_handled ON llmusage_accounting_failed(handled);
 CREATE INDEX idx_laf_failed_time ON llmusage_accounting_failed(failed_time);
 
+-- 3. 为 llmusage 表添加组合索引（优化备份查询: accounting_status + use_date）
+CREATE INDEX idx_llmusage_accounting ON llmusage(accounting_status, use_date);
+
 -- ============================================================
 -- 验证步骤（执行后运行）:
 -- 1. 确认表创建成功:

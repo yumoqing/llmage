@@ -123,6 +123,14 @@
             "idxfields": [
                 "userid"
             ]
+        },
+        {
+            "name": "idx_llmusage_accounting",
+            "idxtype": "index",
+            "idxfields": [
+                "accounting_status",
+                "use_date"
+            ]
         }
     ]
 }
