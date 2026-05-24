@@ -242,7 +242,6 @@ async def llm_accoung_failed(luid, reason=None):
 async def backup_accounted_llmusage():
 	"""Backup yesterday's accounted records to history table and remove from llmusage."""
 	env = ServerEnv()
-	from datetime import datetime, timedelta
 	yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 	ts = env.timestampstr()
 	batched = 0
@@ -295,8 +294,7 @@ async def get_failed_accounting_records(filters=None, page=1, page_size=50):
 		- start_date: filter use_date >= start_date
 		- end_date: filter use_date <= end_date
 	"""
-	env = ServerEnv()
-	async with get_sor_context(env, 'llmage') as sor:
+	async with get_sor_context(ServerEnv(), 'llmage') as sor:
 		conditions = []
 		ns = {}
 		if filters:

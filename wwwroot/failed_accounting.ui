@@ -27,7 +27,7 @@
                     "options": {"spacing": 4},
                     "subwidgets": [
                         {"widgettype": "Text", "options": {"text": "开始日期", "fontSize": "12px"}},
-                        {"widgettype": "DatePicker", "id": "start_date", "options": {"width": "150px"}}
+                        {"widgettype": "TextInput", "id": "start_date", "options": {"width": "150px", "placeholder": "YYYY-MM-DD"}}
                     ]
                 },
                 {
@@ -35,7 +35,7 @@
                     "options": {"spacing": 4},
                     "subwidgets": [
                         {"widgettype": "Text", "options": {"text": "结束日期", "fontSize": "12px"}},
-                        {"widgettype": "DatePicker", "id": "end_date", "options": {"width": "150px"}}
+                        {"widgettype": "TextInput", "id": "end_date", "options": {"width": "150px", "placeholder": "YYYY-MM-DD"}}
                     ]
                 },
                 {
@@ -66,7 +66,7 @@
                             "widgettype": "Button",
                             "id": "search_btn",
                             "options": {
-                                "text": "查询",
+                                "label": "查询",
                                 "bgcolor": "#1976d2",
                                 "color": "#ffffff",
                                 "width": "80px"

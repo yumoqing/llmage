@@ -24,7 +24,7 @@
                 {
                     "widgettype": "VBox",
                     "options": {
-                        "backgroundColor": "#1e3a5f",
+                        "bgcolor": "#1e3a5f",
                         "padding": "24px",
                         "cursor": "pointer",
                         "borderRadius": "8px"
@@ -71,7 +71,7 @@
                 {
                     "widgettype": "VBox",
                     "options": {
-                        "backgroundColor": "#1e3a5f",
+                        "bgcolor": "#1e3a5f",
                         "padding": "24px",
                         "cursor": "pointer",
                         "borderRadius": "8px"
@@ -118,7 +118,7 @@
                 {
                     "widgettype": "VBox",
                     "options": {
-                        "backgroundColor": "#1e3a5f",
+                        "bgcolor": "#1e3a5f",
                         "padding": "24px",
                         "cursor": "pointer",
                         "borderRadius": "8px"
