@@ -244,38 +244,19 @@ async def backup_accounted_llmusage(cutoff_date):
 	env = ServerEnv()
 	ts = env.timestampstr()
 	batched = 0
+	recs = []
 	async with get_sor_context(env, 'llmage') as sor:
 		sql = """select * from llmusage 
 where accounting_status='accounted' 
 	and use_date < ${cutoff_date}$"""
 		recs = await sor.sqlExe(sql, {'cutoff_date': cutoff_date})
-		if not recs:
-			debug(f'backup_accounted_llmusage: no records to backup for use_date < {cutoff_date}')
-			return 0
-		debug(f'backup_accounted_llmusage: {len(recs)} records to backup')
-		for r in recs:
-			history_rec = {
-				'id': r.id,
-				'llmid': r.llmid,
-				'use_date': r.use_date,
-				'use_time': r.use_time,
-				'userid': r.userid,
-				'usages': r.usages,
-				'ioinfo': r.ioinfo,
-				'transno': r.transno,
-				'responsed_seconds': r.responsed_seconds,
-				'finish_seconds': r.finish_seconds,
-				'status': r.status,
-				'taskid': r.taskid,
-				'amount': r.amount,
-				'cost': r.cost,
-				'userorgid': r.userorgid,
-				'ownerid': r.ownerid,
-				'accounting_status': r.accounting_status,
-				'backup_time': ts
-			}
-			await sor.C('llmusage_history', history_rec)
-			# Delete from main table
+	if not recs:
+		debug(f'backup_accounted_llmusage: no records to backup for use_date < {cutoff_date}')
+		return 0
+	debug(f'backup_accounted_llmusage: {cutoff_date} {len(recs)} records to backup')
+	for r in recs:
+		async with get_sor_context(env, 'llmage') as sor:
+			await sor.C('llmusage_history', r.copy())
 			await sor.D('llmusage', {'id': r.id})
 			batched += 1
 	debug(f'backup_accounted_llmusage: backed up {batched} records for use_date < {cutoff_date}')
