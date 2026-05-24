@@ -2,7 +2,7 @@
     "tblname": "llm",
 	"title":"大语言模型",
     "params": {
-		"sortby":"name",
+		"sortby":"model",
 		"logined_userorgid": "ownerid",
         "browserfields": {
             "exclouded": ["id", "ownerid"],
