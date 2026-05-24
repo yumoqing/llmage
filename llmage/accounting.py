@@ -240,19 +240,19 @@ async def llm_accoung_failed(luid, reason=None):
 
 
 async def backup_accounted_llmusage():
-	"""Backup yesterday's accounted records to history table and remove from llmusage."""
+	"""Backup accounted records with use_date before today to history table."""
 	env = ServerEnv()
-	yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+	today = datetime.now().strftime('%Y-%m-%d')
 	ts = env.timestampstr()
 	batched = 0
 	async with get_sor_context(env, 'llmage') as sor:
-		# Select yesterday's accounted records
+		# Select records with use_date < today (i.e. yesterday and earlier)
 		sql = """select * from llmusage 
 where accounting_status='accounted' 
-	and use_date < ${yesterday}$"""
-		recs = await sor.sqlExe(sql, {'yesterday': yesterday})
+	and use_date < ${today}$"""
+		recs = await sor.sqlExe(sql, {'today': today})
 		if not recs:
-			debug(f'backup_accounted_llmusage: no records to backup for use_date < {yesterday}')
+			debug(f'backup_accounted_llmusage: no records to backup for use_date < {today}')
 			return 0
 		debug(f'backup_accounted_llmusage: {len(recs)} records to backup')
 		for r in recs:
@@ -356,9 +356,9 @@ async def backend_accounting():
 				exception(f'{e}, {lu.id=}')
 				await llm_accoung_failed(lu.id, reason=str(e))
 
-		# Run backup every 100 iterations (roughly every ~1000 seconds)
+		# Run backup every 30 iterations (~5 minutes)
 		backup_counter += 1
-		if backup_counter >= 100:
+		if backup_counter >= 30:
 			backup_counter = 0
 			try:
 				await backup_accounted_llmusage()
