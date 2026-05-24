@@ -27,7 +27,10 @@ from .accounting import (
 	llm_charging,
 	get_accounting_llmusages,
 	backend_accounting,
-	llm_accounting
+	llm_accounting,
+	backup_accounted_llmusage,
+	get_failed_accounting_records,
+	llm_accoung_failed
 )
 
 from .asyncinference import (
@@ -58,6 +61,8 @@ def load_llmage():
 	env.keling_token = keling_token
 	env.llm_query_price = llm_query_price
 	env.get_llms_by_catelog_to_customer = get_llms_by_catelog_to_customer
+	env.backup_accounted_llmusage = backup_accounted_llmusage
+	env.get_failed_accounting_records = get_failed_accounting_records
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
 

@@ -1,0 +1,25 @@
+{
+    "tblname": "llmusage_accounting_failed",
+    "title": "记账失败记录",
+    "params": {
+        "sortby": "failed_time desc",
+        "browserfields": {
+            "exclouded": ["id"],
+            "alters": {
+                "handled": {
+                    "uitype": "code",
+                    "data": [
+                        {"value": "0", "text": "未处理"},
+                        {"value": "1", "text": "已处理"}
+                    ]
+                }
+            }
+        },
+        "editexclouded": ["id", "llmusageid", "failed_time"],
+        "editable": {
+            "new_data_url": "{{entire_url('../api/llmusage_accounting_failed_create.dspy')}}",
+            "update_data_url": "{{entire_url('../api/llmusage_accounting_failed_update.dspy')}}",
+            "delete_data_url": "{{entire_url('../api/llmusage_accounting_failed_delete.dspy')}}"
+        }
+    }
+}

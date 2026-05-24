@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+import json
+
+result = {'success': False, 'message': ''}
+
+try:
+    dbname = get_module_dbname('llmage')
+    async with DBPools().sqlorContext(dbname) as sor:
+        data = params_kw
+        rid = data.pop('id', None)
+        if not rid:
+            result['message'] = '缺少id参数'
+        else:
+            data['id'] = rid
+            await sor.U('llmusage', data)
+            result['success'] = True
+            result['message'] = '更新成功'
+except Exception as e:
+    result['message'] = str(e)
+
+return json.dumps(result, ensure_ascii=False, default=str)

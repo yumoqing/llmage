@@ -62,5 +62,41 @@ done
 
 echo ""
 echo "============================================"
+echo "  llmage: 记账失败记录权限初始化"
+echo "============================================"
+
+FAILED_ACCOUNTING_PATHS=(
+    "/llmage/failed_accounting.ui"
+    "/llmage/api/failed_accounting_list.dspy"
+    "/llmage/api/llmusage_accounting_failed_create.dspy"
+    "/llmage/api/llmusage_accounting_failed_update.dspy"
+    "/llmage/api/llmusage_accounting_failed_delete.dspy"
+)
+
+for p in "${FAILED_ACCOUNTING_PATHS[@]}"; do
+    for role in "${PERM_ROLES[@]}"; do
+        set_perm "${role}" "${p}"
+    done
+done
+
+echo ""
+echo "============================================"
+echo "  llmage: llmusage CRUD权限初始化"
+echo "============================================"
+
+LLMUSAGE_PATHS=(
+    "/llmage/api/llmusage_create.dspy"
+    "/llmage/api/llmusage_update.dspy"
+    "/llmage/api/llmusage_delete.dspy"
+)
+
+for p in "${LLMUSAGE_PATHS[@]}"; do
+    for role in "${PERM_ROLES[@]}"; do
+        set_perm "${role}" "${p}"
+    done
+done
+
+echo ""
+echo "============================================"
 echo "  权限配置完成，共设置 ${COUNT} 条权限"
 echo "============================================"

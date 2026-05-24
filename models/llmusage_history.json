@@ -1,0 +1,141 @@
+{
+    "summary": [
+        {
+            "name": "llmusage_history",
+            "title": "模型使用历史记录",
+            "primary": ["id"],
+            "catelog": "entity"
+        }
+    ],
+    "fields": [
+        {
+            "name": "id",
+            "title": "id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "llmid",
+            "title": "模型id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "use_date",
+            "title": "使用日期",
+            "type": "date"
+        },
+        {
+            "name": "use_time",
+            "title": "使用时间",
+            "type": "timestamp"
+        },
+        {
+            "name": "userid",
+            "title": "用户id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "usages",
+            "title": "使用信息",
+            "type": "text"
+        },
+        {
+            "name": "ioinfo",
+            "title": "交互内容",
+            "type": "text"
+        },
+        {
+            "name": "transno",
+            "title": "交易号",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "responsed_seconds",
+            "title": "响应时间",
+            "type": "double",
+            "length": 18,
+            "dec": 3
+        },
+        {
+            "name": "finish_seconds",
+            "title": "结束时间",
+            "type": "double",
+            "length": 18,
+            "dec": 3
+        },
+        {
+            "name": "status",
+            "title": "状态",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "taskid",
+            "title": "任务号",
+            "type": "str",
+            "length": 256
+        },
+        {
+            "name": "amount",
+            "title": "交易金额",
+            "type": "double",
+            "length": 18,
+            "dec": 5
+        },
+        {
+            "name": "cost",
+            "title": "交易成本",
+            "type": "double",
+            "length": 18,
+            "dec": 5
+        },
+        {
+            "name": "userorgid",
+            "title": "用户机构id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "ownerid",
+            "title": "模型机构id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "accounting_status",
+            "title": "记账状态",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "backup_time",
+            "title": "备份时间",
+            "type": "timestamp"
+        }
+    ],
+    "indexes": [
+        {
+            "name": "idx_lh_use_date",
+            "idxtype": "index",
+            "idxfields": ["use_date"]
+        },
+        {
+            "name": "idx_lh_userorgid",
+            "idxtype": "index",
+            "idxfields": ["userorgid"]
+        },
+        {
+            "name": "idx_lh_llmid",
+            "idxtype": "index",
+            "idxfields": ["llmid"]
+        },
+        {
+            "name": "idx_lh_backup_time",
+            "idxtype": "index",
+            "idxfields": ["backup_time"]
+        }
+    ]
+}

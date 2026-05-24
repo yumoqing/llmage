@@ -186,7 +186,7 @@ where a.llmid = b.id
 				r.usages = output.get('usage')
 			if r.usages is None:
 				debug(f'{r.usages=} is None, accoiunting failed')
-				await llm_accoung_failed(r.id)
+				await llm_accoung_failed(r.id, reason='usages is None')
 				continue
 			d = None
 			try:
@@ -195,7 +195,7 @@ where a.llmid = b.id
 
 			except Exception as e:
 				exception(f'{r.ppid=}, {r.usages=} llm_charging() failed,{e}')
-				await llm_accoung_failed(r.id)
+				await llm_accoung_failed(r.id, reason=f'llm_charging failed: {e}')
 				continue
 			r.amount = d.amount
 			r.cost = d.cost
@@ -209,17 +209,135 @@ where a.llmid = b.id
 			lus.append(r)
 	return lus
 
-async def llm_accoung_failed(luid):
+async def llm_accoung_failed(luid, reason=None):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
 		await sor.U('llmusage', {
 			'id': luid,
 			'accounting_status': 'failed'
 		})
+		# Also record in the failed accounting table for tracking
+		recs = await sor.R('llmusage', {'id': luid})
+		if recs:
+			r = recs[0]
+			failed_id = getID()
+			failed_rec = {
+				'id': failed_id,
+				'llmusageid': luid,
+				'llmid': r.llmid,
+				'userid': r.userid,
+				'userorgid': r.userorgid,
+				'use_date': r.use_date,
+				'use_time': r.use_time,
+				'amount': r.amount,
+				'cost': r.cost,
+				'failed_reason': reason or 'accounting failed',
+				'failed_time': env.timestampstr(),
+				'retry_count': 0,
+				'handled': '0'
+			}
+			await sor.C('llmusage_accounting_failed', failed_rec)
+
+
+async def backup_accounted_llmusage():
+	"""Backup yesterday's accounted records to history table and remove from llmusage."""
+	env = ServerEnv()
+	from datetime import datetime, timedelta
+	yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+	ts = env.timestampstr()
+	batched = 0
+	async with get_sor_context(env, 'llmage') as sor:
+		# Select yesterday's accounted records
+		sql = """select * from llmusage 
+where accounting_status='accounted' 
+	and use_date < ${yesterday}$"""
+		recs = await sor.sqlExe(sql, {'yesterday': yesterday})
+		if not recs:
+			debug(f'backup_accounted_llmusage: no records to backup for use_date < {yesterday}')
+			return 0
+		debug(f'backup_accounted_llmusage: {len(recs)} records to backup')
+		for r in recs:
+			history_rec = {
+				'id': r.id,
+				'llmid': r.llmid,
+				'use_date': r.use_date,
+				'use_time': r.use_time,
+				'userid': r.userid,
+				'usages': r.usages,
+				'ioinfo': r.ioinfo,
+				'transno': r.transno,
+				'responsed_seconds': r.responsed_seconds,
+				'finish_seconds': r.finish_seconds,
+				'status': r.status,
+				'taskid': r.taskid,
+				'amount': r.amount,
+				'cost': r.cost,
+				'userorgid': r.userorgid,
+				'ownerid': r.ownerid,
+				'accounting_status': r.accounting_status,
+				'backup_time': ts
+			}
+			await sor.C('llmusage_history', history_rec)
+			# Delete from main table
+			await sor.D('llmusage', {'id': r.id})
+			batched += 1
+	debug(f'backup_accounted_llmusage: backed up {batched} records')
+	return batched
+
+
+async def get_failed_accounting_records(filters=None, page=1, page_size=50):
+	"""Search failed accounting records with optional filters.
+	
+	filters: dict with optional keys:
+		- userorgid: filter by user organization
+		- llmid: filter by model ID
+		- handled: '0' or '1'
+		- start_date: filter use_date >= start_date
+		- end_date: filter use_date <= end_date
+	"""
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		conditions = []
+		ns = {}
+		if filters:
+			if filters.get('userorgid'):
+				conditions.append("userorgid=${userorgid}$")
+				ns['userorgid'] = filters['userorgid']
+			if filters.get('llmid'):
+				conditions.append("llmid=${llmid}$")
+				ns['llmid'] = filters['llmid']
+			if filters.get('handled') is not None:
+				conditions.append("handled=${handled}$")
+				ns['handled'] = filters['handled']
+			if filters.get('start_date'):
+				conditions.append("use_date>=${start_date}$")
+				ns['start_date'] = filters['start_date']
+			if filters.get('end_date'):
+				conditions.append("use_date<=${end_date}$")
+				ns['end_date'] = filters['end_date']
+		where = ""
+		if conditions:
+			where = "where " + " and ".join(conditions)
+		# Count total
+		count_sql = f"select count(*) as cnt from llmusage_accounting_failed {where}"
+		count_recs = await sor.sqlExe(count_sql, ns)
+		total = count_recs[0].cnt if count_recs else 0
+		# Query with pagination
+		offset = (page - 1) * page_size
+		query_sql = f"""select * from llmusage_accounting_failed {where} 
+order by failed_time desc limit {page_size} offset {offset}"""
+		recs = await sor.sqlExe(query_sql, ns)
+		return {
+			'total': total,
+			'page': page,
+			'page_size': page_size,
+			'records': recs
+		}
 
 async def backend_accounting():
 	env = ServerEnv()
 	debug(f'backend accounting started ...')
+	backup_counter = 0
 	while True:
 		try:
 			lus = await get_accounting_llmusages()
@@ -238,8 +356,16 @@ async def backend_accounting():
 					await llm_accounting(lu)
 			except Exception as e:
 				exception(f'{e}, {lu.id=}')
-				await llm_accoung_failed(lu.id)
-				
+				await llm_accoung_failed(lu.id, reason=str(e))
+
+		# Run backup every 100 iterations (roughly every ~1000 seconds)
+		backup_counter += 1
+		if backup_counter >= 100:
+			backup_counter = 0
+			try:
+				await backup_accounted_llmusage()
+			except Exception as e:
+				exception(f'backup_accounted_llmusage failed: {e}')
 
 		await asyncio.sleep(10)
 

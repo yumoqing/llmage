@@ -1,14 +1,17 @@
 {
     "tblname": "llmusage",
-	"title":"模型使用",
+    "title": "模型使用",
     "params": {
-		"sortby":"use_time desc",
+        "sortby": "use_time desc",
         "browserfields": {
             "exclouded": ["id"],
             "alters": {}
         },
-        "editexclouded": [
-            "id"
-        ]
+        "editexclouded": ["id"],
+        "editable": {
+            "new_data_url": "{{entire_url('../api/llmusage_create.dspy')}}",
+            "update_data_url": "{{entire_url('../api/llmusage_update.dspy')}}",
+            "delete_data_url": "{{entire_url('../api/llmusage_delete.dspy')}}"
+        }
     }
 }

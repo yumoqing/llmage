@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+import json
+import os
+
+result = {'success': False, 'rows': [], 'total': 0, 'page': 1, 'page_size': 50}
+
+try:
+    dbname = get_module_dbname('llmage')
+    user_orgid = await get_userorgid()
+
+    # Extract filter parameters from params_kw
+    filters = {}
+    if params_kw.get('userorgid'):
+        filters['userorgid'] = params_kw.get('userorgid')
+    if params_kw.get('llmid'):
+        filters['llmid'] = params_kw.get('llmid')
+    if params_kw.get('handled') is not None:
+        filters['handled'] = params_kw.get('handled')
+    if params_kw.get('start_date'):
+        filters['start_date'] = params_kw.get('start_date')
+    if params_kw.get('end_date'):
+        filters['end_date'] = params_kw.get('end_date')
+
+    page = int(params_kw.get('page', 1))
+    page_size = int(params_kw.get('page_size', 50))
+
+    async with DBPools().sqlorContext(dbname) as sor:
+        # Build dynamic SQL
+        conditions = []
+        ns = {}
+
+        # Default: show unhandled records
+        if 'handled' not in filters:
+            conditions.append("handled='0'")
+
+        if filters.get('userorgid'):
+            conditions.append("userorgid=${userorgid}$")
+            ns['userorgid'] = filters['userorgid']
+        if filters.get('llmid'):
+            conditions.append("llmid=${llmid}$")
+            ns['llmid'] = filters['llmid']
+        if filters.get('handled') is not None:
+            conditions.append("handled=${handled}$")
+            ns['handled'] = filters['handled']
+        if filters.get('start_date'):
+            conditions.append("use_date>=${start_date}$")
+            ns['start_date'] = filters['start_date']
+        if filters.get('end_date'):
+            conditions.append("use_date<=${end_date}$")
+            ns['end_date'] = filters['end_date']
+
+        where = ""
+        if conditions:
+            where = "where " + " and ".join(conditions)
+
+        # Count total
+        count_sql = f"select count(*) as cnt from llmusage_accounting_failed {where}"
+        count_recs = await sor.sqlExe(count_sql, ns)
+        total = count_recs[0].cnt if count_recs else 0
+
+        # Query with pagination
+        offset = (page - 1) * page_size
+        query_sql = f"""select * from llmusage_accounting_failed {where}
+order by failed_time desc limit {page_size} offset {offset}"""
+        recs = await sor.sqlExe(query_sql, ns)
+
+        result['rows'] = [dict(r) for r in (recs or [])]
+        result['total'] = total
+        result['page'] = page
+        result['page_size'] = page_size
+        result['success'] = True
+
+except Exception as e:
+    result['error'] = str(e)
+
+return json.dumps(result, ensure_ascii=False, default=str)

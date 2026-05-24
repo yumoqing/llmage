@@ -1,0 +1,17 @@
+{
+    "tblname": "llmusage_history",
+    "title": "模型使用历史",
+    "params": {
+        "sortby": "use_time desc",
+        "browserfields": {
+            "exclouded": ["id"],
+            "alters": {}
+        },
+        "editexclouded": ["id"],
+        "editable": {
+            "new_data_url": "{{entire_url('../api/llmusage_history_create.dspy')}}",
+            "update_data_url": "{{entire_url('../api/llmusage_history_update.dspy')}}",
+            "delete_data_url": "{{entire_url('../api/llmusage_history_delete.dspy')}}"
+        }
+    }
+}

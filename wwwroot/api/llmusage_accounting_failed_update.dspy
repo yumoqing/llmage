@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+import json
+from ahserver.serverenv import ServerEnv
+
+result = {'success': False, 'message': ''}
+
+try:
+    dbname = get_module_dbname('llmage')
+    async with DBPools().sqlorContext(dbname) as sor:
+        data = params_kw
+        rid = data.pop('id', None)
+        if not rid:
+            result['message'] = '缺少id参数'
+        else:
+            data['id'] = rid
+            # Mark as handled - set handled_time
+            if data.get('handled') == '1' and not data.get('handled_time'):
+                env = ServerEnv()
+                data['handled_time'] = env.timestampstr()
+            await sor.U('llmusage_accounting_failed', data)
+            result['success'] = True
+            result['message'] = '更新成功'
+except Exception as e:
+    result['message'] = str(e)
+
+return json.dumps(result, ensure_ascii=False, default=str)

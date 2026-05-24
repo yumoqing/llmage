@@ -1,0 +1,112 @@
+{
+    "widgettype": "VBox",
+    "options": {
+        "width": "100%",
+        "height": "100%",
+        "padding": "16px",
+        "spacing": 12
+    },
+    "subwidgets": [
+        {
+            "widgettype": "Title2",
+            "options": {
+                "text": "记账失败记录",
+                "halign": "left"
+            }
+        },
+        {
+            "widgettype": "HBox",
+            "options": {
+                "width": "100%",
+                "spacing": 12,
+                "alignItems": "flex-end"
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "VBox",
+                    "options": {"spacing": 4},
+                    "subwidgets": [
+                        {"widgettype": "Text", "options": {"text": "开始日期", "fontSize": "12px"}},
+                        {"widgettype": "DatePicker", "id": "start_date", "options": {"width": "150px"}}
+                    ]
+                },
+                {
+                    "widgettype": "VBox",
+                    "options": {"spacing": 4},
+                    "subwidgets": [
+                        {"widgettype": "Text", "options": {"text": "结束日期", "fontSize": "12px"}},
+                        {"widgettype": "DatePicker", "id": "end_date", "options": {"width": "150px"}}
+                    ]
+                },
+                {
+                    "widgettype": "VBox",
+                    "options": {"spacing": 4},
+                    "subwidgets": [
+                        {"widgettype": "Text", "options": {"text": "处理状态", "fontSize": "12px"}},
+                        {
+                            "widgettype": "Combobox",
+                            "id": "handled_filter",
+                            "options": {
+                                "width": "120px",
+                                "data": [
+                                    {"value": "", "text": "全部"},
+                                    {"value": "0", "text": "未处理"},
+                                    {"value": "1", "text": "已处理"}
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "widgettype": "VBox",
+                    "options": {"spacing": 4},
+                    "subwidgets": [
+                        {"widgettype": "Text", "options": {"text": "", "fontSize": "12px"}},
+                        {
+                            "widgettype": "Button",
+                            "id": "search_btn",
+                            "options": {
+                                "text": "查询",
+                                "bgcolor": "#1976d2",
+                                "color": "#ffffff",
+                                "width": "80px"
+                            },
+                            "binds": [{
+                                "wid": "self",
+                                "event": "click",
+                                "actiontype": "script",
+                                "target": "failed_table",
+                                "script": "var sd = this.root.getElementById('start_date'); var ed = this.root.getElementById('end_date'); var hf = this.root.getElementById('handled_filter'); var params = {handled: hf.value}; if(sd.value) params.start_date = sd.value; if(ed.value) params.end_date = ed.value; this.root.getElementById('failed_table').load(params);"
+                            }]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "widgettype": "DataViewer",
+            "id": "failed_table",
+            "options": {
+                "url": "{{entire_url('/llmage/api/failed_accounting_list.dspy')}}",
+                "title": "失败记录列表",
+                "pageSize": 20,
+                "fields": [
+                    {"name": "id", "title": "ID", "hidden": true},
+                    {"name": "llmusageid", "title": "使用记录ID", "width": "120px"},
+                    {"name": "llmid", "title": "模型ID", "width": "120px"},
+                    {"name": "userid", "title": "用户ID", "width": "120px"},
+                    {"name": "userorgid", "title": "机构ID", "width": "120px"},
+                    {"name": "use_date", "title": "使用日期", "width": "110px"},
+                    {"name": "use_time", "title": "使用时间", "width": "160px"},
+                    {"name": "amount", "title": "金额", "width": "80px"},
+                    {"name": "cost", "title": "成本", "width": "80px"},
+                    {"name": "failed_reason", "title": "失败原因", "width": "30%"},
+                    {"name": "failed_time", "title": "失败时间", "width": "160px"},
+                    {"name": "retry_count", "title": "重试次数", "width": "80px"},
+                    {"name": "handled", "title": "状态", "width": "80px",
+                     "formatter": "function(v){return v==='1'?'已处理':'未处理';}"}
+                ]
+            }
+        }
+    ]
+}

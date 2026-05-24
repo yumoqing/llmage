@@ -1,0 +1,125 @@
+{
+    "summary": [
+        {
+            "name": "llmusage_accounting_failed",
+            "title": "记账失败记录",
+            "primary": ["id"],
+            "catelog": "entity"
+        }
+    ],
+    "fields": [
+        {
+            "name": "id",
+            "title": "id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "llmusageid",
+            "title": "使用记录id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "llmid",
+            "title": "模型id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "userid",
+            "title": "用户id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "userorgid",
+            "title": "用户机构id",
+            "type": "str",
+            "length": 32
+        },
+        {
+            "name": "use_date",
+            "title": "使用日期",
+            "type": "date"
+        },
+        {
+            "name": "use_time",
+            "title": "使用时间",
+            "type": "timestamp"
+        },
+        {
+            "name": "amount",
+            "title": "交易金额",
+            "type": "double",
+            "length": 18,
+            "dec": 5
+        },
+        {
+            "name": "cost",
+            "title": "交易成本",
+            "type": "double",
+            "length": 18,
+            "dec": 5
+        },
+        {
+            "name": "failed_reason",
+            "title": "失败原因",
+            "type": "text"
+        },
+        {
+            "name": "failed_time",
+            "title": "失败时间",
+            "type": "timestamp"
+        },
+        {
+            "name": "retry_count",
+            "title": "重试次数",
+            "type": "int"
+        },
+        {
+            "name": "handled",
+            "title": "是否已处理",
+            "type": "str",
+            "length": 1,
+            "default": "0"
+        },
+        {
+            "name": "handled_time",
+            "title": "处理时间",
+            "type": "timestamp"
+        },
+        {
+            "name": "handled_note",
+            "title": "处理备注",
+            "type": "text"
+        }
+    ],
+    "indexes": [
+        {
+            "name": "idx_laf_use_date",
+            "idxtype": "index",
+            "idxfields": ["use_date"]
+        },
+        {
+            "name": "idx_laf_userorgid",
+            "idxtype": "index",
+            "idxfields": ["userorgid"]
+        },
+        {
+            "name": "idx_laf_llmid",
+            "idxtype": "index",
+            "idxfields": ["llmid"]
+        },
+        {
+            "name": "idx_laf_handled",
+            "idxtype": "index",
+            "idxfields": ["handled"]
+        },
+        {
+            "name": "idx_laf_failed_time",
+            "idxtype": "index",
+            "idxfields": ["failed_time"]
+        }
+    ]
+}
