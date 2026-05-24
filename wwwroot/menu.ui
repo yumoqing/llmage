@@ -31,6 +31,11 @@
 			"name":"llm",
 			"label":"模型",
 			"url":"{{entire_url('/llmage/llm')}}"
+		},
+		{
+			"name":"failed_accounting",
+			"label":"记账失败记录",
+			"url":"{{entire_url('/llmage/failed_accounting.ui')}}"
 		}
 		]
 	}
