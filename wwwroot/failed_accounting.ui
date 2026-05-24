@@ -80,6 +80,30 @@
                             }]
                         }
                     ]
+                },
+                {
+                    "widgettype": "VBox",
+                    "options": {"spacing": 4},
+                    "subwidgets": [
+                        {"widgettype": "Text", "options": {"text": "", "fontSize": "12px"}},
+                        {
+                            "widgettype": "Button",
+                            "id": "retry_btn",
+                            "options": {
+                                "label": "重试",
+                                "bgcolor": "#4caf50",
+                                "color": "#ffffff",
+                                "width": "80px"
+                            },
+                            "binds": [{
+                                "wid": "self",
+                                "event": "click",
+                                "actiontype": "script",
+                                "target": "self",
+                                "script": "var dv = this.root.getElementById('failed_table'); var row = dv.selected_row || (dv.selected_rows && dv.selected_rows[0]); if(!row || !row.llmusageid) { alert('请先选中一条记录'); return; } var url = bricks.build_url ? bricks.build_url('/llmage/api/retry_accounting.dspy') : '/llmage/api/retry_accounting.dspy'; fetch(url + '?id=' + row.llmusageid).then(function(r){return r.json();}).then(function(d){ if(d.success) { alert(d.message); dv.load({}); } else { alert('失败: ' + d.message); } }).catch(function(e){ alert('请求异常: ' + e); });"
+                            }]
+                        }
+                    ]
                 }
             ]
         },

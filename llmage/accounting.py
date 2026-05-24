@@ -240,27 +240,28 @@ async def llm_accoung_failed(luid, reason=None):
 
 
 async def backup_accounted_llmusage(cutoff_date):
-	"""Backup accounted records with use_date < cutoff_date to history table."""
+	"""Backup accounted records with use_date < cutoff_date to history table using single SQL statements."""
 	env = ServerEnv()
 	ts = env.timestampstr()
-	batched = 0
-	recs = []
 	async with get_sor_context(env, 'llmage') as sor:
-		sql = """select * from llmusage 
-where accounting_status='accounted' 
-	and use_date < ${cutoff_date}$"""
-		recs = await sor.sqlExe(sql, {'cutoff_date': cutoff_date})
-	if not recs:
-		debug(f'backup_accounted_llmusage: no records to backup for use_date < {cutoff_date}')
-		return 0
-	debug(f'backup_accounted_llmusage: {cutoff_date} {len(recs)} records to backup')
-	for r in recs:
-		async with get_sor_context(env, 'llmage') as sor:
-			await sor.C('llmusage_history', r.copy())
-			await sor.D('llmusage', {'id': r.id})
-			batched += 1
-	debug(f'backup_accounted_llmusage: backed up {batched} records for use_date < {cutoff_date}')
-	return batched
+		# Step 1: INSERT INTO history SELECT from main table
+		insert_sql = """INSERT INTO llmusage_history 
+(id, llmid, use_date, use_time, userid, usages, ioinfo, transno, responsed_seconds, finish_seconds, status, taskid, amount, cost, userorgid, ownerid, accounting_status, backup_time)
+SELECT id, llmid, use_date, use_time, userid, usages, ioinfo, transno, responsed_seconds, finish_seconds, status, taskid, amount, cost, userorgid, ownerid, accounting_status, ${ts}$
+FROM llmusage
+WHERE accounting_status='accounted' AND use_date < ${cutoff_date}$"""
+		result = await sor.execute(insert_sql, {'cutoff_date': cutoff_date, 'ts': ts})
+		inserted = result if isinstance(result, int) else 0
+		debug(f'backup_accounted_llmusage: {inserted} records inserted to history')
+		
+		if inserted > 0:
+			# Step 2: DELETE from main table
+			delete_sql = """DELETE FROM llmusage
+WHERE accounting_status='accounted' AND use_date < ${cutoff_date}$"""
+			await sor.execute(delete_sql, {'cutoff_date': cutoff_date})
+			debug(f'backup_accounted_llmusage: {inserted} records deleted from main table')
+	
+	return inserted
 
 
 async def get_failed_accounting_records(filters=None, page=1, page_size=50):
