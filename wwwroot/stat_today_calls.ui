@@ -1,0 +1,53 @@
+{% set stats = get_llmage_stats(request) %}
+{
+    "widgettype": "VBox",
+    "options": {
+        "bgcolor": "#1E293B",
+        "padding": "20px",
+        "borderRadius": "12px",
+        "border": "1px solid #334155",
+        "flex": "1",
+        "minHeight": "110px"
+    },
+    "subwidgets": [
+        {
+            "widgettype": "HBox",
+            "options": {
+                "alignItems": "center",
+                "marginBottom": "12px"
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "Svg",
+                    "options": {
+                        "svg": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#22C55E\" stroke-width=\"2\"><path d=\"M7.5 21L3 16.5m0 0L7.5 12M12 9v7.5m0 0l4.5-4.5M12 9l4.5 4.5m0 0L12 16.5\"/><path d=\"M21 12h-4.5M12 3v4.5m0 0L7.5 12\"/></svg>",
+                        "width": "24px",
+                        "height": "24px"
+                    }
+                },
+                {
+                    "widgettype": "Filler"
+                }
+            ]
+        },
+        {
+            "widgettype": "Text",
+            "options": {
+                "text": "{{stats.today_usage_count}}",
+                "fontSize": "32px",
+                "fontWeight": "700",
+                "color": "#F1F5F9",
+                "lineHeight": "1.1"
+            }
+        },
+        {
+            "widgettype": "Text",
+            "options": {
+                "text": "今日调用",
+                "fontSize": "14px",
+                "color": "#94A3B8",
+                "marginTop": "4px"
+            }
+        }
+    ]
+}

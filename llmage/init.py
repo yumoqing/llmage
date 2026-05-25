@@ -32,6 +32,7 @@ from .accounting import (
 	get_failed_accounting_records,
 	llm_accoung_failed
 )
+from .stats import get_llmage_stats
 
 from .asyncinference import (
 	get_asynctask_status,
@@ -63,6 +64,7 @@ def load_llmage():
 	env.get_llms_by_catelog_to_customer = get_llms_by_catelog_to_customer
 	env.backup_accounted_llmusage = backup_accounted_llmusage
 	env.get_failed_accounting_records = get_failed_accounting_records
+	env.get_llmage_stats = get_llmage_stats
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
 
