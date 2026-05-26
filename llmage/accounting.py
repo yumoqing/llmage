@@ -42,6 +42,9 @@ async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
 		return False
 	env = ServerEnv()
 	llm = await get_llm(llmid)
+	if llm.ownerid == userorgid:
+		debug(f'self orgid user')
+		return True
 	balance = 0.00
 	tpac = await get_user_tpac(userid)
 	if tpac:
