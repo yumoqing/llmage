@@ -12,7 +12,8 @@
             "options": {
                 "width": "100%",
                 "alignItems": "center",
-                "marginBottom": "24px"
+                "padding": "16px 24px",
+                "marginBottom": "0"
             },
             "subwidgets": [
                 {
@@ -39,51 +40,17 @@
         {
             "widgettype": "ResponsableBox",
             "options": {
-                "gap": "16px",
+                "gap": "12px",
                 "minWidth": "200px",
-                "marginBottom": "24px"
-            },
-            "subwidgets": [
-                {
-                    "widgettype": "urlwidget",
-                    "options": {
-                        "url": "{{entire_url('/llmage/stat_total_models.ui')}}"
-                    }
-                },
-                {
-                    "widgettype": "urlwidget",
-                    "options": {
-                        "url": "{{entire_url('/llmage/stat_today_calls.ui')}}"
-                    }
-                },
-                {
-                    "widgettype": "urlwidget",
-                    "options": {
-                        "url": "{{entire_url('/llmage/stat_today_amount.ui')}}"
-                    }
-                },
-                {
-                    "widgettype": "urlwidget",
-                    "options": {
-                        "url": "{{entire_url('/llmage/stat_catelog_count.ui')}}"
-                    }
-                }
-            ]
-        },
-        {
-            "widgettype": "ResponsableBox",
-            "options": {
-                "gap": "16px",
-                "minWidth": "250px",
-                "marginBottom": "24px"
+                "padding": "0 24px 16px 24px"
             },
             "subwidgets": [
                 {
                     "widgettype": "VBox",
                     "options": {
                         "bgcolor": "#1E293B",
-                        "padding": "24px",
-                        "borderRadius": "12px",
+                        "padding": "16px 24px",
+                        "borderRadius": "8px",
                         "border": "1px solid #334155",
                         "cursor": "pointer"
                     },
@@ -101,28 +68,18 @@
                     ],
                     "subwidgets": [
                         {
-                            "widgettype": "Svg",
-                            "options": {
-                                "svg": "<svg width=\"36\" height=\"36\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#90caf9\" stroke-width=\"1.5\"><path d=\"M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z\"/></svg>",
-                                "width": "36px",
-                                "height": "36px",
-                                "marginBottom": "16px"
-                            }
-                        },
-                        {
-                            "widgettype": "Title4",
+                            "widgettype": "Title5",
                             "options": {
                                 "text": "模型类型管理",
                                 "color": "#F1F5F9",
-                                "fontWeight": "600",
-                                "marginBottom": "8px"
+                                "fontWeight": "600"
                             }
                         },
                         {
                             "widgettype": "Text",
                             "options": {
                                 "text": "管理模型的分类目录和类型定义",
-                                "fontSize": "14px",
+                                "fontSize": "12px",
                                 "color": "#94A3B8"
                             }
                         }
@@ -132,8 +89,8 @@
                     "widgettype": "VBox",
                     "options": {
                         "bgcolor": "#1E293B",
-                        "padding": "24px",
-                        "borderRadius": "12px",
+                        "padding": "16px 24px",
+                        "borderRadius": "8px",
                         "border": "1px solid #334155",
                         "cursor": "pointer"
                     },
@@ -151,28 +108,18 @@
                     ],
                     "subwidgets": [
                         {
-                            "widgettype": "Svg",
-                            "options": {
-                                "svg": "<svg width=\"36\" height=\"36\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#4caf50\" stroke-width=\"1.5\"><path d=\"M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15.75c-2.062 0-4.024-.614-5.67-1.757l-1.57-.393m15.04 0L12 21 5.25 13.893\"/></svg>",
-                                "width": "36px",
-                                "height": "36px",
-                                "marginBottom": "16px"
-                            }
-                        },
-                        {
-                            "widgettype": "Title4",
+                            "widgettype": "Title5",
                             "options": {
                                 "text": "模型配置",
                                 "color": "#F1F5F9",
-                                "fontWeight": "600",
-                                "marginBottom": "8px"
+                                "fontWeight": "600"
                             }
                         },
                         {
                             "widgettype": "Text",
                             "options": {
                                 "text": "管理 LLM 模型的API配置与供应商映射",
-                                "fontSize": "14px",
+                                "fontSize": "12px",
                                 "color": "#94A3B8"
                             }
                         }
@@ -182,8 +129,8 @@
                     "widgettype": "VBox",
                     "options": {
                         "bgcolor": "#1E293B",
-                        "padding": "24px",
-                        "borderRadius": "12px",
+                        "padding": "16px 24px",
+                        "borderRadius": "8px",
                         "border": "1px solid #334155",
                         "cursor": "pointer"
                     },
@@ -201,28 +148,18 @@
                     ],
                     "subwidgets": [
                         {
-                            "widgettype": "Svg",
-                            "options": {
-                                "svg": "<svg width=\"36\" height=\"36\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#EF4444\" stroke-width=\"1.5\"><path d=\"M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z\"/></svg>",
-                                "width": "36px",
-                                "height": "36px",
-                                "marginBottom": "16px"
-                            }
-                        },
-                        {
-                            "widgettype": "Title4",
+                            "widgettype": "Title5",
                             "options": {
                                 "text": "记账失败记录",
                                 "color": "#F1F5F9",
-                                "fontWeight": "600",
-                                "marginBottom": "8px"
+                                "fontWeight": "600"
                             }
                         },
                         {
                             "widgettype": "Text",
                             "options": {
                                 "text": "查看和检索调用计费失败记录",
-                                "fontSize": "14px",
+                                "fontSize": "12px",
                                 "color": "#94A3B8"
                             }
                         }
@@ -233,10 +170,11 @@
         {
             "widgettype": "VBox",
             "id": "llmage_content",
+            "css": "filler",
             "options": {
                 "width": "100%",
-                "flex": "1",
-                "marginTop": "20px"
+                "padding": "0 24px",
+                "overflowY": "auto"
             }
         }
     ]
