@@ -1,0 +1,53 @@
+{% set stats = get_llmage_stats(request) %}
+{
+    "widgettype": "VBox",
+    "options": {
+        "bgcolor": "#1E293B",
+        "padding": "20px",
+        "borderRadius": "12px",
+        "border": "1px solid #334155",
+        "flex": "1",
+        "minHeight": "110px"
+    },
+    "subwidgets": [
+        {
+            "widgettype": "HBox",
+            "options": {
+                "alignItems": "center",
+                "marginBottom": "12px"
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "Svg",
+                    "options": {
+                        "svg": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#F59E0B\" stroke-width=\"2\"><path d=\"M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"/></svg>",
+                        "width": "24px",
+                        "height": "24px"
+                    }
+                },
+                {
+                    "widgettype": "Filler"
+                }
+            ]
+        },
+        {
+            "widgettype": "Text",
+            "options": {
+                "text": "¥{{'%.2f' % stats.today_amount}}",
+                "fontSize": "32px",
+                "fontWeight": "700",
+                "color": "#F1F5F9",
+                "lineHeight": "1.1"
+            }
+        },
+        {
+            "widgettype": "Text",
+            "options": {
+                "text": "今日消费",
+                "fontSize": "14px",
+                "color": "#94A3B8",
+                "marginTop": "4px"
+            }
+        }
+    ]
+}

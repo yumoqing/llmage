@@ -39,6 +39,40 @@
             "widgettype": "ResponsableBox",
             "options": {
                 "gap": "16px",
+                "minWidth": "200px",
+                "marginBottom": "24px"
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "urlwidget",
+                    "options": {
+                        "url": "{{entire_url('/llmage/stat_total_models.ui')}}"
+                    }
+                },
+                {
+                    "widgettype": "urlwidget",
+                    "options": {
+                        "url": "{{entire_url('/llmage/stat_today_calls.ui')}}"
+                    }
+                },
+                {
+                    "widgettype": "urlwidget",
+                    "options": {
+                        "url": "{{entire_url('/llmage/stat_today_amount.ui')}}"
+                    }
+                },
+                {
+                    "widgettype": "urlwidget",
+                    "options": {
+                        "url": "{{entire_url('/llmage/stat_catelog_count.ui')}}"
+                    }
+                }
+            ]
+        },
+        {
+            "widgettype": "ResponsableBox",
+            "options": {
+                "gap": "16px",
                 "minWidth": "250px",
                 "marginBottom": "24px"
             },
