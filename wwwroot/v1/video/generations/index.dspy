@@ -1,0 +1,87 @@
+# OpenAI-compatible Video Generation API
+# POST /v1/video/generations
+# Required params: model, llmcatelogid
+# Optional params: prompt, image_url, duration, resolution, n, etc.
+#
+# Example request:
+# {
+#     "model": "keling-2.1",
+#     "llmcatelogid": "文生视频",
+#     "prompt": "A beautiful sunset over the ocean",
+#     "duration": "5s",
+#     "resolution": "1080p"
+# }
+#
+# Response (async task):
+# {
+#     "id": "vid_xxx",
+#     "object": "video.generation",
+#     "model": "keling-2.1",
+#     "status": "submitted",
+#     "taskid": "task_xxx",
+#     "created": 1234567890
+# }
+
+import json
+import time
+from functools import partial
+from appPublic.log import debug
+from appPublic.dictObject import DictObject
+from appPublic.uniqueID import getID
+from appPublic.timeUtils import curDateString, timestampstr
+from sqlor.dbpools import get_sor_context
+
+debug(f'{params_kw=}')
+
+userid = await get_user()
+userorgid = await get_userorgid()
+if userid is None:
+    debug('need login')
+    return openai_403()
+
+# Validate required parameters
+if not params_kw.model:
+    d = return_error('Missing required parameter: model')
+    return json_response(d, status=400)
+
+if not params_kw.llmcatelogid:
+    d = return_error('Missing required parameter: llmcatelogid')
+    return json_response(d, status=400)
+
+if not params_kw.prompt:
+    d = return_error('Missing required parameter: prompt')
+    return json_response(d, status=400)
+
+lctype = params_kw.llmcatelogid
+
+env = request._run_ns
+async with get_sor_context(env, 'llmage') as sor:
+    # Look up llm by model name and catalog type through llm_api_map
+    sql = """select distinct a.* from llm a
+join llm_api_map m on a.id = m.llmid
+join llmcatelog b on m.llmcatelogid = b.id
+where b.name = ${lctype}$
+    and a.model=${model}$"""
+    recs = await sor.sqlExe(sql, {
+        'lctype': lctype,
+        'model': params_kw.model
+    })
+    if len(recs) == 0:
+        debug(f'{params_kw.model=} not found for catalog {lctype}')
+        return openai_400()
+    params_kw.llmid = recs[0].id
+
+debug(f'{params_kw.llmid=}')
+
+# Check balance
+f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
+if not f:
+    debug(f'{userid=} balance not enough')
+    return openai_429()
+
+# Generate task ID and attach to params
+if not params_kw.transno:
+    params_kw.transno = getID()
+
+# Call inference (video/image generation is typically async via callback)
+return await inference(request, env=env)
