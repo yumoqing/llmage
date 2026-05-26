@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+import json
+
+result = {'success': False, 'data': {'organizations': []}}
+
+try:
+    async with get_sor_context(request._run_ns, 'rbac') as sor:
+        user_orgid = await get_userorgid()
+        orgs = await sor.R('organization', {'id': user_orgid})
+        # Get current org and its children
+        all_orgs = await sor.sqlExe(
+            "select id, orgname from organization where id = ${id}$ or parentid = ${id}$ order by orgname",
+            {'id': user_orgid}
+        )
+        result['data']['organizations'] = [{'id': r['id'], 'text': r['orgname']} for r in (all_orgs or [])]
+        result['success'] = True
+except Exception as e:
+    result['error'] = str(e)
+
+return json.dumps(result, ensure_ascii=False, default=str)

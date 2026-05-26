@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+import json
+from appPublic.uniqueID import getID
+
+result = {'success': False, 'message': ''}
+
+try:
+    dbname = get_module_dbname('llmage')
+    async with DBPools().sqlorContext(dbname) as sor:
+        data = params_kw.copy()
+        data.pop('page', None)
+        data.pop('rows', None)
+        data.pop('data_filter', None)
+        data['id'] = getID()
+        await sor.C('llm', data)
+        result['success'] = True
+        result['message'] = '创建成功'
+except Exception as e:
+    result['message'] = str(e)
+
+return json.dumps(result, ensure_ascii=False, default=str)

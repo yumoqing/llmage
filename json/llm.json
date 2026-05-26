@@ -4,6 +4,21 @@
     "params": {
 		"sortby":"model",
 		"logined_userorgid": "ownerid",
+		"data_url": "{{entire_url('../api/llm_list.dspy')}}",
+        "data_filter": {
+            "AND": [
+                {"field": "name", "op": "LIKE", "var": "name_input"},
+                {"field": "model", "op": "LIKE", "var": "model_input"},
+                {"field": "providerid", "op": "=", "var": "providerid_input"},
+                {"field": "upappid", "op": "=", "var": "upappid_input"}
+            ]
+        },
+        "filter_labels": {
+            "name_input": "名称",
+            "model_input": "识别名",
+            "providerid_input": "供应商",
+            "upappid_input": "上位系统"
+        },
         "browserfields": {
             "exclouded": ["id", "ownerid"],
             "alters": {
@@ -11,7 +26,21 @@
 					"dataurl":"{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
 					"textField": "name",
                     "valueField": "id"
-				}
+				},
+                "providerid": {
+                    "uitype": "code",
+                    "dataurl": "{{entire_url('../api/get_organizations.dspy')}}",
+                    "data_field": "organizations",
+                    "textField": "text",
+                    "valueField": "id"
+                },
+                "upappid": {
+                    "uitype": "code",
+                    "dataurl": "{{entire_url('../api/get_upapps.dspy')}}",
+                    "data_field": "upapps",
+                    "textField": "text",
+                    "valueField": "id"
+                }
 			}
         },
 		"toolbar": {
@@ -45,6 +74,11 @@
         "editexclouded": [
             "id", "ownerid"
         ],
+		"editable": {
+			"new_data_url": "{{entire_url('../api/llm_create.dspy')}}",
+			"update_data_url": "{{entire_url('../api/llm_update.dspy')}}",
+			"delete_data_url": "{{entire_url('../api/llm_delete.dspy')}}"
+		},
 		"subtables":[
 			{
 				"field":"llmid",

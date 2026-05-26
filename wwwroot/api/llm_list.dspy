@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+import json
+from sqlor.filter import DBFilter
+
+result = {'success': False, 'rows': [], 'total': 0}
+
+try:
+    dbname = get_module_dbname('llmage')
+    page = int(params_kw.get('page', 1))
+    rows_per_page = int(params_kw.get('rows', 20))
+    offset = (page - 1) * rows_per_page
+
+    # Get data_filter JSON from frontend
+    filterjson_str = params_kw.get('data_filter')
+    filterjson = None
+    if filterjson_str:
+        try:
+            filterjson = json.loads(filterjson_str)
+        except (json.JSONDecodeError, TypeError):
+            filterjson = None
+
+    async with DBPools().sqlorContext(dbname) as sor:
+        where_clause = ''
+        filterdic = {}
+        if filterjson:
+            # Preprocess LIKE values: add wildcards if user didn't provide them
+            ns = dict(params_kw)
+            for key, val in ns.items():
+                # Check if this var is used with LIKE op in filterjson
+                if _is_like_var(filterjson, key) and val and '%' not in val:
+                    ns[key] = f'%{val}%'
+
+            dbf = DBFilter(filterjson)
+            conds = dbf.gen(ns)
+            if conds:
+                where_clause = f' WHERE {conds}'
+                filterdic = ns
+
+        # Total count
+        count_sql = f"select count(*) as cnt from llm{where_clause}"
+        count_rows = await sor.sqlExe(count_sql, filterdic)
+        total = count_rows[0]['cnt'] if count_rows else 0
+
+        # Paginated data
+        data_sql = f"""
+            select id, name, model, description, iconid, upappid, providerid,
+                   ownerid, enabled_date, expired_date, min_balance
+            from llm{where_clause}
+            order by model
+            limit ${limit}$ offset ${offset}$
+        """
+        rows = await sor.sqlExe(data_sql, {**filterdic, 'limit': rows_per_page, 'offset': offset})
+        result['rows'] = [dict(r) for r in (rows or [])]
+        result['total'] = total
+        result['success'] = True
+
+except Exception as e:
+    result['error'] = str(e)
+
+return json.dumps(result, ensure_ascii=False, default=str)
+
+
+def _is_like_var(filterjson, varname):
+    """Check if a var is used with LIKE operator in the filter tree."""
+    if not filterjson:
+        return False
+    for key, val in filterjson.items():
+        if key.upper() in ('AND', 'OR') and isinstance(val, list):
+            for item in val:
+                if _is_like_var(item, varname):
+                    return True
+        elif key.upper() == 'NOT' and isinstance(val, dict):
+            if _is_like_var(val, varname):
+                return True
+        elif isinstance(val, dict) and val.get('var') == varname:
+            if val.get('op', '').upper() == 'LIKE':
+                return True
+    return False
