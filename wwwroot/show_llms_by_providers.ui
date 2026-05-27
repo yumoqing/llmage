@@ -31,10 +31,9 @@
 {% for llm in p.llms %}
 							{
 							"widgettype":"VScrollPanel",
-							"options":{
-								"css":"card",
-								"bgcolor": "#def0f0",
-								"cwidth":20,
+						"options":{
+							"css":"card",
+							"cwidth":20,
 								"cheight":12
 							},
 							"subwidgets":[
