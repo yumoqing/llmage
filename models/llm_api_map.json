@@ -4,81 +4,99 @@
         {
             "name": "llm_api_map",
             "title": "模型API映射表",
-            "primary": "id",
+            "primary": [
+                "id"
+            ],
             "catelog": "relation"
         }
     ],
     "fields": [
         {
             "name": "id",
-            "type": "varchar(32)",
+            "type": "str",
             "not_null": true,
-            "title": "主键ID"
+            "title": "主键ID",
+            "length": 32
         },
         {
             "name": "llmid",
-            "type": "varchar(32)",
+            "type": "str",
             "not_null": true,
-            "title": "模型ID"
+            "title": "模型ID",
+            "length": 32
         },
         {
             "name": "llmcatelogid",
-            "type": "varchar(32)",
+            "type": "str",
             "not_null": true,
-            "title": "模型分类ID"
+            "title": "模型分类ID",
+            "length": 32
         },
         {
             "name": "apiname",
-            "type": "varchar(100)",
+            "type": "str",
             "not_null": true,
-            "title": "接口名称"
+            "title": "接口名称",
+            "length": 100
         },
         {
             "name": "query_apiname",
-            "type": "varchar(100)",
-            "title": "任务结果查询接口名称"
+            "type": "str",
+            "title": "任务结果查询接口名称",
+            "length": 100
         },
         {
             "name": "query_period",
-            "type": "bigint",
+            "type": "long",
             "default": 30,
             "title": "任务查询间隔（秒）"
         },
         {
             "name": "ppid",
-            "type": "varchar(32)",
-            "title": "定价ID"
+            "type": "str",
+            "title": "定价ID",
+            "length": 32
         },
         {
             "name": "isdefaultcatelog",
-            "type": "varchar(1)",
+            "type": "str",
             "not_null": true,
-            "title": "缺省分类"
+            "title": "缺省分类",
+            "length": 1
         }
     ],
     "indexes": [
         {
             "name": "idx_api_map_llmid",
             "type": "normal",
-            "idxfields": ["llmid"],
+            "idxfields": [
+                "llmid"
+            ],
             "idxtype": "index"
         },
         {
             "name": "idx_api_map_catelog",
             "type": "normal",
-            "idxfields": ["llmcatelogid"],
+            "idxfields": [
+                "llmcatelogid"
+            ],
             "idxtype": "index"
         },
         {
             "name": "idx_api_map_apiname",
             "type": "normal",
-            "idxfields": ["apiname"],
+            "idxfields": [
+                "apiname"
+            ],
             "idxtype": "index"
         },
         {
             "name": "uk_llmid_apiname",
             "type": "unique",
-            "idxfields": ["llmid", "apiname"],
+            "idxfields": [
+                "llmid",
+                "apiname"
+            ],
             "idxtype": "unique"
         }
     ],

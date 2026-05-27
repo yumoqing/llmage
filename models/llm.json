@@ -72,7 +72,8 @@
             "title": "最低余额",
             "type": "float",
             "length": 20,
-            "default": 10
+            "default": 10,
+            "dec": 2
         }
     ],
     "codes": [

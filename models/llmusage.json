@@ -58,13 +58,15 @@
             "name": "responsed_seconds",
             "title": "响应时间",
             "type": "float",
-            "length": 18
+            "length": 18,
+            "dec": 2
         },
         {
             "name": "finish_seconds",
             "title": "结束时间",
             "type": "float",
-            "length": 18
+            "length": 18,
+            "dec": 2
         },
         {
             "name": "status",
@@ -82,13 +84,15 @@
             "name": "amount",
             "title": "交易金额",
             "type": "float",
-            "length": 18
+            "length": 18,
+            "dec": 2
         },
         {
             "name": "cost",
             "title": "交易成本",
             "type": "float",
-            "length": 18
+            "length": 18,
+            "dec": 2
         },
         {
             "name": "userorgid",
