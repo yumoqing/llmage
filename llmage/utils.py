@@ -154,6 +154,7 @@ async def get_llmproviders():
 		sql = """select a.providerid, a.iconid, b.orgname 
 from llm a, organization b
 where a.providerid = b.id
+	and a.status = 'published'
 group by a.providerid, a.iconid, b.orgname"""
 		return await sor.sqlExe(sql, {})
 	return []
@@ -165,6 +166,7 @@ async def get_llms_sort_by_provider():
 		sql = """select a.*, b.orgname from llm a, organization b
 where a.enabled_date <= ${today}$
 	and a.expired_date > ${today}$
+	and a.status = 'published'
 	and a.providerid = b.id
 	order by a.providerid, a.id
 	"""									 
@@ -211,6 +213,7 @@ m.ppid
 			join llm_api_map m on a.id = m.llmid 
 			join llmcatelog b on m.llmcatelogid = b.id
 			where a.enabled_date <= ${today}$
+			and a.status = 'published'
 			and m.ppid is not null
 			and a.expired_date > ${today}$
 			"""
@@ -250,6 +253,7 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 			join llm_api_map m on a.id = m.llmid 
 			join llmcatelog b on m.llmcatelogid = b.id
 			where a.enabled_date <= ${today}$
+			and a.status = 'published'
 			and a.expired_date > ${today}$"""
 		params = {'today': today, 'sort': orderby}
 		if catelogid:
@@ -311,6 +315,7 @@ and c.id = e.upappid
 and m.apiname = e.name
 and e.ioid = f.id
 and a.id = ${llmid}$
+and a.status = 'published'
 and a.expired_date > ${today}$
 and a.enabled_date <= ${today}$
 """

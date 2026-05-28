@@ -74,6 +74,14 @@
             "length": 20,
             "default": 10,
             "dec": 2
+        },
+        {
+            "name": "status",
+            "title": "上架状态",
+            "type": "str",
+            "length": 16,
+            "nullable": "no",
+            "default": "unpublished"
         }
     ],
     "codes": [

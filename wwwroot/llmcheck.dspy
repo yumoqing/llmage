@@ -2,7 +2,7 @@ llmid = params_kw.llmid
 today= params_kw.today
 msgs = []
 async with get_sor_context(request._run_ns, 'llmage') as sor:
-	sql = "select * from llm where id=${llmid}$ and enabled_date <= ${today}$ and expired_date > ${today}$"
+	sql = "select * from llm where id=${llmid}$ and enabled_date <= ${today}$ and expired_date > ${today}$ and status = 'published'"
 	ns = {'llmid': llmid, 'today': today}
 	recs = await sor.sqlExe(sql, ns.copy())
 	if recs:

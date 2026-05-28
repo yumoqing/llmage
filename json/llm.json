@@ -10,18 +10,28 @@
                 {"field": "name", "op": "LIKE", "var": "name_input"},
                 {"field": "model", "op": "LIKE", "var": "model_input"},
                 {"field": "providerid", "op": "=", "var": "providerid_input"},
-                {"field": "upappid", "op": "=", "var": "upappid_input"}
+                {"field": "upappid", "op": "=", "var": "upappid_input"},
+                {"field": "status", "op": "=", "var": "status_input"}
             ]
         },
         "filter_labels": {
             "name_input": "名称",
             "model_input": "识别名",
             "providerid_input": "供应商",
-            "upappid_input": "上位系统"
+            "upappid_input": "上位系统",
+            "status_input": "上架状态"
         },
         "browserfields": {
             "exclouded": ["id", "ownerid"],
             "alters": {
+                "status": {
+                    "uitype": "select",
+                    "options": [
+                        {"value": "", "text": "全部"},
+                        {"value": "published", "text": "已上架"},
+                        {"value": "unpublished", "text": "已下架"}
+                    ]
+                },
 				"ppid":{
 					"dataurl":"{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
 					"textField": "name",

@@ -3,7 +3,7 @@ db = DBPools()
 async with db.sqlorContext(dbname) as sor:
 	sql = """select distinct a.* from llm a
 join llm_api_map m on a.id = m.llmid
-where m.llmcatelogid = ${llmcatelogid}$ and a.id != ${llmid}$"""
+where m.llmcatelogid = ${llmcatelogid}$ and a.id != ${llmid}$ and a.status = 'published'"""
 	ns = params_kw.copy()
 	recs = await sor.sqlExe(sql, ns)
 	for r in recs.get('rows', []):

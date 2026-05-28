@@ -18,6 +18,7 @@ join llm_api_map m on a.id = m.llmid
 join llmcatelog b on m.llmcatelogid = b.id
 join upapp c on a.upappid = c.id
 join uapi e on c.apisetid = e.apisetid and a.apiname = e.name
+where a.status = 'published'
 ) x left join historyformat y on x.hfid = y.id
     left join uapiio z on x.ioid = z.id
 where m.llmcatelogid = ${llmcatelogid}$

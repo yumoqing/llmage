@@ -12,6 +12,7 @@ join uapiio e on d.ioid = e.id
 where b.name=${lt}$
 	and a.enabled_date <= ${biz_date}$
 	and ${biz_date}$ < a.expired_date
+	and a.status = 'published'
 	and ppid is not NULL'''
 	biz_date = await get_business_date(sor)
 	recs = await sor.sqlExe(sql, {
