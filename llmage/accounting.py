@@ -16,13 +16,6 @@ async def llm_charging(ppid, llmusage):
 	usages =  llmusage.usages
 	if isinstance(usages, str):
 		usages = json.loads(usages)
-	# 展平嵌套dict，使 prompt_tokens_details.cached_tokens 等点号路径
-	# 可以作为顶层key被pricing引擎的 config_data.get(k) 取到
-	for nested_key in ('prompt_tokens_details', 'completion_tokens_details'):
-		nested = usages.get(nested_key)
-		if isinstance(nested, dict):
-			for k, v in nested.items():
-				usages[f'{nested_key}.{k}'] = v
 	prices = await env.buffered_charging(ppid, usages)
 	if prices is None:
 		e = Exception(f'{ppid=}, {usages=}{llmusage.id=}  env.buffered_charging() return None')
