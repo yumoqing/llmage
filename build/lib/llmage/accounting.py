@@ -1,7 +1,7 @@
 import asyncio
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from appPublic.log import exception, debug
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
@@ -41,7 +41,7 @@ async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
 		debug(f'checkCustomerBalance(): llmid is None')
 		return False
 	env = ServerEnv()
-	llm = await get_llmage_llm(llmid)
+	llm = await get_llm(llmid)
 	if llm.ownerid == userorgid:
 		debug(f'self orgid user')
 		return True
@@ -64,34 +64,37 @@ async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
 async def llm_accounting(llmusage):
 	env = ServerEnv()
 	llmid = llmusage.llmid
-	llm = await get_llmage_llm(llmid)
-	if llm is None:
-		async with get_sor_context(env, 'llmage') as sor:
-			ns = {
-				'id': llmusage.id,
-				'accounting_status': 'failed'
-			}
-			await sor.U('llmusage', ns)
-		e = Exception(f'llm not found({llmid})')
-		exception(f'{e}')
-		raise e
-	if llm.ppid is None:
-		async with get_sor_context(env, 'llmage') as sor:
-			ns = {
-				'id': llmusage.id,
-				'accounting_status': 'failed'
-			}
-			await sor.U('llmusage', ns)
-		e = Exception(f'llm ({llmid}) donot has a pricing_program')
-		exception(f'{e}')
-		raise e
-	customerid = llmusage.userorgid
-	userid = llmusage.userid
-	resellerid = llm.ownerid
-	providerid = llm.providerid
-	trans_amount = llmusage.amount
-	trans_cost = llmusage.cost
 	async with get_sor_context(env, 'llmage') as sor:
+		sql = """select a.*, b.ppid from llm a, llm_api_map b 
+where a.id=${llmid}$ 
+	and a.id = b.llmid 
+	and b.isdefaultcatelog = '1'
+"""
+		recs = await sor.sqlExe(sql, {'llmid': llmusage.llmid})
+		if len(recs) == 0:
+			ns = {
+				'id': llmusage.id,
+				'accounting_status': 'failed'
+			}
+			await sor.U('llmusage', ns)
+			e = Exception(f'llm not found({llmid})')
+			exception(f'{e}')
+			raise e
+		if recs[0].ppid is None:
+			ns = {
+				'id': llmusage.id,
+				'accounting_status': 'failed'
+			}
+			await sor.U('llmusage', ns)
+			e = Exception(f'llm ({llmid}) donot has a pricing_program')
+			exception(f'{e}')
+			raise e
+		customerid = llmusage.userorgid
+		userid = llmusage.userid
+		resellerid = recs[0].ownerid
+		providerid = recs[0].providerid
+		trans_amount = llmusage.amount
+		trans_cost = llmusage.cost
 		biz_date = await env.get_business_date(sor)
 		timestamp = env.timestampstr()
 		orderid = getID()
@@ -236,37 +239,49 @@ async def llm_accoung_failed(luid, reason=None):
 			await sor.C('llmusage_accounting_failed', failed_rec)
 
 
-async def backup_accounted_llmusage(cutoff_date):
-	"""Backup accounted records with use_date < cutoff_date to history table."""
+async def backup_accounted_llmusage():
+	"""Backup yesterday's accounted records to history table and remove from llmusage."""
 	env = ServerEnv()
+	yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 	ts = env.timestampstr()
+	batched = 0
 	async with get_sor_context(env, 'llmage') as sor:
-		# Step 0: Count records to backup
-		count_sql = """SELECT COUNT(*) as cnt FROM llmusage
-WHERE accounting_status='accounted' AND use_date < ${cutoff_date}$"""
-		count_recs = await sor.sqlExe(count_sql, {'cutoff_date': cutoff_date})
-		total = count_recs[0].cnt if count_recs else 0
-		if total == 0:
-			debug(f'backup_accounted_llmusage: no records to backup for use_date < {cutoff_date}')
+		# Select yesterday's accounted records
+		sql = """select * from llmusage 
+where accounting_status='accounted' 
+	and use_date < ${yesterday}$"""
+		recs = await sor.sqlExe(sql, {'yesterday': yesterday})
+		if not recs:
+			debug(f'backup_accounted_llmusage: no records to backup for use_date < {yesterday}')
 			return 0
-		debug(f'backup_accounted_llmusage: {total} records to backup')
-		
-		# Step 1: INSERT INTO history SELECT from main table
-		insert_sql = """INSERT INTO llmusage_history 
-(id, llmid, use_date, use_time, userid, usages, ioinfo, transno, responsed_seconds, finish_seconds, status, taskid, amount, cost, userorgid, ownerid, accounting_status, backup_time)
-SELECT id, llmid, use_date, use_time, userid, usages, ioinfo, transno, responsed_seconds, finish_seconds, status, taskid, amount, cost, userorgid, ownerid, accounting_status, ${ts}$
-FROM llmusage
-WHERE accounting_status='accounted' AND use_date < ${cutoff_date}$"""
-		await sor.execute(insert_sql, {'cutoff_date': cutoff_date, 'ts': ts})
-		debug(f'backup_accounted_llmusage: inserted {total} records to history')
-		
-		# Step 2: DELETE from main table
-		delete_sql = """DELETE FROM llmusage
-WHERE accounting_status='accounted' AND use_date < ${cutoff_date}$"""
-		await sor.execute(delete_sql, {'cutoff_date': cutoff_date})
-		debug(f'backup_accounted_llmusage: deleted {total} records from main table')
-	
-	return total
+		debug(f'backup_accounted_llmusage: {len(recs)} records to backup')
+		for r in recs:
+			history_rec = {
+				'id': r.id,
+				'llmid': r.llmid,
+				'use_date': r.use_date,
+				'use_time': r.use_time,
+				'userid': r.userid,
+				'usages': r.usages,
+				'ioinfo': r.ioinfo,
+				'transno': r.transno,
+				'responsed_seconds': r.responsed_seconds,
+				'finish_seconds': r.finish_seconds,
+				'status': r.status,
+				'taskid': r.taskid,
+				'amount': r.amount,
+				'cost': r.cost,
+				'userorgid': r.userorgid,
+				'ownerid': r.ownerid,
+				'accounting_status': r.accounting_status,
+				'backup_time': ts
+			}
+			await sor.C('llmusage_history', history_rec)
+			# Delete from main table
+			await sor.D('llmusage', {'id': r.id})
+			batched += 1
+	debug(f'backup_accounted_llmusage: backed up {batched} records')
+	return batched
 
 
 async def get_failed_accounting_records(filters=None, page=1, page_size=50):
@@ -320,13 +335,14 @@ order by failed_time desc limit {page_size} offset {offset}"""
 async def backend_accounting():
 	env = ServerEnv()
 	debug(f'backend accounting started ...')
-	last_backup_date = None
+	backup_counter = 0
 	while True:
 		try:
 			lus = await get_accounting_llmusages()
 		except Exception as e:
 			exception(f'{e}')
 			lus = []
+		# debug(f'{len(lus)=} need to accounting........')
 		for lu in lus:
 			try:
 				tpac = await get_user_tpac(lu.userid)
@@ -340,14 +356,12 @@ async def backend_accounting():
 				exception(f'{e}, {lu.id=}')
 				await llm_accoung_failed(lu.id, reason=str(e))
 
-		# Check if date changed, trigger backup once per day
-		today = datetime.now().strftime('%Y-%m-%d')
-		if today != last_backup_date:
-			yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
-			last_backup_date = today
+		# Run backup every 100 iterations (roughly every ~1000 seconds)
+		backup_counter += 1
+		if backup_counter >= 100:
+			backup_counter = 0
 			try:
-				debug(f'date changed to {today}, triggering backup for use_date < {yesterday}')
-				await backup_accounted_llmusage(yesterday)
+				await backup_accounted_llmusage()
 			except Exception as e:
 				exception(f'backup_accounted_llmusage failed: {e}')
 

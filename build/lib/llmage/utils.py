@@ -154,7 +154,6 @@ async def get_llmproviders():
 		sql = """select a.providerid, a.iconid, b.orgname 
 from llm a, organization b
 where a.providerid = b.id
-	and a.status = 'published'
 group by a.providerid, a.iconid, b.orgname"""
 		return await sor.sqlExe(sql, {})
 	return []
@@ -166,7 +165,6 @@ async def get_llms_sort_by_provider():
 		sql = """select a.*, b.orgname from llm a, organization b
 where a.enabled_date <= ${today}$
 	and a.expired_date > ${today}$
-	and a.status = 'published'
 	and a.providerid = b.id
 	order by a.providerid, a.id
 	"""									 
@@ -187,39 +185,6 @@ where a.enabled_date <= ${today}$
 				x['llms'].append(l)
 		return d
 	return []
-
-async def get_llmage_llm(llmid=None, catelogid=None):
-	"""Unified accessor for llm + llm_api_map + llmcatelog.
-	For non-API-call scenarios only (display, listing, querying, accounting).
-	Do NOT use for vendor model API calls — use get_llm() instead.
-	
-	- llmid: get specific llm by id (returns single DictObject or None)
-	- catelogid: filter by catalog (returns list)
-	- neither: return all with catalog info (returns list)
-	"""
-	env = ServerEnv()
-	async with get_sor_context(env, 'llmage') as sor:
-		sql = """select a.id, a.name, a.model, a.providerid, a.description,
-a.iconid, a.upappid, a.ownerid, a.min_balance, a.status,
-m.llmcatelogid, m.apiname, m.query_apiname, m.query_period, m.ppid, m.isdefaultcatelog,
-lc.name as catelogname
-from llm a
-join llm_api_map m on a.id = m.llmid
-join llmcatelog lc on m.llmcatelogid = lc.id
-where 1=1
-"""
-		ns = {}
-		if llmid:
-			sql += " and a.id = ${llmid}$ and m.isdefaultcatelog = '1'"
-			ns['llmid'] = llmid
-		if catelogid:
-			sql += " and m.llmcatelogid = ${catelogid}$"
-			ns['catelogid'] = catelogid
-		sql += " order by m.llmcatelogid, a.id"
-		recs = await sor.sqlExe(sql, ns)
-		if llmid:
-			return recs[0] if recs else None
-		return recs
 
 async def get_llmcatelogs():
 	db = DBPools()
@@ -246,7 +211,6 @@ m.ppid
 			join llm_api_map m on a.id = m.llmid 
 			join llmcatelog b on m.llmcatelogid = b.id
 			where a.enabled_date <= ${today}$
-			and a.status = 'published'
 			and m.ppid is not null
 			and a.expired_date > ${today}$
 			"""
@@ -286,7 +250,6 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 			join llm_api_map m on a.id = m.llmid 
 			join llmcatelog b on m.llmcatelogid = b.id
 			where a.enabled_date <= ${today}$
-			and a.status = 'published'
 			and a.expired_date > ${today}$"""
 		params = {'today': today, 'sort': orderby}
 		if catelogid:
@@ -313,38 +276,6 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 		return d
 	return []
 	
-async def get_llmage_llm(llmid, catelogid=None):
-	sql = """select distinct a.*, 
-m.llmcatelogid,
-m.apiname,
-m.query_apiname,
-m.query_period,
-m.ppid from llm a
-	join llm_api_map m on a.id = m.llmid
-	join llmcatelog b on m.llmcatelogid = b.id
-	where b.id = m.llmcatelogid
-		and a.model=${model}$
-		and a.expired_date > ${today}$
-		and a.enabled_date <= ${today}$
-		and a.status = 'published'"""
-	env = ServerEnv()
-    async with get_sor_context(env, 'llmage') as sor:
-		ns = {'llmid': llmid, 'today': today}
-		if catelogid:
-			sql += ' and m.llmcatelogid = ${catelogid}$ '
-			ns['catelogid'] = catelogid
-		else:
-			sql += " and m.isdefaultcatelog = '1'"
-		recs = await sor.sqlExe(sql, ns.copy())
-		if len(recs) > 0:
-			r = recs[0]
-			return r
-		else:
-			debug(f'{llmid=} not found, {ns=}, {sql=}')
-			return None
-	exception(f'Error: {format_exc()}')
-	return None
-
 async def get_llm(llmid, catelogid=None):
 	today = curDateString()
 	env = ServerEnv()
@@ -380,7 +311,6 @@ and c.id = e.upappid
 and m.apiname = e.name
 and e.ioid = f.id
 and a.id = ${llmid}$
-and a.status = 'published'
 and a.expired_date > ${today}$
 and a.enabled_date <= ${today}$
 """
@@ -408,7 +338,7 @@ async def write_llmusage(llmusage):
 
 async def llm_query_price(llmid, config_data):
 	env = ServerEnv()
-	llm = await get_llmage_llm(llmid)
+	llm = await get_llm(llmid)
 	if llm.ppid is None:	
 		e = Exception(f'{llm=} ppid is None')
 		exception(f'{e}')

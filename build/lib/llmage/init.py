@@ -12,12 +12,10 @@ from .utils import (
 	get_llm_by_model,
 	get_llms_by_catelog,
 	get_llms_sort_by_provider,
-	get_llmage_llm,
 	get_llmcatelogs,
 	get_llms_by_catelog_to_customer,
 	get_llmproviders,
-	get_llm,
-	get_llmage_llm,
+	get_llm, 
 )
 
 from .llmclient import (
@@ -34,7 +32,6 @@ from .accounting import (
 	get_failed_accounting_records,
 	llm_accoung_failed
 )
-from .stats import get_llmage_stats
 
 from .asyncinference import (
 	get_asynctask_status,
@@ -46,7 +43,6 @@ def load_llmage():
 	env = ServerEnv()
 	env.llm_query_orders = llm_query_orders
 	env.read_webpath = read_webpath
-	env.get_llmage_llm = get_llmage_llm
 	env.get_llm_by_model = get_llm_by_model
 	env.llm_charging = llm_charging
 	env.get_accounting_llmusages = get_accounting_llmusages
@@ -55,7 +51,6 @@ def load_llmage():
 	env.get_asynctask_status = get_asynctask_status
 	env.query_task_status = query_task_status
 	env.get_llm = get_llm
-	env.get_llmage_llm = get_llmage_llm
 	env.inference = inference
 	env.inference_generator = inference_generator
 	env.get_llms_by_catelog = get_llms_by_catelog
@@ -68,7 +63,6 @@ def load_llmage():
 	env.get_llms_by_catelog_to_customer = get_llms_by_catelog_to_customer
 	env.backup_accounted_llmusage = backup_accounted_llmusage
 	env.get_failed_accounting_records = get_failed_accounting_records
-	env.get_llmage_stats = get_llmage_stats
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
 
