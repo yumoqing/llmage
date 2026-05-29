@@ -31,7 +31,7 @@ from appPublic.uniqueID import getID
 from appPublic.timeUtils import curDateString, timestampstr
 from sqlor.dbpools import get_sor_context
 
-debug(f'{params_kw=}')
+debug_params('params_kw', params_kw)
 
 userid = await get_user()
 userorgid = await get_userorgid()

@@ -1,0 +1,148 @@
+
+ns = params_kw.copy()
+
+
+debug_params('get_llmusage', ns)
+if not ns.get('page'):
+	ns['page'] = 1 
+if not ns.get('sort'):
+
+
+	ns['sort'] = 'use_time desc'
+
+
+
+sql = '''select * from llmusage where 1=1  [[filterstr]]'''
+
+filterjson = params_kw.get('data_filter')
+fields_str=r'''[
+    {
+        "name": "id",
+        "title": "id",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "llmid",
+        "title": "模型id",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "use_date",
+        "title": "使用日期",
+        "type": "date"
+    },
+    {
+        "name": "use_time",
+        "title": "使用时间",
+        "type": "timestamp"
+    },
+    {
+        "name": "userid",
+        "title": "用户id",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "usages",
+        "title": "使用信息",
+        "type": "text"
+    },
+    {
+        "name": "ioinfo",
+        "title": "交互内容",
+        "type": "text"
+    },
+    {
+        "name": "transno",
+        "title": "交易号",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "responsed_seconds",
+        "title": "响应时间",
+        "type": "float",
+        "length": 18
+    },
+    {
+        "name": "finish_seconds",
+        "title": "结束时间",
+        "type": "float",
+        "length": 18
+    },
+    {
+        "name": "status",
+        "title": "状态",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "taskid",
+        "title": "任务号",
+        "type": "str",
+        "length": 256
+    },
+    {
+        "name": "amount",
+        "title": "交易金额",
+        "type": "float",
+        "length": 18
+    },
+    {
+        "name": "cost",
+        "title": "交易成本",
+        "type": "float",
+        "length": 18
+    },
+    {
+        "name": "userorgid",
+        "title": "用户机构id",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "ownerid",
+        "title": "模型机构id",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "accounting_status",
+        "title": "记账状态",
+        "type": "str",
+        "length": 32
+    }
+]'''
+ori_fields = json.loads(fields_str)
+if not filterjson:
+	fields = [ f['name'] for f in ori_fields ]
+	filterjson = default_filterjson(fields, ns)
+filterdic = ns.copy()
+filterdic['filterstr'] = ''
+filterdic['userorgid'] = '${userorgid}$'
+filterdic['userid'] = '${userid}$'
+if filterjson:
+	dbf = DBFilter(filterjson)
+	conds = dbf.gen(ns)
+	if conds:
+		ns.update(dbf.consts)
+		conds = f' and {conds}'
+		filterdic['filterstr'] = conds
+ac = ArgsConvert('[[', ']]')
+vars = ac.findAllVariables(sql)
+NameSpace = {v:'${' + v + '}$' for v in vars if v != 'filterstr' }
+filterdic.update(NameSpace)
+sql = ac.convert(sql, filterdic)
+
+debug(f'sql({len(sql)}ch): {sql[:200]}')
+db = DBPools()
+dbname = get_module_dbname('llm')
+async with db.sqlorContext(dbname) as sor:
+	r = await sor.sqlPaging(sql, ns) 
+	return r
+return {
+	"total":0,
+	"rows":[]
+}

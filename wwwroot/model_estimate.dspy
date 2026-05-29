@@ -1,5 +1,5 @@
 
-debug(f'model_estimate.dspy:{params_kw=}')
+debug_params('model_estimate', params_kw)
 db = DBPools()
 dbname = get_module_dbname('llmage')
 async with db.sqlorContext(dbname) as sor:

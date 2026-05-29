@@ -1,0 +1,92 @@
+
+{
+	"id":"llmcatelog_tbl",
+	"widgettype":"Tabular",
+	"options":{
+		"width":"100%",
+		"height":"100%",
+
+
+		"title":"模型类目",
+
+
+
+
+		"css":"card",
+
+
+		"editable":{
+
+			"new_data_url":"{{entire_url('add_llmcatelog.dspy')}}",
+
+
+			"delete_data_url":"{{entire_url('delete_llmcatelog.dspy')}}",
+
+
+			"update_data_url":"{{entire_url('update_llmcatelog.dspy')}}"
+
+		},
+
+
+		"data_url":"{{entire_url('./get_llmcatelog.dspy')}}",
+
+		"data_method":"GET",
+		"data_params":{{json.dumps(params_kw, indent=4, ensure_ascii=False)}},
+		"row_options":{
+
+
+
+			"browserfields": {
+    "exclouded": [
+        "id"
+    ],
+    "alters": {}
+},
+
+
+			"editexclouded":[
+    "id"
+],
+
+			"fields":[
+    {
+        "name": "id",
+        "title": "id",
+        "type": "str",
+        "length": 32,
+        "cwidth": 18,
+        "uitype": "str",
+        "datatype": "str",
+        "label": "id"
+    },
+    {
+        "name": "name",
+        "title": "类型名",
+        "type": "str",
+        "length": 100,
+        "cwidth": 18,
+        "uitype": "str",
+        "datatype": "str",
+        "label": "类型名"
+    },
+    {
+        "name": "description",
+        "title": "类型说明",
+        "type": "text",
+        "length": 0,
+        "uitype": "text",
+        "datatype": "text",
+        "label": "类型说明"
+    }
+]
+		},  
+
+
+
+		"page_rows":160,
+		"cache_limit":5
+	}
+
+	,"binds":[]
+
+}

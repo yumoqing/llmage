@@ -1,0 +1,235 @@
+
+{
+	"id":"llmusage_accounting_failed_tbl",
+	"widgettype":"Tabular",
+	"options":{
+		"width":"100%",
+		"height":"100%",
+
+
+		"title":"记账失败记录",
+
+
+
+
+		"css":"card",
+
+
+		"editable":{
+
+			"new_data_url":"{{entire_url('add_llmusage_accounting_failed.dspy')}}",
+
+
+			"delete_data_url":"{{entire_url('delete_llmusage_accounting_failed.dspy')}}",
+
+
+			"update_data_url":"{{entire_url('update_llmusage_accounting_failed.dspy')}}"
+
+		},
+
+
+		"data_url":"{{entire_url('./get_llmusage_accounting_failed.dspy')}}",
+
+		"data_method":"GET",
+		"data_params":{{json.dumps(params_kw, indent=4, ensure_ascii=False)}},
+		"row_options":{
+
+
+
+			"browserfields": {
+    "exclouded": [
+        "id"
+    ],
+    "alters": {
+        "handled": {
+            "uitype": "code",
+            "data": [
+                {
+                    "value": "0",
+                    "text": "未处理"
+                },
+                {
+                    "value": "1",
+                    "text": "已处理"
+                }
+            ]
+        }
+    }
+},
+
+
+			"editexclouded":[
+    "id",
+    "llmusageid",
+    "failed_time"
+],
+
+			"fields":[
+    {
+        "name": "id",
+        "title": "id",
+        "type": "str",
+        "length": 32,
+        "cwidth": 18,
+        "uitype": "str",
+        "datatype": "str",
+        "label": "id"
+    },
+    {
+        "name": "llmusageid",
+        "title": "使用记录id",
+        "type": "str",
+        "length": 32,
+        "cwidth": 18,
+        "uitype": "str",
+        "datatype": "str",
+        "label": "使用记录id"
+    },
+    {
+        "name": "llmid",
+        "title": "模型id",
+        "type": "str",
+        "length": 32,
+        "cwidth": 18,
+        "uitype": "str",
+        "datatype": "str",
+        "label": "模型id"
+    },
+    {
+        "name": "userid",
+        "title": "用户id",
+        "type": "str",
+        "length": 32,
+        "cwidth": 18,
+        "uitype": "str",
+        "datatype": "str",
+        "label": "用户id"
+    },
+    {
+        "name": "userorgid",
+        "title": "用户机构id",
+        "type": "str",
+        "length": 32,
+        "cwidth": 18,
+        "uitype": "str",
+        "datatype": "str",
+        "label": "用户机构id"
+    },
+    {
+        "name": "use_date",
+        "title": "使用日期",
+        "type": "date",
+        "length": 0,
+        "uitype": "date",
+        "datatype": "date",
+        "label": "使用日期"
+    },
+    {
+        "name": "use_time",
+        "title": "使用时间",
+        "type": "timestamp",
+        "length": 0,
+        "uitype": "str",
+        "datatype": "timestamp",
+        "label": "使用时间"
+    },
+    {
+        "name": "amount",
+        "title": "交易金额",
+        "type": "double",
+        "length": 18,
+        "dec": 5,
+        "cwidth": 18,
+        "uitype": "float",
+        "datatype": "double",
+        "label": "交易金额"
+    },
+    {
+        "name": "cost",
+        "title": "交易成本",
+        "type": "double",
+        "length": 18,
+        "dec": 5,
+        "cwidth": 18,
+        "uitype": "float",
+        "datatype": "double",
+        "label": "交易成本"
+    },
+    {
+        "name": "failed_reason",
+        "title": "失败原因",
+        "type": "text",
+        "length": 0,
+        "uitype": "text",
+        "datatype": "text",
+        "label": "失败原因"
+    },
+    {
+        "name": "failed_time",
+        "title": "失败时间",
+        "type": "timestamp",
+        "length": 0,
+        "uitype": "str",
+        "datatype": "timestamp",
+        "label": "失败时间"
+    },
+    {
+        "name": "retry_count",
+        "title": "重试次数",
+        "type": "int",
+        "length": 0,
+        "uitype": "int",
+        "datatype": "int",
+        "label": "重试次数"
+    },
+    {
+        "name": "handled",
+        "title": "是否已处理",
+        "type": "str",
+        "length": 1,
+        "default": "0",
+        "cwidth": 4,
+        "uitype": "code",
+        "datatype": "str",
+        "label": "是否已处理",
+        "data": [
+            {
+                "value": "0",
+                "text": "未处理"
+            },
+            {
+                "value": "1",
+                "text": "已处理"
+            }
+        ]
+    },
+    {
+        "name": "handled_time",
+        "title": "处理时间",
+        "type": "timestamp",
+        "length": 0,
+        "uitype": "str",
+        "datatype": "timestamp",
+        "label": "处理时间"
+    },
+    {
+        "name": "handled_note",
+        "title": "处理备注",
+        "type": "text",
+        "length": 0,
+        "uitype": "text",
+        "datatype": "text",
+        "label": "处理备注"
+    }
+]
+		},  
+
+
+
+		"page_rows":160,
+		"cache_limit":5
+	}
+
+	,"binds":[]
+
+}
