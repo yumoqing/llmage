@@ -100,7 +100,11 @@
                   "event": "click",
                   "actiontype": "urlwidget",
                   "target": "PopupWindow",
-                  "popup_options": {"archor": "cc", "width": "30%", "height": "20%"},
+                  "popup_options": {
+                    "archor": "cc",
+                    "width": "30%",
+                    "height": "20%"
+                  },
                   "options": {
                     "url": "{{entire_url('./api/llm_api_map_create.dspy')}}",
                     "params": {
@@ -124,7 +128,8 @@
       "options": {
         "width": "calc(100% - 40px)",
         "margin": "0 20px",
-        "spacing": 12
+        "spacing": 12,
+        "cheight": 30
       },
       "subwidgets": [
         {
@@ -146,19 +151,46 @@
             "page_rows": 20,
             "row_options": {
               "fields": [
-                {"name": "llm_name", "title": "模型名称", "width": 180},
-                {"name": "catelog_name", "title": "分类", "width": 120},
-                {"name": "apiname", "title": "API接口", "width": 150},
-                {"name": "query_apiname", "title": "查询API", "width": 180},
-                {"name": "query_period", "title": "间隔(秒)", "width": 80},
-                {"name": "ppid_name", "title": "计费项目", "width": 150},
+                {
+                  "name": "llm_name",
+                  "title": "模型名称",
+                  "width": 180
+                },
+                {
+                  "name": "catelog_name",
+                  "title": "分类",
+                  "width": 120
+                },
+                {
+                  "name": "apiname",
+                  "title": "API接口",
+                  "width": 150
+                },
+                {
+                  "name": "query_apiname",
+                  "title": "查询API",
+                  "width": 180
+                },
+                {
+                  "name": "query_period",
+                  "title": "间隔(秒)",
+                  "width": 80
+                },
+                {
+                  "name": "ppid_name",
+                  "title": "计费项目",
+                  "width": 150
+                },
                 {
                   "name": "actions",
                   "title": "操作",
                   "width": 100,
                   "uitype": "button",
                   "data": [
-                    {"text": "删除", "event": "delete_map"}
+                    {
+                      "text": "删除",
+                      "event": "delete_map"
+                    }
                   ]
                 }
               ]
@@ -170,7 +202,11 @@
               "event": "delete_map",
               "actiontype": "urlwidget",
               "target": "PopupWindow",
-              "popup_options": {"archor": "cc", "width": "30%", "height": "20%"},
+              "popup_options": {
+                "archor": "cc",
+                "width": "30%",
+                "height": "20%"
+              },
               "options": {
                 "url": "{{entire_url('./api/llm_api_map_delete.dspy')}}",
                 "params": {
