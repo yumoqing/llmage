@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+import json
+
+result = []
+
+try:
+    dbname = get_module_dbname('pricing')
+    async with DBPools().sqlorContext(dbname) as sor:
+        rows = await sor.sqlExe("select id, name from pricing_program order by name", {})
+        result = [{'value': r['id'], 'text': r['name']} for r in (rows or [])]
+except Exception as e:
+    pass
+
+return json.dumps(result, ensure_ascii=False, default=str)

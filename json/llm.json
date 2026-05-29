@@ -39,17 +39,11 @@
 				},
                 "providerid": {
                     "uitype": "code",
-                    "dataurl": "{{entire_url('../api/get_organizations.dspy')}}",
-                    "data_field": "organizations",
-                    "textField": "text",
-                    "valueField": "id"
+                    "dataurl": "{{entire_url('../api/get_organizations.dspy')}}"
                 },
                 "upappid": {
                     "uitype": "code",
-                    "dataurl": "{{entire_url('../api/get_upapps.dspy')}}",
-                    "data_field": "upapps",
-                    "textField": "text",
-                    "valueField": "id"
+                    "dataurl": "{{entire_url('../api/get_upapps.dspy')}}"
                 }
 			}
         },
@@ -58,6 +52,16 @@
 				{
 					"name":"test",
 					"label":"体验",
+					"selected_row":true
+				},
+				{
+					"name":"publish",
+					"label":"上架",
+					"selected_row":true
+				},
+				{
+					"name":"unpublish",
+					"label":"下架",
 					"selected_row":true
 				}
 			]
@@ -77,6 +81,42 @@
 					"url":"{{entire_url('./llm_dialog.ui')}}",
 					"params":{
 						"id":"${id}"
+					}
+				}
+			},
+			{
+				"wid":"self",
+				"event":"publish",
+				"actiontype":"urlwidget",
+				"target":"PopupWindow",
+				"popup_options":{
+					"title":"上架确认",
+					"cwidth":20,
+					"cheight":8
+				},
+				"options":{
+					"url":"{{entire_url('../api/llm_status_update.dspy')}}",
+					"params":{
+						"id":"${id}",
+						"status":"published"
+					}
+				}
+			},
+			{
+				"wid":"self",
+				"event":"unpublish",
+				"actiontype":"urlwidget",
+				"target":"PopupWindow",
+				"popup_options":{
+					"title":"下架确认",
+					"cwidth":20,
+					"cheight":8
+				},
+				"options":{
+					"url":"{{entire_url('../api/llm_status_update.dspy')}}",
+					"params":{
+						"id":"${id}",
+						"status":"unpublished"
 					}
 				}
 			}

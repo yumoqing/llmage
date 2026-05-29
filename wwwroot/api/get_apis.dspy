@@ -5,11 +5,9 @@ result = []
 
 try:
     dbname = get_module_dbname('llmage')
-
     async with DBPools().sqlorContext(dbname) as sor:
         rows = await sor.sqlExe("select name, path from uapi order by name", {})
         result = [{'value': r['name'], 'text': f"{r['name']} ({r['path']})"} for r in (rows or [])]
-
 except Exception as e:
     pass
 

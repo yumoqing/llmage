@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json
 
-result = {'success': False, 'data': {'organizations': []}}
+result = []
 
 try:
     async with get_sor_context(request._run_ns, 'rbac') as sor:
@@ -12,9 +12,8 @@ try:
             "select id, orgname from organization where id = ${id}$ or parentid = ${id}$ order by orgname",
             {'id': user_orgid}
         )
-        result['data']['organizations'] = [{'id': r['id'], 'text': r['orgname']} for r in (all_orgs or [])]
-        result['success'] = True
+        result = [{'value': r['id'], 'text': r['orgname']} for r in (all_orgs or [])]
 except Exception as e:
-    result['error'] = str(e)
+    pass
 
 return json.dumps(result, ensure_ascii=False, default=str)

@@ -53,16 +53,14 @@
                     "name": "llmcatelogid",
                     "label": "选择分类",
                     "uitype": "code",
-                    "dataurl": "{{entire_url('./api/llm_api_map_options.dspy')}}",
-                    "data_field": "catelogs",
+                    "dataurl": "{{entire_url('./api/get_catelogs.dspy')}}",
                     "placeholder": "请选择分类"
                   },
                   {
                     "name": "apiname",
                     "label": "API接口",
                     "uitype": "code",
-                    "dataurl": "{{entire_url('./api/llm_api_map_options.dspy')}}",
-                    "data_field": "apis",
+                    "dataurl": "{{entire_url('./api/get_apis.dspy')}}",
                     "placeholder": "请选择API接口"
                   },
                   {
@@ -81,8 +79,7 @@
                     "name": "ppid",
                     "label": "计费项目",
                     "uitype": "code",
-                    "dataurl": "{{entire_url('./api/llm_api_map_options.dspy')}}",
-                    "data_field": "ppids",
+                    "dataurl": "{{entire_url('./api/get_ppids.dspy')}}",
                     "placeholder": "请选择计费项目"
                   }
                 ],

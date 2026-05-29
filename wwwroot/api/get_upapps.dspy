@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json
 
-result = {'success': False, 'data': {'upapps': []}}
+result = []
 
 try:
     async with get_sor_context(request._run_ns, 'uapi') as sor:
@@ -10,9 +10,8 @@ try:
             "select id, name from upapp where ownerid = ${ownerid}$ or ownerid is null order by name",
             {'ownerid': user_orgid}
         )
-        result['data']['upapps'] = [{'id': r['id'], 'text': r['name']} for r in (apps or [])]
-        result['success'] = True
+        result = [{'value': r['id'], 'text': r['name']} for r in (apps or [])]
 except Exception as e:
-    result['error'] = str(e)
+    pass
 
 return json.dumps(result, ensure_ascii=False, default=str)
