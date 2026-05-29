@@ -13,16 +13,18 @@ import subprocess
 import os
 import sys
 
+
 def find_sage_root():
     candidates = [
         os.path.expanduser("~/repos/sage"),
         os.path.expanduser("~/sage"),
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
     ]
     for c in candidates:
         if os.path.isdir(os.path.join(c, "py3")) and os.path.isdir(os.path.join(c, "wwwroot")):
             return c
     return None
+
 
 SAGE_ROOT = find_sage_root()
 if not SAGE_ROOT:
@@ -38,95 +40,64 @@ MOD = "llmage"
 # 权限路径定义 — 每次新增页面或API时同步更新
 # ============================================================
 
-# any — 无需登录（仅静态资源和菜单）
+# any — 无需登录（菜单、静态资源）
 PATHS_ANY = [
     f"/{MOD}/menu.ui",
-    f"/{MOD}/imgs",
-    f"/{MOD}/imgs/kdb.svg",
-    f"/{MOD}/list_catelog_models.dspy",
+    f"/{MOD}/imgs/%",
 ]
 
-# logined — 需要认证的页面和 API
+# logined — 所有已登录用户
 PATHS_LOGINED = [
-    # Module entry
+    # 模块入口
     f"/{MOD}",
+    f"/{MOD}/index.ui",
 
-    # Top-level pages and APIs
-    f"/{MOD}/llmcost.dspy",
-    f"/{MOD}/llminference.dspy",
+    # 顶层 .ui 页面
     f"/{MOD}/llm_dialog.ui",
     f"/{MOD}/show_same_catelog_llm.ui",
-    f"/{MOD}/model_estimate.dspy",
     f"/{MOD}/show_llms.ui",
-    f"/{MOD}/llmcheck.dspy",
     f"/{MOD}/show_llms_by_providers.ui",
-    f"/{MOD}/list_paging_catelog_llms.dspy",
+    f"/{MOD}/failed_accounting.ui",
+    f"/{MOD}/llmcatelog_list.ui",
 
-    # llmusage CRUD directory
-    f"/{MOD}/llmusage",
-    f"/{MOD}/llmusage/update_llmusage.dspy",
-    f"/{MOD}/llmusage/delete_llmusage.dspy",
-    f"/{MOD}/llmusage/add_llmusage.dspy",
-    f"/{MOD}/llmusage/index.ui",
-    f"/{MOD}/llmusage/get_llmusage.dspy",
+    # 顶层 .dspy（非 api/ 目录）
+    f"/{MOD}/%.dspy",
 
-    # llmcatelog CRUD directory
-    f"/{MOD}/llmcatelog",
-    f"/{MOD}/llmcatelog/add_llmcatelog.dspy",
-    f"/{MOD}/llmcatelog/get_llmcatelog.dspy",
-    f"/{MOD}/llmcatelog/delete_llmcatelog.dspy",
-    f"/{MOD}/llmcatelog/index.ui",
-    f"/{MOD}/llmcatelog/update_llmcatelog.dspy",
+    # api/ 目录 — 所有 .dspy 通配
+    f"/{MOD}/api/%",
 
-    # llm CRUD directory
-    f"/{MOD}/llm",
-    f"/{MOD}/llm/update_llm.dspy",
-    f"/{MOD}/llm/delete_llm.dspy",
-    f"/{MOD}/llm/index.ui",
-    f"/{MOD}/llm/get_llm.dspy",
-    f"/{MOD}/llm/add_llm.dspy",
+    # CRUD 子目录 — 通配（每个子目录下的所有文件）
+    f"/{MOD}/llm/%",
+    f"/{MOD}/llmcatelog/%",
+    f"/{MOD}/llmcatelog_list/%",
+    f"/{MOD}/llmusage/%",
+    f"/{MOD}/llmusage_accounting_failed/%",
+    f"/{MOD}/llmusage_history/%",
+    f"/{MOD}/llm_api_map/%",
 
-    # API endpoints
-    f"/{MOD}/api/llm_list.dspy",
-    f"/{MOD}/api/llm_create.dspy",
-    f"/{MOD}/api/llm_update.dspy",
-    f"/{MOD}/api/llm_delete.dspy",
-    f"/{MOD}/api/get_organizations.dspy",
-    f"/{MOD}/api/get_upapps.dspy",
-    f"/{MOD}/api/llm_api_map_list.dspy",
-    f"/{MOD}/api/llm_api_map_create.dspy",
-    f"/{MOD}/api/llm_api_map_delete.dspy",
-    f"/{MOD}/api/llm_api_map_options.dspy",
-    f"/{MOD}/api/uapi_options.dspy",
-    f"/{MOD}/api/failed_accounting_list.dspy",
-    f"/{MOD}/api/llmusage_accounting_failed_create.dspy",
-    f"/{MOD}/api/llmusage_accounting_failed_update.dspy",
-    f"/{MOD}/api/llmusage_accounting_failed_delete.dspy",
-    f"/{MOD}/api/llmusage_create.dspy",
-    f"/{MOD}/api/llmusage_update.dspy",
-    f"/{MOD}/api/llmusage_delete.dspy",
+    # v1 API 目录
+    f"/{MOD}/v1/%",
 
-    # v1 API endpoints
-    f"/{MOD}/v1/chat/completions",
-    f"/{MOD}/v1/chat/completions/index.dspy",
-    f"/{MOD}/v1/models",
-    f"/{MOD}/v1/models/index.dspy",
-    f"/{MOD}/v1/tasks",
-    f"/{MOD}/v1/tasks/index.dspy",
-    f"/{MOD}/v1/video/generations",
-    f"/{MOD}/v1/video/generations/index.dspy",
-    f"/{MOD}/v1/image/generations",
-    f"/{MOD}/v1/image/generations/index.dspy",
+    # 其他子目录
+    f"/{MOD}/list_llmcatelogs/%",
+    f"/{MOD}/list_llms/%",
+    f"/{MOD}/openai/%",
+    f"/{MOD}/t2t/%",
+    f"/{MOD}/tasks/%",
+    f"/{MOD}/upload_asset/%",
+    f"/{MOD}/video/%",
 ]
 
 # ============================================================
 # 执行注册
 # ============================================================
 
+
 def run_set_perm(role, path):
     cmd = [PYTHON, SET_PERM_SCRIPT, role, path]
     result = subprocess.run(cmd, capture_output=True, text=True)
     return result.returncode == 0
+
 
 def register_role_paths(role, paths):
     count = 0
@@ -136,6 +107,7 @@ def register_role_paths(role, paths):
     print(f"  {role}: {count}/{len(paths)} paths registered")
     return count
 
+
 def main():
     print(f"Sage root: {SAGE_ROOT}")
     total = 0
@@ -143,6 +115,7 @@ def main():
     total += register_role_paths("logined", PATHS_LOGINED)
     print(f"\nDone. Total {total} permission entries registered.")
     print("NOTE: Restart Sage after permission changes to reload RBAC cache.")
+
 
 if __name__ == "__main__":
     main()

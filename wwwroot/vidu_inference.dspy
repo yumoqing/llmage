@@ -1,4 +1,4 @@
-debug(f'{params_kw=}')
+debug_params('params_kw', params_kw)
 if params_kw.off_peak:
 	off_peak = params_kw.off_peak
 	if off_peak in [True, "Y" "y", 1, "1"]:

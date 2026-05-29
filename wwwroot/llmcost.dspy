@@ -1,4 +1,4 @@
-debug(f'{params_kw=}')
+debug_params('params_kw', params_kw)
 ns = params_kw.copy()
 if not ns.page:
         ns.page = 1
