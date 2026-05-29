@@ -12,6 +12,7 @@ from .utils import (
 	get_llm_by_model,
 	get_llms_by_catelog,
 	get_llms_sort_by_provider,
+	get_llmage_llm,
 	get_llmcatelogs,
 	get_llms_by_catelog_to_customer,
 	get_llmproviders,
@@ -44,6 +45,7 @@ def load_llmage():
 	env = ServerEnv()
 	env.llm_query_orders = llm_query_orders
 	env.read_webpath = read_webpath
+	env.get_llmage_llm = get_llmage_llm
 	env.get_llm_by_model = get_llm_by_model
 	env.llm_charging = llm_charging
 	env.get_accounting_llmusages = get_accounting_llmusages

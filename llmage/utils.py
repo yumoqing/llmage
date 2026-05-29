@@ -280,6 +280,38 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 		return d
 	return []
 	
+async def get_llmage_llm(llmid, catelogid=None):
+	sql = """select distinct a.*, 
+m.llmcatelogid,
+m.apiname,
+m.query_apiname,
+m.query_period,
+m.ppid from llm a
+	join llm_api_map m on a.id = m.llmid
+	join llmcatelog b on m.llmcatelogid = b.id
+	where b.id = m.llmcatelogid
+		and a.model=${model}$
+		and a.expired_date > ${today}$
+		and a.enabled_date <= ${today}$
+		and a.status = 'published'"""
+	env = ServerEnv()
+    async with get_sor_context(env, 'llmage') as sor:
+		ns = {'llmid': llmid, 'today': today}
+		if catelogid:
+			sql += ' and m.llmcatelogid = ${catelogid}$ '
+			ns['catelogid'] = catelogid
+		else:
+			sql += " and m.isdefaultcatelog = '1'"
+		recs = await sor.sqlExe(sql, ns.copy())
+		if len(recs) > 0:
+			r = recs[0]
+			return r
+		else:
+			debug(f'{llmid=} not found, {ns=}, {sql=}')
+			return None
+	exception(f'Error: {format_exc()}')
+	return None
+
 async def get_llm(llmid, catelogid=None):
 	today = curDateString()
 	env = ServerEnv()
