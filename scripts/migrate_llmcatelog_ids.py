@@ -24,8 +24,9 @@ import argparse
 import sys
 import os
 
-# 确保 Sage 虚拟环境的包可用
-sage_root = os.path.expanduser('~/repos/sage')
+# 从脚本位置推断 sage 根目录（脚本在 pkgs/llmage/scripts/ 下）
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+sage_root = os.path.abspath(os.path.join(_script_dir, '..', '..', '..'))
 sys.path.insert(0, sage_root)
 sys.path.insert(0, os.path.join(sage_root, 'py3/lib/python3.10/site-packages'))
 
