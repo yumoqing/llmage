@@ -17,6 +17,7 @@ from .utils import (
 	get_llmproviders,
 	get_llm,
 	get_llmage_llm,
+	invalidate_uapi_cache,
 )
 
 from .llmclient import (
@@ -54,6 +55,7 @@ def load_llmage():
 	env.query_task_status = query_task_status
 	env.get_llm = get_llm
 	env.get_llmage_llm = get_llmage_llm
+	env.invalidate_uapi_cache = invalidate_uapi_cache
 	env.inference = inference
 	env.inference_generator = inference_generator
 	env.get_llms_by_catelog = get_llms_by_catelog
