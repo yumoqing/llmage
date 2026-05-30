@@ -24,6 +24,13 @@ import argparse
 import sys
 import os
 
+# 确保 Sage 虚拟环境的包可用
+sage_root = os.path.expanduser('~/repos/sage')
+sys.path.insert(0, sage_root)
+sys.path.insert(0, os.path.join(sage_root, 'py3/lib/python3.10/site-packages'))
+
+from appPublic.jsonConfig import getConfig
+
 # 旧ID -> 新ID 映射表
 ID_MAP = {
     'text2text':                 't2t',
@@ -48,7 +55,17 @@ async def migrate(dry_run=False, dbname='llmage'):
     from sqlor.dbpools import DBPools
     from appPublic.log import debug
 
-    db = DBPools()
+    config = getConfig(sage_root)
+    db = DBPools(config.databases)
+    
+    # 如果传入的 dbname 不在配置中，尝试使用第一个数据库
+    if dbname not in config.databases:
+        available = list(config.databases.keys())
+        print(f"Warning: '{dbname}' not in config.databases, available: {available}")
+        if available:
+            dbname = available[0]
+            print(f"Using '{dbname}' instead")
+    
     async with db.sqlorContext(dbname) as sor:
         print(f"{'='*60}")
         print(f"llmcatelog ID 迁移脚本")
