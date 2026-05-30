@@ -21,6 +21,7 @@ Base Path: `/llmage/v1`
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
+| `catelogid` | string | 目录类型，默认 `"文生文"` |
 | `stream` | boolean | 是否启用流式输出 |
 | `off_peak` | boolean | 是否使用非高峰时段 |
 | `transno` | string | 交易流水号（不传则自动生成） |
@@ -82,7 +83,7 @@ data: [DONE]
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | `model` | string | 模型名称，如 `"keling-2.1"` |
-| `llmcatelogid` | string | 目录类型，如 `"文生视频"` / `"图生视频"` |
+| `catelogid` | string | 目录类型，如 `"文生视频"` / `"图生视频"` |
 | `prompt` | string | 生成提示词 |
 
 ### 可选参数
@@ -100,7 +101,7 @@ data: [DONE]
 ```json
 {
     "model": "keling-2.1",
-    "llmcatelogid": "文生视频",
+    "catelogid": "文生视频",
     "prompt": "A beautiful sunset over the ocean",
     "duration": "5s",
     "resolution": "1080p"
@@ -135,7 +136,7 @@ data: [DONE]
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | `model` | string | 模型名称，如 `"jimeng-4.0"` |
-| `llmcatelogid` | string | 目录类型，如 `"文生图"` / `"图生图"` |
+| `catelogid` | string | 目录类型，如 `"文生图"` / `"图生图"` |
 | `prompt` | string | 生成提示词 |
 
 ### 可选参数
@@ -154,7 +155,7 @@ data: [DONE]
 ```json
 {
     "model": "jimeng-4.0",
-    "llmcatelogid": "文生图",
+    "catelogid": "文生图",
     "prompt": "A beautiful sunset over the ocean",
     "size": "1024x1024",
     "n": 1
@@ -218,7 +219,7 @@ GET /llmage/v1/tasks?taskid=task_xxx
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| `lctype` | string | 按目录类型过滤 |
+| `catelogid` | string | 按目录类型过滤 |
 | `orderby` | string | 排序字段 |
 
 ### 请求示例
@@ -247,12 +248,16 @@ GET /llmage/v1/models
 
 ## 通用说明
 
+### 参数统一
+
+所有 v1 接口统一使用 `catelogid` 参数标识目录类型，替代原有的 `lctype` / `llmcatelogid`。
+
 ### 认证
 
 所有接口需要 Bearer Token 认证，请求头中携带:
 
 ```
-Authorization: Bearer <your_api_key>
+Authorization: Bearer ***
 ```
 
 ### 余额检查

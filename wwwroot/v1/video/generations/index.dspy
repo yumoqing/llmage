@@ -1,12 +1,12 @@
 # OpenAI-compatible Video Generation API
 # POST /v1/video/generations
-# Required params: model, llmcatelogid
+# Required params: model, catelogid
 # Optional params: prompt, image_url, duration, resolution, n, etc.
 #
 # Example request:
 # {
 #     "model": "keling-2.1",
-#     "llmcatelogid": "文生视频",
+#     "catelogid": "文生视频",
 #     "prompt": "A beautiful sunset over the ocean",
 #     "duration": "5s",
 #     "resolution": "1080p"
@@ -44,15 +44,15 @@ if not params_kw.model:
     d = return_error('Missing required parameter: model')
     return json_response(d, status=400)
 
-if not params_kw.llmcatelogid:
-    d = return_error('Missing required parameter: llmcatelogid')
+if not params_kw.catelogid:
+    d = return_error('Missing required parameter: catelogid')
     return json_response(d, status=400)
 
 if not params_kw.prompt:
     d = return_error('Missing required parameter: prompt')
     return json_response(d, status=400)
 
-lctype = params_kw.llmcatelogid
+lctype = params_kw.catelogid
 
 env = request._run_ns
 async with get_sor_context(env, 'llmage') as sor:

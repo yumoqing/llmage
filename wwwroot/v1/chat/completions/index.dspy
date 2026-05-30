@@ -10,7 +10,7 @@ async def gen():
 			yield l
 
 debug_params('params_kw', params_kw)
-lctype='文生文'
+catelogid = params_kw.catelogid or '文生文'
 if params_kw.off_peak:
 	off_peak = params_kw.off_peak
 	if off_peak in [True, "Y" "y", 1, "1"]:
@@ -33,11 +33,11 @@ async with get_sor_context(env, 'llmage') as sor:
 	sql = """select distinct a.* from llm a 
 join llm_api_map m on a.id = m.llmid
 join llmcatelog b on m.llmcatelogid = b.id
-where b.name = ${lctype}$
+where b.name = ${catelogid}$
 	and a.model=${model}$
 	and a.status = 'published'"""
 	recs = await sor.sqlExe(sql, {
-		'lctype': lctype,
+		'catelogid': catelogid,
 		'model': params_kw.model or 'qwen3-max'
 	})
 	if len(recs) == 0:

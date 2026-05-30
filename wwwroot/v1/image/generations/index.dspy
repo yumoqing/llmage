@@ -1,12 +1,12 @@
 # OpenAI-compatible Image Generation API
 # POST /v1/image/generations
-# Required params: model, llmcatelogid
+# Required params: model, catelogid
 # Optional params: prompt, image_url, n, size, style, quality, etc.
 #
 # Example request:
 # {
 #     "model": "jimeng-4.0",
-#     "llmcatelogid": "文生图",
+#     "catelogid": "文生图",
 #     "prompt": "A beautiful sunset over the ocean",
 #     "size": "1024x1024",
 #     "n": 1
@@ -36,15 +36,15 @@ if not params_kw.model:
     d = return_error('Missing required parameter: model')
     return json_response(d, status=400)
 
-if not params_kw.llmcatelogid:
-    d = return_error('Missing required parameter: llmcatelogid')
+if not params_kw.catelogid:
+    d = return_error('Missing required parameter: catelogid')
     return json_response(d, status=400)
 
 if not params_kw.prompt:
     d = return_error('Missing required parameter: prompt')
     return json_response(d, status=400)
 
-lctype = params_kw.llmcatelogid
+lctype = params_kw.catelogid
 
 env = request._run_ns
 async with get_sor_context(env, 'llmage') as sor:

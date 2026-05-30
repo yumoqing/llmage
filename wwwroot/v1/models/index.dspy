@@ -6,9 +6,9 @@ def get_time_in_seconds(datestr):
 	timestamp = dt_obj.timestamp()
 	return timestamp
 
-lctype=params_kw.lctype
-orderby=params_kw.orderby or 'model'
-rets = await get_llms_by_catelog_to_customer(catelogid=lctype, orderby=orderby)
+catelogid = params_kw.catelogid
+orderby = params_kw.orderby or 'model'
+rets = await get_llms_by_catelog_to_customer(catelogid=catelogid, orderby=orderby)
 ret = {
 	"object": "list",
 	"data": []
