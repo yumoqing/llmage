@@ -1,7 +1,10 @@
 
-lt = '文生视频'
-if params_kw.type in ['文生视频', '参考生视频', '图生视频']:
-	lt = params_kw.type
+_CATELOG_ALIAS = {
+	'文生视频': 't2v', '参考生视频': 'r2v', '图生视频': 'i2v',
+}
+lt = 't2v'
+if params_kw.type:
+	lt = _CATELOG_ALIAS.get(params_kw.type, params_kw.type)
 async with get_sor_context(request._run_ns, 'llmage') as sor:
 	sql = '''select distinct a.*, e.input_fields from llm a 
 join llm_api_map m on a.id = m.llmid
@@ -9,7 +12,7 @@ join llmcatelog b on m.llmcatelogid = b.id
 join upapp c on a.upappid = c.id
 join uapi d on c.apisetid = d.apisetid and a.apiname = d.name
 join uapiio e on d.ioid = e.id
-where b.name=${lt}$
+where (b.id=${lt}$ OR b.name=${lt}$)
 	and a.enabled_date <= ${biz_date}$
 	and ${biz_date}$ < a.expired_date
 	and a.status = 'published'

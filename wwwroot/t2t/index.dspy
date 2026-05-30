@@ -1,5 +1,5 @@
 debug_params('params_kw', params_kw)
-lctype='文生文'
+lctype='t2t'
 if params_kw.off_peak:
 	off_peak = params_kw.off_peak
 	if off_peak in [True, "Y" "y", 1, "1"]:
@@ -20,7 +20,7 @@ async with get_sor_context(env, 'llmage') as sor:
 	sql = """select distinct a.* from llm a 
 join llm_api_map m on a.id = m.llmid
 join llmcatelog b on m.llmcatelogid = b.id
-where b.name = ${lctype}$
+where (b.id = ${lctype}$ OR b.name = ${lctype}$)
 	and a.model=${model}$
 	and a.status = 'published'"""
 	recs = await sor.sqlExe(sql, {

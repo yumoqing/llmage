@@ -6,7 +6,7 @@
 # Example request:
 # {
 #     "model": "jimeng-4.0",
-#     "catelogid": "文生图",
+#     "catelogid": "t2i",
 #     "prompt": "A beautiful sunset over the ocean",
 #     "size": "1024x1024",
 #     "n": 1
@@ -52,7 +52,7 @@ async with get_sor_context(env, 'llmage') as sor:
     sql = """select distinct a.* from llm a
 join llm_api_map m on a.id = m.llmid
 join llmcatelog b on m.llmcatelogid = b.id
-where b.name = ${lctype}$
+where (b.id = ${lctype}$ OR b.name = ${lctype}$)
     and a.model=${model}$
     and a.status = 'published'"""
     recs = await sor.sqlExe(sql, {

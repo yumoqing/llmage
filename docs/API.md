@@ -21,7 +21,7 @@ Base Path: `/llmage/v1`
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| `catelogid` | string | 目录类型，默认 `"文生文"` |
+| `catelogid` | string | 目录类型ID，默认 `"t2t"`，也支持中文名（向后兼容） |
 | `stream` | boolean | 是否启用流式输出 |
 | `off_peak` | boolean | 是否使用非高峰时段 |
 | `transno` | string | 交易流水号（不传则自动生成） |
@@ -83,7 +83,7 @@ data: [DONE]
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | `model` | string | 模型名称，如 `"keling-2.1"` |
-| `catelogid` | string | 目录类型，如 `"文生视频"` / `"图生视频"` |
+| `catelogid` | string | 目录类型ID，如 `"t2v"` / `"i2v"` / `"r2v"` |
 | `prompt` | string | 生成提示词 |
 
 ### 可选参数
@@ -101,7 +101,7 @@ data: [DONE]
 ```json
 {
     "model": "keling-2.1",
-    "catelogid": "文生视频",
+    "catelogid": "t2v",
     "prompt": "A beautiful sunset over the ocean",
     "duration": "5s",
     "resolution": "1080p"
@@ -136,7 +136,7 @@ data: [DONE]
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | `model` | string | 模型名称，如 `"jimeng-4.0"` |
-| `catelogid` | string | 目录类型，如 `"文生图"` / `"图生图"` |
+| `catelogid` | string | 目录类型ID，如 `"t2i"` |
 | `prompt` | string | 生成提示词 |
 
 ### 可选参数
@@ -155,7 +155,7 @@ data: [DONE]
 ```json
 {
     "model": "jimeng-4.0",
-    "catelogid": "文生图",
+    "catelogid": "t2i",
     "prompt": "A beautiful sunset over the ocean",
     "size": "1024x1024",
     "n": 1
@@ -247,6 +247,28 @@ GET /llmage/v1/models
 ---
 
 ## 通用说明
+
+### catelogid 目录类型ID对照表
+
+| ID | 中文名 | 说明 |
+|----|--------|------|
+| `t2t` | 文生文 | 文本生成（默认） |
+| `t2i` | 文生图 | 图像生成 |
+| `t2v` | 文生视频 | 文本生成视频 |
+| `i2v` | 图生视频 | 图像生成视频 |
+| `r2v` | 参考生视频 | 参考图像生成视频 |
+| `tts` | 语音合成 | 文本转语音 |
+| `asr` | 语音识别 | 语音转文本 |
+| `vision` | 图理解 | 图像理解 |
+| `ai_search` | AI搜索 | AI搜索 |
+| `digital_human` | 数字人 | 数字人 |
+| `music_gen` | 音乐生成 | 音乐生成 |
+| `text_cls` | 文本分类 | 文本分类 |
+| `3d_gen` | 3D生成 | 3D模型生成 |
+| `video_tool` | 视频工具 | 视频处理工具 |
+| `translate` | 翻译 | 文本翻译 |
+
+> 向后兼容：catelogid 参数同时支持新ID（如 `"t2v"`）和旧中文名（如 `"文生视频"`），推荐使用新ID。
 
 ### 参数统一
 
