@@ -4,7 +4,7 @@ import aiofiles
 from random import randint
 from functools import partial
 from traceback import format_exc
-from time import time
+import time
 from sqlor.dbpools import DBPools, get_sor_context
 from appPublic.log import debug, exception, error, critical
 from appPublic.uniqueID import getID
@@ -29,10 +29,10 @@ async def _get_uapi_cached(upappid, apiname):
     global _uapi_cache
     cache_key = f"{upappid}:{apiname}"
     cached = _uapi_cache.get(cache_key)
-    if cached and (time() - cached['ts']) < _UAPI_CACHE_TTL:
+    if cached and (time.time() - cached['ts']) < _UAPI_CACHE_TTL:
         return cached['data']
     uapi_rec = await get_uapi(upappid, apiname)
-    _uapi_cache[cache_key] = {'data': uapi_rec, 'ts': time()}
+    _uapi_cache[cache_key] = {'data': uapi_rec, 'ts': time.time()}
     return uapi_rec
 
 
@@ -42,14 +42,14 @@ async def _get_uapiio_cached(ioid):
     if ioid is None:
         return None
     cached = _uapiio_cache.get(ioid)
-    if cached and (time() - cached['ts']) < _UAPI_CACHE_TTL:
+    if cached and (time.time() - cached['ts']) < _UAPI_CACHE_TTL:
         return cached['data']
     env = ServerEnv()
     uapi_dbname = get_serverenv('get_module_dbname')('uapi')
     async with DBPools().sqlorContext(uapi_dbname) as sor:
         recs = await sor.R('uapiio', {'id': ioid})
         result = recs[0] if recs else None
-    _uapiio_cache[ioid] = {'data': result, 'ts': time()}
+    _uapiio_cache[ioid] = {'data': result, 'ts': time.time()}
     return result
 
 
