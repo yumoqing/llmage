@@ -53,6 +53,8 @@ PATHS_LOGINED = [
     f"/{MOD}/index.ui",
 
     # 顶层 .ui 页面
+    f"/{MOD}/api_doc.ui",
+    f"/{MOD}/api_doc.md",
     f"/{MOD}/llm_dialog.ui",
     f"/{MOD}/show_same_catelog_llm.ui",
     f"/{MOD}/show_llms.ui",
