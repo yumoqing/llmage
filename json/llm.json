@@ -39,11 +39,15 @@
 				},
                 "providerid": {
                     "uitype": "code",
-                    "dataurl": "{{entire_url('../api/get_organizations.dspy')}}"
+                    "dataurl": "{{entire_url('../api/get_organizations.dspy')}}",
+                    "textField": "text",
+                    "valueField": "value"
                 },
                 "upappid": {
                     "uitype": "code",
-                    "dataurl": "{{entire_url('../api/get_upapps.dspy')}}"
+                    "dataurl": "{{entire_url('../api/get_upapps.dspy')}}",
+                    "textField": "text",
+                    "valueField": "value"
                 }
 			}
         },
