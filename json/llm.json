@@ -36,6 +36,14 @@
                     "dataurl":"{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
                     "textField": "name",
                     "valueField": "id"
+                },
+                "providerid": {
+                    "uitype": "code",
+                    "dataurl": "{{entire_url('../api/get_organizations.dspy')}}"
+                },
+                "upappid": {
+                    "uitype": "code",
+                    "dataurl": "{{entire_url('../api/get_upapps.dspy')}}"
                 }
 			}
         },

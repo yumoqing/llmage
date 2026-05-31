@@ -51,6 +51,44 @@ try:
         """
         rows = await sor.sqlExe(data_sql, {**filterdic, 'limit': rows_per_page, 'offset': offset})
         result['rows'] = [dict(r) for r in (rows or [])]
+        
+        # Build text mappings for providerid and upappid
+        if result['rows']:
+            provider_ids = list(set(r['providerid'] for r in result['rows'] if r.get('providerid')))
+            upapp_ids = list(set(r['upappid'] for r in result['rows'] if r.get('upappid')))
+            
+            # Query organization table for providerid mapping
+            provider_map = {}
+            if provider_ids:
+                try:
+                    async with get_sor_context(request._run_ns, 'rbac') as rbac_sor:
+                        orgs = await rbac_sor.sqlExe(
+                            "select id, orgname from organization", {}
+                        )
+                        if orgs:
+                            provider_map = {str(r.id): r.orgname or '' for r in orgs}
+                except Exception as e:
+                    debug(f'get organization mapping error: {e}')
+            
+            # Query upapp table for upappid mapping
+            upapp_map = {}
+            if upapp_ids:
+                try:
+                    async with get_sor_context(request._run_ns, 'uapi') as uapi_sor:
+                        apps = await uapi_sor.sqlExe(
+                            "select id, name from upapp", {}
+                        )
+                        if apps:
+                            upapp_map = {str(r.id): r.name or '' for r in apps}
+                except Exception as e:
+                    debug(f'get upapp mapping error: {e}')
+            
+            # Attach text fields to rows
+            for row in result['rows']:
+                if row.get('providerid'):
+                    row['providerid_text'] = provider_map.get(str(row['providerid']))
+                if row.get('upappid'):
+                    row['upappid_text'] = upapp_map.get(str(row['upappid']))
         result['total'] = total
         result['success'] = True
 
