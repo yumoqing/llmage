@@ -4,8 +4,7 @@
     "params": {
         "sortby": "use_time desc",
         "browserfields": {
-            "exclouded": ["id"],
-            "alters": {}
+            "exclouded": ["id"]
         },
         "editexclouded": ["id"],
         "editable": {

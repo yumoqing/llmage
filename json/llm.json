@@ -22,30 +22,7 @@
             "status_input": "上架状态"
         },
         "browserfields": {
-            "exclouded": ["id", "ownerid"],
-            "alters": {
-                "status": {
-                    "uitype": "code",
-                    "data": [
-                        {"value": "", "text": "全部"},
-                        {"value": "published", "text": "已上架"},
-                        {"value": "unpublished", "text": "已下架"}
-                    ]
-                },
-                "ppid":{
-                    "dataurl":"{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
-                    "textField": "name",
-                    "valueField": "id"
-                },
-                "providerid": {
-                    "uitype": "code",
-                    "dataurl": "{{entire_url('../api/get_organizations.dspy')}}"
-                },
-                "upappid": {
-                    "uitype": "code",
-                    "dataurl": "{{entire_url('../api/get_upapps.dspy')}}"
-                }
-			}
+            "exclouded": ["id", "ownerid"]
         },
 		"toolbar": {
 			"tools":[
