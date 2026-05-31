@@ -22,7 +22,22 @@
             "status_input": "上架状态"
         },
         "browserfields": {
-            "exclouded": ["id", "ownerid"]
+            "exclouded": ["id", "ownerid"],
+            "alters": {
+                "status": {
+                    "uitype": "code",
+                    "data": [
+                        {"value": "", "text": "全部"},
+                        {"value": "published", "text": "已上架"},
+                        {"value": "unpublished", "text": "已下架"}
+                    ]
+                },
+                "ppid":{
+                    "dataurl":"{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
+                    "textField": "name",
+                    "valueField": "id"
+                }
+			}
         },
 		"toolbar": {
 			"tools":[

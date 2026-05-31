@@ -4,7 +4,16 @@
     "params": {
         "sortby": "failed_time desc",
         "browserfields": {
-            "exclouded": ["id"]
+            "exclouded": ["id"],
+            "alters": {
+                "handled": {
+                    "uitype": "code",
+                    "data": [
+                        {"value": "0", "text": "未处理"},
+                        {"value": "1", "text": "已处理"}
+                    ]
+                }
+            }
         },
         "editexclouded": ["id", "llmusageid", "failed_time"],
         "editable": {

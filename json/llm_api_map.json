@@ -3,7 +3,9 @@
     "title": "模型能力映射",
     "params": {
         "browserfields": {
-            "exclouded": ["id", "llmid"]
+            "exclouded": ["id", "llmid"],
+            "alters": {
+            }
         },
         "editexclouded": ["id", "llmid"]
     }
