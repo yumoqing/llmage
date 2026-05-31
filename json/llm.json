@@ -4,7 +4,7 @@
     "params": {
 		"sortby":"model",
 		"logined_userorgid": "ownerid",
-		"data_url": "{{entire_url('../api/llm_list.dspy')}}",
+		"data_url": "{{entire_url('../api/get_llm.dspy')}}",
         "data_filter": {
             "AND": [
                 {"field": "name", "op": "LIKE", "var": "name_input"},
