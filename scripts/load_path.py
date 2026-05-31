@@ -77,7 +77,7 @@ PATHS_LOGINED = [
     f"/{MOD}/llmusage_history/%",
     f"/{MOD}/llm_api_map/%",
 
-    # v1 API 目录
+    # v1 API 目录（管理员通过 logined 访问）
     f"/{MOD}/v1/%",
 
     # 其他子目录
@@ -88,6 +88,18 @@ PATHS_LOGINED = [
     f"/{MOD}/tasks/%",
     f"/{MOD}/upload_asset/%",
     f"/{MOD}/video/%",
+]
+
+# ============================================================
+# 客户角色 — v1 API 调用权限
+# ============================================================
+
+PATHS_V1_CUSTOMER = [
+    f"/{MOD}/v1/chat/completions/index.dspy",
+    f"/{MOD}/v1/video/generations/index.dspy",
+    f"/{MOD}/v1/image/generations/index.dspy",
+    f"/{MOD}/v1/models/index.dspy",
+    f"/{MOD}/v1/tasks/index.dspy",
 ]
 
 # ============================================================
@@ -115,6 +127,9 @@ def main():
     total = 0
     total += register_role_paths("any", PATHS_ANY)
     total += register_role_paths("logined", PATHS_LOGINED)
+    # 客户角色 — v1 API 调用权限
+    for role in ["customer.admin", "customer.user"]:
+        total += register_role_paths(role, PATHS_V1_CUSTOMER)
     print(f"\nDone. Total {total} permission entries registered.")
     print("NOTE: Restart Sage after permission changes to reload RBAC cache.")
 

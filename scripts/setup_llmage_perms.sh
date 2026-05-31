@@ -98,5 +98,26 @@ done
 
 echo ""
 echo "============================================"
+echo "  llmage: 客户 v1 API 调用权限"
+echo "============================================"
+
+CUSTOMER_ROLES=("customer.admin" "customer.user")
+
+V1_API_PATHS=(
+    "/llmage/v1/chat/completions/index.dspy"
+    "/llmage/v1/video/generations/index.dspy"
+    "/llmage/v1/image/generations/index.dspy"
+    "/llmage/v1/models/index.dspy"
+    "/llmage/v1/tasks/index.dspy"
+)
+
+for p in "${V1_API_PATHS[@]}"; do
+    for role in "${CUSTOMER_ROLES[@]}"; do
+        set_perm "${role}" "${p}"
+    done
+done
+
+echo ""
+echo "============================================"
 echo "  权限配置完成，共设置 ${COUNT} 条权限"
 echo "============================================"
