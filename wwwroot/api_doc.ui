@@ -1,0 +1,41 @@
+{
+    "widgettype": "VBox",
+    "options": {
+        "width": "100%",
+        "height": "100%",
+        "padding": "0"
+    },
+    "subwidgets": [
+        {
+            "widgettype": "HBox",
+            "options": {
+                "width": "100%",
+                "alignItems": "center",
+                "marginBottom": "16px"
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "Title2",
+                    "options": {
+                        "text": "大模型 API 文档"
+                    }
+                }
+            ]
+        },
+        {
+            "widgettype": "VScrollPanel",
+            "options": {
+                "css": "filler"
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "MarkdownViewer",
+                    "options": {
+                        "md_url": "{{entire_url('/llmage/api_doc.md')}}",
+                        "width": "100%"
+                    }
+                }
+            ]
+        }
+    ]
+}
