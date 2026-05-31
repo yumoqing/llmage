@@ -8,7 +8,7 @@ try:
 		)
 		if orgs:
 			for r in orgs:
-				result.append({'value': str(r.id), 'text': r.orgname or ''})
+				result.append({'providerid': str(r.id), 'providerid_text': r.orgname or ''})
 except Exception as e:
 	debug(f'get_organizations error: {e}')
 
