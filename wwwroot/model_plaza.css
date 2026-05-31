@@ -1,0 +1,65 @@
+/* Model Plaza — 模型广场 */
+
+.plaza-header {
+	padding: 8px 16px 4px 16px;
+}
+
+.plaza-tabs .tab-bar {
+	border-bottom: 2px solid var(--sage-border, #e2e8f0);
+}
+
+.plaza-tabs .tab-item {
+	font-weight: 500;
+	transition: color 0.2s ease;
+}
+
+.plaza-tabs .tab-item:hover {
+	color: var(--sage-brand, #6366f1);
+}
+
+/* Card hover effects for model cards */
+.plaza-card {
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	cursor: pointer;
+	border-radius: 8px !important;
+}
+
+.plaza-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Category section headers */
+.plaza-section-title {
+	padding: 12px 0 4px 4px;
+	position: relative;
+}
+
+.plaza-section-title::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 4px;
+	height: 70%;
+	border-radius: 2px;
+	background: var(--sage-brand, #6366f1);
+}
+
+/* Smooth card grid */
+.plaza-grid {
+	gap: 12px !important;
+	padding: 4px 0;
+}
+
+/* Model icon area */
+.plaza-card .model-icon-row {
+	gap: 8px;
+}
+
+/* Description text */
+.plaza-card .model-desc {
+	line-height: 1.5;
+	opacity: 0.85;
+}

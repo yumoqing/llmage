@@ -59,6 +59,7 @@ PATHS_LOGINED = [
     f"/{MOD}/show_same_catelog_llm.ui",
     f"/{MOD}/show_llms.ui",
     f"/{MOD}/show_llms_by_providers.ui",
+    f"/{MOD}/model_plaza.ui",
     f"/{MOD}/failed_accounting.ui",
     f"/{MOD}/llmcatelog_list.ui",
 

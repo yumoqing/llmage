@@ -25,7 +25,7 @@
 				{
 					"widgettype":"DynamicColumn",
 					"options":{
-						"css":"filler",
+						"css":"filler plaza-grid",
 						"width":"100%"
 					},
 					"subwidgets":[
@@ -33,7 +33,7 @@
 							{
 							"widgettype":"VScrollPanel",
 						"options":{
-							"css":"card",
+							"css":"card plaza-card",
 							"cwidth":20,
 								"cheight":12
 							},

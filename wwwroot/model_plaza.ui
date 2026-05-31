@@ -1,0 +1,65 @@
+{
+	"widgettype": "VBox",
+	"options": {
+		"css": "filler",
+		"width": "100%"
+	},
+	"subwidgets": [
+		{
+			"widgettype": "VBox",
+			"options": {
+				"css": "plaza-header",
+				"width": "100%"
+			},
+			"subwidgets": [
+				{
+					"widgettype": "Title2",
+					"options": {
+						"otext": "模型广场",
+						"i18n": true,
+						"halign": "left"
+					}
+				},
+				{
+					"widgettype": "Text",
+					"options": {
+						"otext": "探索和使用各类AI模型",
+						"i18n": true,
+						"halign": "left",
+						"wrap": true
+					}
+				}
+			]
+		},
+		{
+			"widgettype": "TabPanel",
+			"id": "plaza_tabs",
+			"options": {
+				"css": "filler plaza-tabs",
+				"tab_pos": "top",
+				"items": [
+					{
+						"name": "by_catelog",
+						"label": "按分类",
+						"content": {
+							"widgettype": "urlwidget",
+							"options": {
+								"url": "{{entire_url('show_llms.ui')}}"
+							}
+						}
+					},
+					{
+						"name": "by_provider",
+						"label": "按供应商",
+						"content": {
+							"widgettype": "urlwidget",
+							"options": {
+								"url": "{{entire_url('show_llms_by_providers.ui')}}"
+							}
+						}
+					}
+				]
+			}
+		}
+	]
+}
