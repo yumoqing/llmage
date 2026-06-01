@@ -20,6 +20,11 @@ from .utils import (
 	invalidate_uapi_cache,
 )
 
+
+def _on_hot_reload(data=None):
+	"""Event handler for hot_reload — wraps invalidate_uapi_cache to accept dispatcher's data arg."""
+	invalidate_uapi_cache()
+
 from .llmclient import (
 	inference_generator,
 	inference 
@@ -69,6 +74,9 @@ def load_llmage():
 	env.backup_accounted_llmusage = backup_accounted_llmusage
 	env.get_failed_accounting_records = get_failed_accounting_records
 	env.get_llmage_stats = get_llmage_stats
+	# Bind hot_reload event — module-level function, ref safe (module keeps it alive)
+	if hasattr(env, 'event_dispatcher'):
+		env.event_dispatcher.bind('hot_reload', _on_hot_reload)
 	rf = RegisterFunction()
 	rf.register('jimeng_auth_headers', jimeng_auth_headers)
 
