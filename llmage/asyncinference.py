@@ -141,9 +141,15 @@ async def get_llm_llmusage(luid):
 			return
 		if llmusage.status == 'FAILED':
 			return
-		llms = await sor.R('llm', {'id': llmusage.llmid})
+		# Use JOIN to get query_apiname/query_period from llm_api_map
+		sql = """select a.id, a.name, a.model, a.upappid, a.ownerid, a.status,
+m.apiname, m.query_apiname, m.query_period, m.ppid
+from llm a
+join llm_api_map m on a.id = m.llmid
+where a.id = ${llmid}$ and m.isdefaultcatelog = '1'"""
+		llms = await sor.sqlExe(sql, {'llmid': llmusage.llmid})
 		if len(llms) == 0:
-			e = Exception(f'{llmusage.llmid=} not found in llm')
+			e = Exception(f'{llmusage.llmid=} not found in llm/llm_api_map')
 			exception(f'{e}')
 			raise e
 		llm = llms[0]
