@@ -45,6 +45,8 @@ from .asyncinference import (
 
 def _on_hot_reload(data=None):
 	"""Event handler for hot_reload — wraps invalidate_uapi_cache to accept dispatcher's data arg."""
+	from appPublic.log import debug
+	debug(f'[llmage] on_hot_reload called, invalidating uapi cache (data={data})')
 	invalidate_uapi_cache()
 
 
