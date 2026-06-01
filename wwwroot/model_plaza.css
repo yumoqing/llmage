@@ -69,6 +69,17 @@
 	padding: 4px 8px;
 }
 
+/* Right panel: ensure scrollable area fills available space */
+.plaza-tabs .tabpanel-content {
+	display: flex;
+	flex-direction: column;
+}
+.plaza-tabs .tabpanel-content > .scrollpanel {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+}
+
 /* Model icon area */
 .plaza-card .model-icon-row {
 	gap: 8px;

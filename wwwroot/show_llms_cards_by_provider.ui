@@ -4,6 +4,7 @@
 {
 	"widgettype":"VScrollPanel",
 	"options":{
+		"css":"filler",
 		"width":"100%",
 		"height":"100%"
 	},
