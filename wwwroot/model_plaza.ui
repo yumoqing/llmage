@@ -30,192 +30,93 @@
 						"halign": "left",
 						"wrap": true
 					}
+				},
+				{
+					"widgettype": "HBox",
+					"options": {
+						"css": "plaza-view-switcher",
+						"cheight": 3
+					},
+					"subwidgets": [
+						{
+							"widgettype": "Button",
+							"id": "btn_by_catelog",
+							"options": {
+								"label": "按分类",
+								"css": "plaza-view-btn plaza-view-active",
+								"cwidth": 15
+							},
+							"binds": [
+								{
+									"wid": "self",
+									"event": "click",
+									"actiontype": "script",
+									"target": "self",
+									"script": "document.getElementById('plaza_view_provider').style.display='none'; document.getElementById('plaza_view_catelog').style.display='flex'; var a=bricks.getWidgetById('btn_by_catelog',bricks.app); var b=bricks.getWidgetById('btn_by_provider',bricks.app); if(a)a.dom_element.classList.add('plaza-view-active'); if(b)b.dom_element.classList.remove('plaza-view-active');"
+								}
+							]
+						},
+						{
+							"widgettype": "Button",
+							"id": "btn_by_provider",
+							"options": {
+								"label": "按供应商",
+								"css": "plaza-view-btn",
+								"cwidth": 15
+							},
+							"binds": [
+								{
+									"wid": "self",
+									"event": "click",
+									"actiontype": "script",
+									"target": "self",
+									"script": "document.getElementById('plaza_view_catelog').style.display='none'; document.getElementById('plaza_view_provider').style.display='flex'; var a=bricks.getWidgetById('btn_by_catelog',bricks.app); var b=bricks.getWidgetById('btn_by_provider',bricks.app); if(a)a.dom_element.classList.remove('plaza-view-active'); if(b)b.dom_element.classList.add('plaza-view-active');"
+								}
+							]
+						}
+					]
 				}
 			]
 		},
 		{
-			"widgettype": "TabPanel",
-			"id": "plaza_tabs",
+			"widgettype": "VBox",
+			"id": "plaza_view_catelog",
 			"options": {
-				"css": "filler plaza-tabs",
-				"tab_pos": "top",
-				"items": [
-					{
-						"name": "by_catelog",
-						"label": "按分类",
-						"content": {
-							"widgettype": "HBox",
-							"options": {
-								"css": "filler",
-								"width": "100%",
-								"height": "100%"
-							},
-							"subwidgets": [
-								{
-									"widgettype": "VScrollPanel",
-									"options": {
-										"cwidth": 18,
-										"height": "100%",
-										"css": "plaza-sidebar"
-									},
-									"subwidgets": [
-										{
-											"widgettype": "Button",
-											"options": {
-												"label": "全部",
-												"css": "plaza-nav-btn",
-												"width": "100%"
-											},
-											"binds": [
-												{
-													"wid": "self",
-													"event": "click",
-													"actiontype": "urlwidget",
-													"target": "app.plaza_cards_panel",
-													"mode": "replace",
-													"options": {
-														"url": "{{entire_url('show_llms_cards.ui')}}"
-													}
-												}
-											]
-										}{% for cat in catelogs %},
-										{
-											"widgettype": "Button",
-											"options": {
-												"label": "{{cat.name}}",
-												"css": "plaza-nav-btn",
-												"width": "100%"
-											},
-											"binds": [
-												{
-													"wid": "self",
-													"event": "click",
-													"actiontype": "urlwidget",
-													"target": "app.plaza_cards_panel",
-													"mode": "replace",
-													"options": {
-														"url": "{{entire_url('show_llms_cards.ui')}}",
-														"params": {
-															"catelogid": "{{cat.id}}"
-														}
-													}
-												}
-											]
-										}{% endfor %}
-									]
-								},
-								{
-									"widgettype": "VBox",
-									"id": "plaza_cards_panel",
-									"options": {
-										"css": "filler",
-										"cwidth": 82,
-										"height": "100%"
-									},
-									"subwidgets": [
-										{
-											"widgettype": "urlwidget",
-											"options": {
-												"css": "filler",
-												"width": "100%",
-												"height": "100%",
-												"url": "{{entire_url('show_llms_cards.ui')}}"
-											}
-										}
-									]
-								}
-							]
-						}
-					},
-					{
-						"name": "by_provider",
-						"label": "按供应商",
-						"content": {
-							"widgettype": "HBox",
-							"options": {
-								"css": "filler",
-								"width": "100%",
-								"height": "100%"
-							},
-							"subwidgets": [
-								{
-									"widgettype": "VScrollPanel",
-									"options": {
-										"cwidth": 18,
-										"height": "100%",
-										"css": "plaza-sidebar"
-									},
-									"subwidgets": [
-										{
-											"widgettype": "Button",
-											"options": {
-												"label": "全部",
-												"css": "plaza-nav-btn",
-												"width": "100%"
-											},
-											"binds": [
-												{
-													"wid": "self",
-													"event": "click",
-													"actiontype": "urlwidget",
-													"target": "app.plaza_provider_panel",
-													"mode": "replace",
-													"options": {
-														"url": "{{entire_url('show_llms_cards_by_provider.ui')}}"
-													}
-												}
-											]
-										}{% for p in providers %},
-										{
-											"widgettype": "Button",
-											"options": {
-												"label": "{{p.orgname}}",
-												"css": "plaza-nav-btn",
-												"width": "100%"
-											},
-											"binds": [
-												{
-													"wid": "self",
-													"event": "click",
-													"actiontype": "urlwidget",
-													"target": "app.plaza_provider_panel",
-													"mode": "replace",
-													"options": {
-														"url": "{{entire_url('show_llms_cards_by_provider.ui')}}",
-														"params": {
-															"providerid": "{{p.id}}"
-														}
-													}
-												}
-											]
-										}{% endfor %}
-									]
-								},
-								{
-									"widgettype": "VBox",
-									"id": "plaza_provider_panel",
-									"options": {
-										"css": "filler",
-										"cwidth": 82,
-										"height": "100%"
-									},
-									"subwidgets": [
-										{
-											"widgettype": "urlwidget",
-											"options": {
-												"css": "filler",
-												"width": "100%",
-												"height": "100%",
-												"url": "{{entire_url('show_llms_cards_by_provider.ui')}}"
-											}
-										}
-									]
-								}
-							]
-						}
+				"css": "filler",
+				"width": "100%",
+				"height": "100%"
+			},
+			"subwidgets": [
+				{
+					"widgettype": "urlwidget",
+					"options": {
+						"css": "filler",
+						"width": "100%",
+						"height": "100%",
+						"url": "{{entire_url('show_llms.ui')}}"
 					}
-				]
-			}
+				}
+			]
+		},
+		{
+			"widgettype": "VBox",
+			"id": "plaza_view_provider",
+			"options": {
+				"css": "filler",
+				"width": "100%",
+				"height": "100%"
+			},
+			"subwidgets": [
+				{
+					"widgettype": "urlwidget",
+					"options": {
+						"css": "filler",
+						"width": "100%",
+						"height": "100%",
+						"url": "{{entire_url('show_llms_by_providers.ui')}}"
+					}
+				}
+			]
 		}
 	]
 }

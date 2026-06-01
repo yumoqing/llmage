@@ -1,20 +1,27 @@
 /* Model Plaza — 模型广场 */
 
+/* Hide provider view initially */
+#plaza_view_provider {
+	display: none;
+}
+
 .plaza-header {
 	padding: 8px 16px 4px 16px;
 }
 
-.plaza-tabs .tab-bar {
-	border-bottom: 2px solid var(--sage-border, #e2e8f0);
+/* View switcher buttons */
+.plaza-view-switcher {
+	gap: 8px;
+	padding: 8px 0 4px 0;
 }
 
-.plaza-tabs .tab-item {
-	font-weight: 500;
-	transition: color 0.2s ease;
+.plaza-view-btn {
+	border-radius: 6px !important;
+	transition: all 0.2s ease;
 }
 
-.plaza-tabs .tab-item:hover {
-	color: var(--sage-brand, #6366f1);
+.plaza-view-btn.plaza-view-active {
+	border: 2px solid var(--sage-brand, #6366f1) !important;
 }
 
 /* Left sidebar */
@@ -67,17 +74,6 @@
 .plaza-grid {
 	gap: 12px !important;
 	padding: 4px 8px;
-}
-
-/* Right panel: ensure scrollable area fills available space */
-.plaza-tabs .tabpanel-content {
-	display: flex;
-	flex-direction: column;
-}
-.plaza-tabs .tabpanel-content > .scrollpanel {
-	flex: 1;
-	min-height: 0;
-	overflow-y: auto;
 }
 
 /* Model icon area */
