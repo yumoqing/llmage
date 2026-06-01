@@ -20,11 +20,6 @@ from .utils import (
 	invalidate_uapi_cache,
 )
 
-
-def _on_hot_reload(data=None):
-	"""Event handler for hot_reload — wraps invalidate_uapi_cache to accept dispatcher's data arg."""
-	invalidate_uapi_cache()
-
 from .llmclient import (
 	inference_generator,
 	inference 
@@ -46,6 +41,12 @@ from .asyncinference import (
 	query_task_status,
 	get_today_asynctask_list
 )
+
+
+def _on_hot_reload(data=None):
+	"""Event handler for hot_reload — wraps invalidate_uapi_cache to accept dispatcher's data arg."""
+	invalidate_uapi_cache()
+
 
 def load_llmage():
 	env = ServerEnv()
