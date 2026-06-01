@@ -12,7 +12,7 @@
 		{
 			"widgettype":"DynamicColumn",
 			"options":{
-				"css":"filler plaza-grid",
+				"css":"plaza-grid",
 				"width":"100%"
 			},
 			"subwidgets":[
