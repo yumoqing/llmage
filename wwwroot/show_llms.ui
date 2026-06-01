@@ -21,17 +21,18 @@
 						"css":"plaza-nav-btn",
 						"width":"100%"
 					},
-					"binds":[
-						{
-							"wid":"self",
-							"event":"click",
-							"actiontype":"urlwidget",
-							"target":"plaza_cards_panel",
-							"options":{
-								"url":"{{entire_url('show_llms_cards.ui')}}"
-							}
+				"binds":[
+					{
+						"wid":"self",
+						"event":"click",
+						"actiontype":"urlwidget",
+						"target":"app.plaza_cards_panel",
+						"mode":"replace",
+						"options":{
+							"url":"{{entire_url('show_llms_cards.ui')}}"
 						}
-					]
+					}
+				]
 				},
 {% for cat in catelogs %}
 				{
@@ -41,20 +42,21 @@
 						"css":"plaza-nav-btn",
 						"width":"100%"
 					},
-					"binds":[
-						{
-							"wid":"self",
-							"event":"click",
-							"actiontype":"urlwidget",
-							"target":"plaza_cards_panel",
-							"options":{
-								"url":"{{entire_url('show_llms_cards.ui')}}",
-								"params":{
-									"catelogid":"{{cat.id}}"
-								}
+				"binds":[
+					{
+						"wid":"self",
+						"event":"click",
+						"actiontype":"urlwidget",
+						"target":"app.plaza_cards_panel",
+						"mode":"replace",
+						"options":{
+							"url":"{{entire_url('show_llms_cards.ui')}}",
+							"params":{
+								"catelogid":"{{cat.id}}"
 							}
 						}
-					]
+					}
+				]
 				}{% if not loop.last %},{% endif %}
 {% endfor %}
 			]
