@@ -61,7 +61,7 @@
 			]
 		},
 		{
-			"widgettype":"VScrollPanel",
+			"widgettype":"VBox",
 			"id":"plaza_cards_panel",
 			"options":{
 				"css":"filler",
