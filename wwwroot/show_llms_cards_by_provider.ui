@@ -1,10 +1,5 @@
-{% set providerid = params_kw.get('providerid', None) %}
-{% set all_data = get_llms_sort_by_provider() %}
-{% if providerid %}
-{% set data = [p for p in all_data if p.id == providerid] %}
-{% else %}
-{% set data = all_data %}
-{% endif %}
+{% set providerid = params_kw.get('providerid', '') %}
+{% set data = get_llms_sort_by_provider() %}
 {% set ns = namespace(first=true) %}
 {
 	"widgettype":"VScrollPanel",
@@ -21,6 +16,7 @@
 			},
 			"subwidgets":[
 {% for p in data %}
+{% if not providerid or p.id|string == providerid|string %}
 {% for llm in p.llms %}
 {% if not ns.first %},{% endif %}
 				{
@@ -55,7 +51,7 @@
 						{
 							"widgettype":"Text",
 							"options":{
-								"text":{{json.dumps(llm.description, ensure_ascii=False)}},
+								"text":{{json.dumps(llm.description or '', ensure_ascii=False)}},
 								"wrap":true,
 								"halign":"left"
 							}
@@ -88,6 +84,7 @@
 				}
 {% set ns.first = false %}
 {% endfor %}
+{% endif %}
 {% endfor %}
 			]
 		}
