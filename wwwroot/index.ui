@@ -33,164 +33,154 @@
             ]
         },
         {
-            "widgettype": "VScrollPanel",
+            "widgettype": "VBox",
             "options": {
-                "css": "filler"
+                "css": "filler",
+                "spacing": 16
             },
             "subwidgets": [
                 {
-                    "widgettype": "VBox",
+                    "widgettype": "ResponsableBox",
                     "options": {
-                        "spacing": 24
+                        "gap": "16px",
+                        "minWidth": "250px"
                     },
                     "subwidgets": [
                         {
-                            "widgettype": "ResponsableBox",
+                            "widgettype": "VBox",
                             "options": {
-                                "gap": "16px",
-                                "minWidth": "250px"
+                                "css": "card",
+                                "cwidth": 23,
+                                "padding": "16px",
+                                "cursor": "pointer",
+                                "borderRadius": "8px"
                             },
+                            "binds": [
+                                {
+                                    "wid": "self",
+                                    "event": "click",
+                                    "actiontype": "urlwidget",
+                                    "target": "app.llmage_content",
+                                    "options": {
+                                        "url": "{{entire_url('/llmage/llmcatelog_list.ui')}}"
+                                    },
+                                    "mode": "replace"
+                                }
+                            ],
                             "subwidgets": [
                                 {
-                                    "widgettype": "VBox",
+                                    "widgettype": "Svg",
                                     "options": {
-                                        "css": "card",
-                                        
-                                        "cwidth": 23,
-                                        "padding": "16px",
-                                        "cursor": "pointer",
-                                        "borderRadius": "8px"
-                                    },
-                                    "binds": [
-                                        {
-                                            "wid": "self",
-                                            "event": "click",
-                                            "actiontype": "urlwidget",
-                                            "target": "app.llmage_content",
-                                            "options": {
-                                                "url": "{{entire_url('/llmage/llmcatelog_list.ui')}}"
-                                            },
-                                            "mode": "replace"
-                                        }
-                                    ],
-                                    "subwidgets": [
-                                        {
-                                            "widgettype": "Svg",
-                                            "options": {
-                                                "svg": "<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#3B82F6\" stroke-width=\"2\"><path d=\"M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z\"/></svg>",
-                                                "width": "28px",
-                                                "height": "28px"
-                                            }
-                                        },
-                                        {
-                                            "widgettype": "Title4",
-                                            "options": {
-                                                "text": "模型类型管理",
-                                                "marginTop": "8px"
-                                            }
-                                        },
-                                        {
-                                            "widgettype": "Text",
-                                            "options": {
-                                                "text": "管理模型的分类和类型",
-                                                "cfontsize": 1.2
-                                            }
-                                        }
-                                    ]
+                                        "svg": "<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#3B82F6\" stroke-width=\"2\"><path d=\"M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z\"/></svg>",
+                                        "width": "28px",
+                                        "height": "28px"
+                                    }
                                 },
                                 {
-                                    "widgettype": "VBox",
+                                    "widgettype": "Title4",
                                     "options": {
-                                        "css": "card",
-                                        
-                                        "cwidth": 23,
-                                        "padding": "16px",
-                                        "cursor": "pointer",
-                                        "borderRadius": "8px"
-                                    },
-                                    "binds": [
-                                        {
-                                            "wid": "self",
-                                            "event": "click",
-                                            "actiontype": "urlwidget",
-                                            "target": "app.llmage_content",
-                                            "options": {
-                                                "url": "{{entire_url('/llmage/llm')}}"
-                                            },
-                                            "mode": "replace"
-                                        }
-                                    ],
-                                    "subwidgets": [
-                                        {
-                                            "widgettype": "Svg",
-                                            "options": {
-                                                "svg": "<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#22C55E\" stroke-width=\"2\"><path d=\"M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15.75c-2.062 0-4.024-.614-5.67-1.757l-1.57-.393m15.04 0L12 21 5.25 13.893\"/></svg>",
-                                                "width": "28px",
-                                                "height": "28px"
-                                            }
-                                        },
-                                        {
-                                            "widgettype": "Title4",
-                                            "options": {
-                                                "text": "模型管理",
-                                                "marginTop": "8px"
-                                            }
-                                        },
-                                        {
-                                            "widgettype": "Text",
-                                            "options": {
-                                                "text": "管理 LLM 模型配置",
-                                                "cfontsize": 1.2
-                                            }
-                                        }
-                                    ]
+                                        "text": "模型类型管理",
+                                        "marginTop": "8px"
+                                    }
                                 },
                                 {
-                                    "widgettype": "VBox",
+                                    "widgettype": "Text",
                                     "options": {
-                                        "css": "card",
-                                        
-                                        "cwidth": 23,
-                                        "padding": "16px",
-                                        "cursor": "pointer",
-                                        "borderRadius": "8px"
+                                        "text": "管理模型的分类和类型",
+                                        "cfontsize": 1.2
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "widgettype": "VBox",
+                            "options": {
+                                "css": "card",
+                                "cwidth": 23,
+                                "padding": "16px",
+                                "cursor": "pointer",
+                                "borderRadius": "8px"
+                            },
+                            "binds": [
+                                {
+                                    "wid": "self",
+                                    "event": "click",
+                                    "actiontype": "urlwidget",
+                                    "target": "app.llmage_content",
+                                    "options": {
+                                        "url": "{{entire_url('/llmage/llm')}}"
                                     },
-                                    "binds": [
-                                        {
-                                            "wid": "self",
-                                            "event": "click",
-                                            "actiontype": "urlwidget",
-                                            "target": "app.llmage_content",
-                                            "options": {
-                                                "url": "{{entire_url('/llmage/failed_accounting.ui')}}"
-                                            },
-                                            "mode": "replace"
-                                        }
-                                    ],
-                                    "subwidgets": [
-                                        {
-                                            "widgettype": "Svg",
-                                            "options": {
-                                                "svg": "<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#EF4444\" stroke-width=\"2\"><path d=\"M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z\"/></svg>",
-                                                "width": "28px",
-                                                "height": "28px"
-                                            }
-                                        },
-                                        {
-                                            "widgettype": "Title4",
-                                            "options": {
-                                                "text": "记账失败记录",
-                                                "marginTop": "8px"
-                                            }
-                                        },
-                                        {
-                                            "widgettype": "Text",
-                                            "options": {
-                                                "text": "查看和检索记账失败的记录",
-                                                "cfontsize": 1.2
-                                            }
-                                        }
-                                    ]
+                                    "mode": "replace"
+                                }
+                            ],
+                            "subwidgets": [
+                                {
+                                    "widgettype": "Svg",
+                                    "options": {
+                                        "svg": "<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#22C55E\" stroke-width=\"2\"><path d=\"M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15.75c-2.062 0-4.024-.614-5.67-1.757l-1.57-.393m15.04 0L12 21 5.25 13.893\"/></svg>",
+                                        "width": "28px",
+                                        "height": "28px"
+                                    }
+                                },
+                                {
+                                    "widgettype": "Title4",
+                                    "options": {
+                                        "text": "模型管理",
+                                        "marginTop": "8px"
+                                    }
+                                },
+                                {
+                                    "widgettype": "Text",
+                                    "options": {
+                                        "text": "管理 LLM 模型配置",
+                                        "cfontsize": 1.2
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "widgettype": "VBox",
+                            "options": {
+                                "css": "card",
+                                "cwidth": 23,
+                                "padding": "16px",
+                                "cursor": "pointer",
+                                "borderRadius": "8px"
+                            },
+                            "binds": [
+                                {
+                                    "wid": "self",
+                                    "event": "click",
+                                    "actiontype": "urlwidget",
+                                    "target": "app.llmage_content",
+                                    "options": {
+                                        "url": "{{entire_url('/llmage/failed_accounting.ui')}}"
+                                    },
+                                    "mode": "replace"
+                                }
+                            ],
+                            "subwidgets": [
+                                {
+                                    "widgettype": "Svg",
+                                    "options": {
+                                        "svg": "<svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#EF4444\" stroke-width=\"2\"><path d=\"M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z\"/></svg>",
+                                        "width": "28px",
+                                        "height": "28px"
+                                    }
+                                },
+                                {
+                                    "widgettype": "Title4",
+                                    "options": {
+                                        "text": "记账失败记录",
+                                        "marginTop": "8px"
+                                    }
+                                },
+                                {
+                                    "widgettype": "Text",
+                                    "options": {
+                                        "text": "查看和检索记账失败的记录",
+                                        "cfontsize": 1.2
+                                    }
                                 }
                             ]
                         }
@@ -198,7 +188,11 @@
                 },
                 {
                     "widgettype": "VBox",
-                    "id": "llmage_content"
+                    "id": "llmage_content",
+                    "options": {
+                        "css": "filler",
+                        "height": "100%"
+                    }
                 }
             ]
         }
