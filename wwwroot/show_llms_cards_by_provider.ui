@@ -1,0 +1,95 @@
+{% set providerid = params_kw.get('providerid', None) %}
+{% set all_data = get_llms_sort_by_provider() %}
+{% if providerid %}
+{% set data = [p for p in all_data if p.id == providerid] %}
+{% else %}
+{% set data = all_data %}
+{% endif %}
+{% set ns = namespace(first=true) %}
+{
+	"widgettype":"VScrollPanel",
+	"options":{
+		"width":"100%",
+		"height":"100%"
+	},
+	"subwidgets":[
+		{
+			"widgettype":"DynamicColumn",
+			"options":{
+				"css":"filler plaza-grid",
+				"width":"100%"
+			},
+			"subwidgets":[
+{% for p in data %}
+{% for llm in p.llms %}
+{% if not ns.first %},{% endif %}
+				{
+					"widgettype":"VScrollPanel",
+					"options":{
+						"css":"card plaza-card",
+						"cwidth":25,
+						"cheight":12
+					},
+					"subwidgets":[
+						{
+							"widgettype":"HBox",
+							"options":{
+								"cheight":2
+							},
+							"subwidgets":[
+								{
+									"widgettype":"Svg",
+									"options":{
+										"rate":1.5,
+										"url":"{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}"
+									}
+								},
+								{
+									"widgettype":"Title6",
+									"options":{
+										"text":"{{llm.name}}"
+									}
+								}
+							]
+						},
+						{
+							"widgettype":"Text",
+							"options":{
+								"text":{{json.dumps(llm.description, ensure_ascii=False)}},
+								"wrap":true,
+								"halign":"left"
+							}
+						}
+					],
+					"binds":[
+						{
+							"wid":"self",
+							"event":"click",
+							"actiontype":"urlwidget",
+							"target":"PopupWindow",
+							"popup_options":{
+								"title":"{{llm.name}}",
+{% if int(params_kw._is_mobile) %}
+								"width": "100%",
+								"height": "100%"
+{% else %}
+								"width": "40%",
+								"height":"85%"
+{% endif %}
+							},
+							"options":{
+								"params":{
+									"id":"{{llm.id}}"
+								},
+								"url":"{{entire_url('./llm_dialog.ui')}}"
+							}
+						}
+					]
+				}
+{% set ns.first = false %}
+{% endfor %}
+{% endfor %}
+			]
+		}
+	]
+}

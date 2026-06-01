@@ -17,6 +17,22 @@
 	color: var(--sage-brand, #6366f1);
 }
 
+/* Left sidebar */
+.plaza-sidebar {
+	border-right: 1px solid var(--sage-border, #e2e8f0);
+	padding: 4px;
+}
+
+.plaza-nav-btn {
+	margin-bottom: 2px;
+	text-align: left;
+	transition: background-color 0.15s ease;
+}
+
+.plaza-nav-btn:hover {
+	background-color: var(--sage-hover, rgba(99, 102, 241, 0.08));
+}
+
 /* Card hover effects for model cards */
 .plaza-card {
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -50,7 +66,7 @@
 /* Smooth card grid */
 .plaza-grid {
 	gap: 12px !important;
-	padding: 4px 0;
+	padding: 4px 8px;
 }
 
 /* Model icon area */
