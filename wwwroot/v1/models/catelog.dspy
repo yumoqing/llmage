@@ -1,0 +1,23 @@
+# GET /v1/models/catelog
+# List published models by catalog, optionally exclude one model
+# Params: catelogid (required), exclude_id (optional)
+catelogid = params_kw.catelogid
+if not catelogid:
+	return json.dumps({'error': 'catelogid is required'})
+exclude_id = params_kw.exclude_id or ''
+dbname = get_module_dbname('llmage')
+db = DBPools()
+async with db.sqlorContext(dbname) as sor:
+	sql = """select distinct a.* from llm a
+join llm_api_map m on a.id = m.llmid
+where m.llmcatelogid = ${catelogid}$ and a.status = 'published'
+"""
+	ns = {'catelogid': catelogid}
+	if exclude_id:
+		sql += " and a.id != ${exclude_id}$"
+		ns['exclude_id'] = exclude_id
+	recs = await sor.sqlExe(sql, ns)
+	for r in recs.get('rows', []):
+		r.description = json.dumps(r.description)
+	return recs
+return []
