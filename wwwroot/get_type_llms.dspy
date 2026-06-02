@@ -5,7 +5,7 @@ try:
 		sql = '''select distinct a.*, e.input_fields from llm a 
 	join llm_api_map m on a.id = m.llmid
 	join llmcatelog b on m.llmcatelogid = b.id
-	join uapi d on d.upappid = a.upappid and a.apiname = d.name
+	join uapi d on d.upappid = a.upappid and m.apiname = d.name
 	join uapiio e on d.ioid = e.id
 	where (b.id=${lt}$ OR b.name=${lt}$)
 		and a.enabled_date <= ${biz_date}$
