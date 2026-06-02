@@ -1,10 +1,4 @@
-
-_CATELOG_ALIAS = {
-	'文生视频': 't2v', '参考生视频': 'r2v', '图生视频': 'i2v',
-}
-lt = 't2v'
-if params_kw.type:
-	lt = _CATELOG_ALIAS.get(params_kw.type, params_kw.type)
+lt = params_kw.catelogid or 't2v'
 async with get_sor_context(request._run_ns, 'llmage') as sor:
 	sql = '''select distinct a.*, e.input_fields from llm a 
 join llm_api_map m on a.id = m.llmid
