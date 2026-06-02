@@ -3,14 +3,13 @@ async with get_sor_context(request._run_ns, 'llmage') as sor:
 	sql = '''select distinct a.*, e.input_fields from llm a 
 join llm_api_map m on a.id = m.llmid
 join llmcatelog b on m.llmcatelogid = b.id
-join upapp c on a.upappid = c.id
-join uapi d on c.apisetid = d.apisetid and a.apiname = d.name
+join uapi d on d.upappid = a.upappid and a.apiname = d.name
 join uapiio e on d.ioid = e.id
 where (b.id=${lt}$ OR b.name=${lt}$)
 	and a.enabled_date <= ${biz_date}$
 	and ${biz_date}$ < a.expired_date
 	and a.status = 'published'
-	and ppid is not NULL'''
+	and m.ppid is not NULL'''
 	biz_date = await get_business_date(sor)
 	recs = await sor.sqlExe(sql, {
 		'biz_date': biz_date,
