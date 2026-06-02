@@ -187,10 +187,11 @@
                     ]
                 },
                 {
-                    "widgettype": "VBox",
+                    "widgettype": "VScrollPanel",
                     "id": "llmage_content",
                     "options": {
                         "css": "filler",
+                        "width": "100%",
                         "height": "100%"
                     }
                 }
