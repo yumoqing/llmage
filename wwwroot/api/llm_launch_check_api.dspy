@@ -1,0 +1,158 @@
+import json
+from sqlor.dbpools import get_sor_context
+from ahserver.serverenv import ServerEnv
+
+llmid = params_kw.get('llmid', '')
+action = params_kw.get('action', 'check')
+
+if not llmid:
+	return json.dumps({'error': 'missing llmid'}, ensure_ascii=False)
+
+if action == 'check':
+	# Return check results
+	from datetime import date
+	today = date.today().isoformat()
+	env = request._run_ns
+	result = {'llmid': llmid, 'checks': [], 'all_passed': True}
+
+	async def add_check(name, passed, detail=''):
+		result['checks'].append({'name': name, 'passed': passed, 'detail': detail})
+		if not passed:
+			result['all_passed'] = False
+
+	async with get_sor_context(env, 'llmage') as sor:
+		# 1. llm record
+		recs = await sor.sqlExe(
+			"select * from llm where id=${llmid}$", {'llmid': llmid})
+		if not recs:
+			await add_check('模型记录', False, f'llm id={llmid} 不存在')
+			return json.dumps(result, ensure_ascii=False)
+		llm = recs[0]
+		await add_check('模型记录', True, f'{llm.name} ({llm.model})')
+
+		# 2. dates & status
+		date_ok = llm.enabled_date and llm.expired_date
+		status_ok = llm.status == 'published'
+		await add_check('日期与状态',
+			date_ok and status_ok,
+			f"启用:{llm.enabled_date} 失效:{llm.expired_date} 状态:{llm.status}")
+
+		# 3. upapp
+		recs = await sor.sqlExe(
+			"select a.* from llm a, upapp b where a.id=${llmid}$ and a.upappid=b.id",
+			{'llmid': llmid})
+		if recs:
+			await add_check('上位系统(upapp)', True, f'upappid={llm.upappid}')
+		else:
+			await add_check('上位系统(upapp)', False, f'upappid={llm.upappid} 未找到关联')
+
+		# 4. uapi
+		recs = await sor.sqlExe("""
+			select a.*, e.ioid, e.stream
+			from llm a
+			join upapp c on a.upappid = c.id
+			join uapi e on c.apisetid = e.apisetid and a.apiname = e.name
+			where a.id=${llmid}$""", {'llmid': llmid})
+		if recs:
+			await add_check('API映射(uapi)', True, f'ioid={recs[0].ioid}, stream={recs[0].stream}')
+		else:
+			await add_check('API映射(uapi)', False, f'apiname={getattr(llm, "apiname", "N/A")} 在upapp中未找到')
+
+		# 5. uapiio
+		if recs:
+			ioid = recs[0].ioid
+			recs2 = await sor.sqlExe(
+				"select * from uapiio where id=${ioid}$", {'ioid': ioid})
+			if recs2:
+				await add_check('IO定义(uapiio)', True, f'uapiio id={ioid}')
+			else:
+				await add_check('IO定义(uapiio)', False, f'ioid={ioid} 未找到')
+		else:
+			await add_check('IO定义(uapiio)', False, '依赖 uapi 未通过')
+
+		# 6. llm_api_map
+		maps = await sor.sqlExe(
+			"select * from llm_api_map where llmid=${llmid}$", {'llmid': llmid})
+		if maps:
+			ppids = [m.ppid for m in maps if m.ppid]
+			await add_check('能力映射(llm_api_map)', True,
+				f'{len(maps)}条记录, {len(ppids)}个有定价')
+		else:
+			await add_check('能力映射(llm_api_map)', False, '无映射记录')
+			ppids = []
+
+		# 7. pricing_program
+		if ppids:
+			ppid = ppids[0]
+			async with get_sor_context(env, 'pricing') as psor:
+				pregs = await psor.sqlExe(
+					"select * from pricing_program where id=${ppid}$", {'ppid': ppid})
+				if pregs:
+					await add_check('定价项目(pricing_program)', True,
+						f'{pregs[0].name} (id={ppid})')
+					# 8. pricingdata
+					datas = await psor.sqlExe(
+						"select count(*) as cnt from pricingdata where ppid=${ppid}$",
+						{'ppid': ppid})
+					cnt = datas[0].cnt if datas else 0
+					await add_check('定价数据(pricingdata)', cnt > 0,
+						f'{cnt}条记录' if cnt > 0 else '无定价数据')
+				else:
+					await add_check('定价项目(pricing_program)', False,
+						f'ppid={ppid} 未找到')
+					await add_check('定价数据(pricingdata)', False, '依赖定价项目未通过')
+		else:
+			await add_check('定价项目(pricing_program)', False, 'llm_api_map中无ppid')
+			await add_check('定价数据(pricingdata)', False, '无定价项目')
+
+	return json.dumps(result, ensure_ascii=False)
+
+elif action == 'inference':
+	# Perform test inference
+	# Get llm info
+	async with get_sor_context(request._run_ns, 'llmage') as sor:
+		recs = await sor.sqlExe(
+			"select * from llm where id=${llmid}$", {'llmid': llmid})
+		if not recs:
+			return json.dumps({'error': 'llm not found'}, ensure_ascii=False)
+		llm = recs[0]
+		
+		# Get API mapping
+		maps = await sor.sqlExe(
+			"select * from llm_api_map where llmid=${llmid}$ and isdefaultcatelog='1'",
+			{'llmid': llmid})
+		if not maps:
+			return json.dumps({'error': 'no default api map'}, ensure_ascii=False)
+		
+		api_map = maps[0]
+		
+		# Call llminference logic
+		try:
+			from llmage.llmclient import llm_inference
+			userid = await get_user()
+			userorgid = await get_userorgid()
+			
+			# Simple test message
+			test_input = {'messages': [{'role': 'user', 'content': '你好，这是一条测试消息'}]}
+			
+			result = await llm_inference(
+				llmid=llmid,
+				apiname=api_map.apiname,
+				user_input=test_input,
+				userid=userid,
+				userorgid=userorgid,
+				stream=False
+			)
+			
+			return json.dumps({
+				'success': True,
+				'response': result.get('response', ''),
+				'usage': result.get('usage', {})
+			}, ensure_ascii=False)
+		except Exception as e:
+			return json.dumps({
+				'success': False,
+				'error': str(e)
+			}, ensure_ascii=False)
+
+return json.dumps({'error': 'invalid action'}, ensure_ascii=False)

@@ -49,8 +49,8 @@
 		"toolbar": {
 			"tools":[
 				{
-					"name":"test",
-					"label":"体验",
+					"name":"launch_check",
+					"label":"上线检查",
 					"selected_row":true
 				},
 				{
@@ -68,16 +68,16 @@
 		"binds":[
 			{
 				"wid":"self",
-				"event":"test",
+				"event":"launch_check",
 				"actiontype":"urlwidget",
 				"target":"PopupWindow",
 				"popup_options":{
-					"title":"model Test",
-					"cwidth":22,
-					"height":"75%"
+					"title":"上线检查",
+					"cwidth":25,
+					"cheight":20
 				},
 				"options":{
-					"url":"{{entire_url('./llm_dialog.ui')}}",
+					"url":"{{entire_url('./llm_launch_check.ui')}}",
 					"params":{
 						"id":"${id}"
 					}

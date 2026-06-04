@@ -1,0 +1,61 @@
+{% if params_kw.id %}
+{% set llmid = params_kw.id %}
+{
+	"widgettype": "VBox",
+	"options": {
+		"width": "100%",
+		"height": "100%",
+		"spacing": 10,
+		"children": [
+			{
+				"widgettype": "Title",
+				"options": {
+					"text": "模型上线检查",
+					"level": 2
+				}
+			},
+			{
+				"widgettype": "Text",
+				"options": {
+					"name": "check_status",
+					"text": "检查中...",
+					"i18n": false
+				}
+			},
+			{
+				"widgettype": "VBox",
+				"options": {
+					"name": "checks_list",
+					"spacing": 5
+				}
+			},
+			{
+				"widgettype": "Button",
+				"options": {
+					"name": "test_btn",
+					"text": "体验一次",
+					"i18n": false,
+					"disabled": true
+				}
+			},
+			{
+				"widgettype": "Text",
+				"options": {
+					"name": "test_result",
+					"text": "",
+					"i18n": false
+				}
+			}
+		],
+		"init": "async function(self) {\n  const llmid = '{{llmid}}';\n  const statusEl = self.children.check_status;\n  const listEl = self.children.checks_list;\n  const testBtn = self.children.test_btn;\n  const testResult = self.children.test_result;\n  \n  async function runCheck() {\n    statusEl.setText('检查中...');\n    listEl.clear();\n    testBtn.setDisabled(true);\n    \n    try {\n      const url = bricks.absurl('../api/llm_launch_check_api.dspy?llmid=' + llmid, self);\n      const resp = await fetch(url);\n      const data = await resp.json();\n      \n      if (data.error) {\n        statusEl.setText('错误: ' + data.error);\n        return;\n      }\n      \n      statusEl.setText(data.all_passed ? '✓ 所有检查通过' : '✗ 存在未通过项');\n      statusEl.setStyle({color: data.all_passed ? '#4CAF50' : '#F44336', fontSize: '16px', fontWeight: 'bold'});\n      \n      data.checks.forEach(check => {\n        const row = bricks.createWidget('HBox', {\n          spacing: 10,\n          children: [\n            {widgettype: 'Text', options: {text: check.passed ? '✓' : '✗', style: {color: check.passed ? '#4CAF50' : '#F44336', fontSize: '18px', width: '30px'}}},\n            {widgettype: 'Text', options: {text: check.name, style: {fontWeight: 'bold', width: '200px'}}},\n            {widgettype: 'Text', options: {text: check.detail, style: {color: '#666'}}}\n          ]\n        });\n        listEl.addChild(row);\n      });\n      \n      if (data.all_passed) {\n        testBtn.setDisabled(false);\n      }\n    } catch (e) {\n      statusEl.setText('请求失败: ' + e.message);\n    }\n  }\n  \n  testBtn.on('click', async () => {\n    testResult.setText('体验中...');\n    try {\n      const url = bricks.absurl('../api/llm_launch_check_api.dspy?llmid=' + llmid + '&action=inference', self);\n      const resp = await fetch(url);\n      const data = await resp.json();\n      \n      if (data.success) {\n        testResult.setText('响应: ' + (data.response || JSON.stringify(data.usage)));\n        testResult.setStyle({color: '#4CAF50'});\n      } else {\n        testResult.setText('失败: ' + data.error);\n        testResult.setStyle({color: '#F44336'});\n      }\n    } catch (e) {\n      testResult.setText('请求失败: ' + e.message);\n      testResult.setStyle({color: '#F44336'});\n    }\n  });\n  \n  await runCheck();\n}"
+	}
+}
+{% else %}
+{
+	"widgettype": "Text",
+	"options": {
+		"text": "缺少模型ID参数",
+		"i18n": true
+	}
+}
+{% endif %}
