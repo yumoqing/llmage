@@ -427,6 +427,90 @@ data: [DONE]
 
 ---
 
+## POST /v1/music/generations
+
+音乐生成接口。
+
+### 必填参数
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `model` | string | 模型名称，如 `"music-2.6"`, `"music-2.5"` |
+| `catelogid` | string | 目录类型ID，固定为 `"music_gen"` |
+| `prompt` | string | 音乐风格描述（风格、情绪、场景），如 `"流行音乐, 开心, 适合阳光明媚的下午"` |
+| `lyrics` | string | 歌词内容，使用 `\n` 分隔每行，可包含结构标签 |
+
+### 歌词结构标签
+
+歌词中可包含以下结构标签来优化生成的音乐结构：
+- `[Intro]` - 前奏
+- `[Verse]` - 主歌
+- `[Pre Chorus]` - 预副歌
+- `[Chorus]` - 副歌
+- `[Bridge]` - 桥段
+- `[Outro]` - 尾声
+- `[Interlude]` - 间奏
+- `[Hook]` - 记忆点
+- `[Build Up]` - 情绪铺垫
+- `[Solo]` - 独奏
+
+### 请求示例
+
+```json
+{
+    "model": "music-2.6",
+    "catelogid": "music_gen",
+    "prompt": "Pop music, happy, suitable for a sunny day",
+    "lyrics": "[Intro]\n\n[Verse]\nWalking down the street\nFeeling the beat\n\n[Chorus]\nDancing in the sun\nHaving so much fun"
+}
+```
+
+### 响应格式
+
+MiniMax 音乐生成为同步接口，直接返回音频URL：
+
+```json
+{
+    "id": "luid_xxx",
+    "object": "music.generation",
+    "model": "music-2.6",
+    "status": "SUCCEEDED",
+    "audio": "https://...",
+    "created": 1716912000
+}
+```
+
+### 可用模型
+
+| 模型名称 | model 参数 | 说明 |
+|---------|-----------|------|
+| MiniMax Music 2.6 | `music-2.6` | 最新版本，音质最佳 |
+| MiniMax Music 2.5 | `music-2.5` | 支持14种段落级结构标签，物理级高保真 |
+
+### MiniMax Music 2.5 特性
+
+Music 2.5 在「段落级强控制」与「物理级高保真」两大技术难题上实现突破：
+- 开放全段落标签控制，精准支持14种结构变体
+- 长度限制：歌词内容 [1, 3500] 个字符
+- prompt 长度限制：[10, 300] 个字符
+
+### MiniMax Music 2.0 特性（已过期）
+
+Music 2.0 能根据文本描述和歌词直接生成包含人声的完整歌曲：
+- prompt 长度限制：[10, 300] 个字符
+- lyrics 长度限制：[10, 3000] 个字符
+- 状态：已过期（expired_date: 2026-01-01）
+
+### 错误响应
+
+| 状态码 | 说明 |
+|--------|------|
+| 400 | 缺少必填参数或模型不存在 |
+| 403 | 未登录 |
+| 429 | 账户余额不足 |
+
+---
+
 ## GET /v1/tasks
 
 查询异步任务状态。

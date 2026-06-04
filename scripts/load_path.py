@@ -163,6 +163,7 @@ PATHS_LOGINED = [
     f"/{MOD}/v1/models/index.dspy",
     f"/{MOD}/v1/tasks/index.dspy",
     f"/{MOD}/v1/video/generations/index.dspy",
+    f"/{MOD}/v1/music/generations/index.dspy",
 
     # 其他子目录
     f"/{MOD}/list_llmcatelogs/index.dspy",
@@ -182,6 +183,7 @@ PATHS_V1_CUSTOMER = [
     f"/{MOD}/v1/chat/completions/index.dspy",
     f"/{MOD}/v1/video/generations/index.dspy",
     f"/{MOD}/v1/image/generations/index.dspy",
+    f"/{MOD}/v1/music/generations/index.dspy",
     f"/{MOD}/v1/models/index.dspy",
     f"/{MOD}/v1/tasks/index.dspy",
 ]
