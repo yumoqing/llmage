@@ -108,8 +108,7 @@ if action == 'check':
 	return json.dumps(result, ensure_ascii=False)
 
 elif action == 'inference':
-	# Perform test inference
-	# Get llm info
+	# Perform test inference - direct uapi call to get usage data
 	async with get_sor_context(request._run_ns, 'llmage') as sor:
 		recs = await sor.sqlExe(
 			"select * from llm where id=${llmid}$", {'llmid': llmid})
@@ -126,33 +125,122 @@ elif action == 'inference':
 		
 		api_map = maps[0]
 		
-		# Call llminference logic
+		# Direct uapi call
 		try:
-			from llmage.llmclient import llm_inference
+			env = request._run_ns
+			uapi = env.UpAppApi(request)
 			userid = await get_user()
 			userorgid = await get_userorgid()
 			
-			# Simple test message
-			test_input = {'messages': [{'role': 'user', 'content': '你好，这是一条测试消息'}]}
+			# Get caller userid for the upapp
+			caller_userid = await env.uapi_data.get_calluserid(llm.upappid, orgid=llm.ownerid)
 			
-			result = await llm_inference(
-				llmid=llmid,
-				apiname=api_map.apiname,
-				user_input=test_input,
-				userid=userid,
-				userorgid=userorgid,
-				stream=False
-			)
+			# Simple test message
+			test_params = {
+				'messages': [{'role': 'user', 'content': '你好，这是一条测试消息'}],
+				'model': llm.model
+			}
+			
+			# Call uapi
+			response = await uapi.call(llm.upappid, api_map.apiname, caller_userid, params=test_params)
+			if isinstance(response, bytes):
+				response = response.decode('utf-8')
+			
+			data = json.loads(response)
+			usage = data.get('usage', {})
+			content = data.get('content', '')
+			if not content and 'choices' in data:
+				content = data['choices'][0].get('message', {}).get('content', '')
 			
 			return json.dumps({
 				'success': True,
-				'response': result.get('response', ''),
-				'usage': result.get('usage', {})
+				'response': content or '(空响应)',
+				'usage': usage
 			}, ensure_ascii=False)
 		except Exception as e:
 			return json.dumps({
 				'success': False,
 				'error': str(e)
+			}, ensure_ascii=False)
+
+elif action == 'check_charging':
+	# Check if pricing can calculate costs from usage data
+	usages_str = params_kw.get('usages', '{}')
+	llmusage_id = params_kw.get('llmusage_id', '')
+	
+	try:
+		usages = json.loads(usages_str) if isinstance(usages_str, str) else usages_str
+	except Exception as e:
+		return json.dumps({'error': f'invalid usages format: {e}'}, ensure_ascii=False)
+	
+	if not usages:
+		return json.dumps({'error': 'usages is empty'}, ensure_ascii=False)
+	
+	env = request._run_ns
+	
+	# Get ppid from llm_api_map
+	async with get_sor_context(env, 'llmage') as sor:
+		maps = await sor.sqlExe(
+			"select * from llm_api_map where llmid=${llmid}$ and isdefaultcatelog='1'",
+			{'llmid': llmid})
+		if not maps:
+			return json.dumps({'error': 'no default api map'}, ensure_ascii=False)
+		
+		api_map = maps[0]
+		ppid = api_map.ppid
+		
+		if not ppid:
+			return json.dumps({
+				'success': False,
+				'error': 'llm_api_map 中没有定价项目(ppid)'
+			}, ensure_ascii=False)
+		
+		# Get pricing program name
+		async with get_sor_context(env, 'pricing') as psor:
+			pregs = await psor.sqlExe(
+				"select name from pricing_program where id=${ppid}$", {'ppid': ppid})
+			pp_name = pregs[0].name if pregs else '未知'
+		
+		# Test charging calculation
+		try:
+			prices = await env.buffered_charging(ppid, usages)
+			if prices is None or len(prices) == 0:
+				return json.dumps({
+					'success': False,
+					'error': f'buffered_charging 返回空，定价项目 {pp_name}(ppid={ppid}) 无法计算费用',
+					'usages': usages
+				}, ensure_ascii=False)
+			
+			# Calculate totals
+			total_amount = 0
+			total_cost = 0
+			breakdown = []
+			for p in prices:
+				total_amount += p.amount
+				if p.cost:
+					total_cost += p.cost
+				breakdown.append({
+					'factor': getattr(p, 'factor', ''),
+					'amount': p.amount,
+					'cost': p.cost
+				})
+			
+			return json.dumps({
+				'success': True,
+				'ppid': ppid,
+				'pp_name': pp_name,
+				'usages': usages,
+				'total_amount': total_amount,
+				'total_cost': total_cost,
+				'breakdown': breakdown
+			}, ensure_ascii=False)
+		except Exception as e:
+			return json.dumps({
+				'success': False,
+				'error': f'计费计算失败: {e}',
+				'ppid': ppid,
+				'pp_name': pp_name,
+				'usages': usages
 			}, ensure_ascii=False)
 
 return json.dumps({'error': 'invalid action'}, ensure_ascii=False)
