@@ -1,4 +1,4 @@
-lt = params_kw.catelogid or 't2v'
+lt = params_kw.llmcatelogid or 't2v'
 debug(f'{lt=}')
 try:
 	async with get_sor_context(request._run_ns, 'llmage') as sor:
