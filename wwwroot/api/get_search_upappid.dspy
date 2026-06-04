@@ -6,7 +6,7 @@ try:
 			"select id as value, name as text from upapp order by name",
 			{}
 		)
-		return apps
+		return json.dumps([{'value': '', 'text': '全部'}] + list(apps), ensure_ascii=False)
 except Exception as e:
 	debug(f'get_search_upappid error: {e}')
 
