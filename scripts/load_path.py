@@ -43,7 +43,7 @@ MOD = "llmage"
 # any — 无需登录（菜单、静态资源）
 PATHS_ANY = [
     f"/{MOD}/menu.ui",
-    f"/{MOD}/imgs/%",
+    f"/{MOD}/imgs/kdb.svg",
 ]
 
 # logined — 所有已登录用户
@@ -64,31 +64,114 @@ PATHS_LOGINED = [
     f"/{MOD}/llmcatelog_list.ui",
 
     # 顶层 .dspy（非 api/ 目录）
-    f"/{MOD}/%.dspy",
+    f"/{MOD}/get_accounting_llmusages.dspy",
+    f"/{MOD}/get_asynctask_status.dspy",
+    f"/{MOD}/get_my_asynctasks.dspy",
+    f"/{MOD}/get_type_llms.dspy",
+    f"/{MOD}/grap_task_status.dspy",
+    f"/{MOD}/list_catelog_models.dspy",
+    f"/{MOD}/list_paging_catelog_llms.dspy",
+    f"/{MOD}/llmaccounting.dspy",
+    f"/{MOD}/llmcheck.dspy",
+    f"/{MOD}/llmcost.dspy",
+    f"/{MOD}/llminference.dspy",
+    f"/{MOD}/model_estimate.dspy",
+    f"/{MOD}/query_orders.dspy",
+    f"/{MOD}/query_price.dspy",
+    f"/{MOD}/test_llm_charging.dspy",
+    f"/{MOD}/vidu_callback.dspy",
+    f"/{MOD}/vidu_inference.dspy",
 
-    # api/ 目录 — 所有 .dspy 通配
-    f"/{MOD}/api/%",
+    # api/ 目录
+    f"/{MOD}/api/failed_accounting_list.dspy",
+    f"/{MOD}/api/get_apis.dspy",
+    f"/{MOD}/api/get_catelogs.dspy",
+    f"/{MOD}/api/get_organizations.dspy",
+    f"/{MOD}/api/get_ppids.dspy",
+    f"/{MOD}/api/get_upapps.dspy",
+    f"/{MOD}/api/llm_api_map_create.dspy",
+    f"/{MOD}/api/llm_api_map_delete.dspy",
+    f"/{MOD}/api/llm_api_map_list.dspy",
+    f"/{MOD}/api/llm_api_map_options.dspy",
+    f"/{MOD}/api/llm_catelog_options.dspy",
+    f"/{MOD}/api/llm_create.dspy",
+    f"/{MOD}/api/llm_delete.dspy",
+    f"/{MOD}/api/llm_status_update.dspy",
+    f"/{MOD}/api/llm_update.dspy",
+    f"/{MOD}/api/llmcatelog_create.dspy",
+    f"/{MOD}/api/llmcatelog_delete.dspy",
+    f"/{MOD}/api/llmcatelog_list.dspy",
+    f"/{MOD}/api/llmcatelog_update.dspy",
+    f"/{MOD}/api/llmusage_accounting_failed_create.dspy",
+    f"/{MOD}/api/llmusage_accounting_failed_delete.dspy",
+    f"/{MOD}/api/llmusage_accounting_failed_update.dspy",
+    f"/{MOD}/api/llmusage_create.dspy",
+    f"/{MOD}/api/llmusage_delete.dspy",
+    f"/{MOD}/api/llmusage_history_create.dspy",
+    f"/{MOD}/api/llmusage_history_delete.dspy",
+    f"/{MOD}/api/llmusage_history_update.dspy",
+    f"/{MOD}/api/llmusage_update.dspy",
+    f"/{MOD}/api/retry_accounting.dspy",
+    f"/{MOD}/api/uapi_options.dspy",
 
-    # CRUD 子目录 — 通配（每个子目录下的所有文件）
-    f"/{MOD}/llm/%",
-    f"/{MOD}/llmcatelog/%",
-    f"/{MOD}/llmcatelog_list/%",
-    f"/{MOD}/llmusage/%",
-    f"/{MOD}/llmusage_accounting_failed/%",
-    f"/{MOD}/llmusage_history/%",
-    f"/{MOD}/llm_api_map/%",
+    # CRUD 子目录 — llm/
+    f"/{MOD}/llm/index.ui",
+    f"/{MOD}/llm/add_llm.dspy",
+    f"/{MOD}/llm/delete_llm.dspy",
+    f"/{MOD}/llm/get_llm.dspy",
+    f"/{MOD}/llm/update_llm.dspy",
 
-    # v1 API 目录（管理员通过 logined 访问）
-    f"/{MOD}/v1/%",
+    # CRUD 子目录 — llm_api_map/
+    f"/{MOD}/llm_api_map/index.ui",
+    f"/{MOD}/llm_api_map/add_llm_api_map.dspy",
+    f"/{MOD}/llm_api_map/delete_llm_api_map.dspy",
+    f"/{MOD}/llm_api_map/get_llm_api_map.dspy",
+    f"/{MOD}/llm_api_map/update_llm_api_map.dspy",
+
+    # CRUD 子目录 — llmcatelog_list/ (alias for llmcatelog)
+    f"/{MOD}/llmcatelog_list/index.ui",
+    f"/{MOD}/llmcatelog_list/add_llmcatelog.dspy",
+    f"/{MOD}/llmcatelog_list/delete_llmcatelog.dspy",
+    f"/{MOD}/llmcatelog_list/get_llmcatelog.dspy",
+    f"/{MOD}/llmcatelog_list/update_llmcatelog.dspy",
+
+    # CRUD 子目录 — llmusage/
+    f"/{MOD}/llmusage/index.ui",
+    f"/{MOD}/llmusage/add_llmusage.dspy",
+    f"/{MOD}/llmusage/delete_llmusage.dspy",
+    f"/{MOD}/llmusage/get_llmusage.dspy",
+    f"/{MOD}/llmusage/update_llmusage.dspy",
+
+    # CRUD 子目录 — llmusage_accounting_failed/
+    f"/{MOD}/llmusage_accounting_failed/index.ui",
+    f"/{MOD}/llmusage_accounting_failed/add_llmusage_accounting_failed.dspy",
+    f"/{MOD}/llmusage_accounting_failed/delete_llmusage_accounting_failed.dspy",
+    f"/{MOD}/llmusage_accounting_failed/get_llmusage_accounting_failed.dspy",
+    f"/{MOD}/llmusage_accounting_failed/update_llmusage_accounting_failed.dspy",
+
+    # CRUD 子目录 — llmusage_history/
+    f"/{MOD}/llmusage_history/index.ui",
+    f"/{MOD}/llmusage_history/add_llmusage_history.dspy",
+    f"/{MOD}/llmusage_history/delete_llmusage_history.dspy",
+    f"/{MOD}/llmusage_history/get_llmusage_history.dspy",
+    f"/{MOD}/llmusage_history/update_llmusage_history.dspy",
+
+    # v1 API 目录
+    f"/{MOD}/v1/chat/completions/index.dspy",
+    f"/{MOD}/v1/image/generations/index.dspy",
+    f"/{MOD}/v1/models/catelog.dspy",
+    f"/{MOD}/v1/models/index.dspy",
+    f"/{MOD}/v1/tasks/index.dspy",
+    f"/{MOD}/v1/video/generations/index.dspy",
 
     # 其他子目录
-    f"/{MOD}/list_llmcatelogs/%",
-    f"/{MOD}/list_llms/%",
-    f"/{MOD}/openai/%",
-    f"/{MOD}/t2t/%",
-    f"/{MOD}/tasks/%",
-    f"/{MOD}/upload_asset/%",
-    f"/{MOD}/video/%",
+    f"/{MOD}/list_llmcatelogs/index.dspy",
+    f"/{MOD}/list_llms/index.dspy",
+    f"/{MOD}/openai/index.dspy",
+    f"/{MOD}/t2t/index.dspy",
+    f"/{MOD}/tasks/index.dspy",
+    f"/{MOD}/upload_asset/index.dspy",
+    f"/{MOD}/video/index.dspy",
 ]
 
 # ============================================================
