@@ -6,8 +6,7 @@ if not llmid:
 
 if action == 'check':
 	# Return check results
-	from datetime import date
-	today = date.today().isoformat()
+	today = curDateString()[:10]
 	env = request._run_ns
 	result = {'llmid': llmid, 'checks': [], 'all_passed': True}
 
