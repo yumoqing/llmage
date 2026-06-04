@@ -1,0 +1,15 @@
+result = [{'providerid': '', 'providerid_text': '全部'}]
+
+try:
+	async with get_sor_context(request._run_ns, 'rbac') as sor:
+		orgs = await sor.sqlExe(
+			"select id, orgname from organization order by orgname",
+			{}
+		)
+		if orgs:
+			for r in orgs:
+				result.append({'providerid': str(r.id), 'providerid_text': r.orgname or ''})
+except Exception as e:
+	debug(f'get_search_providerid error: {e}')
+
+return json.dumps(result, ensure_ascii=False)

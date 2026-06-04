@@ -88,6 +88,8 @@ PATHS_LOGINED = [
     f"/{MOD}/api/get_catelogs.dspy",
     f"/{MOD}/api/get_organizations.dspy",
     f"/{MOD}/api/get_ppids.dspy",
+    f"/{MOD}/api/get_search_providerid.dspy",
+    f"/{MOD}/api/get_search_upappid.dspy",
     f"/{MOD}/api/get_upapps.dspy",
     f"/{MOD}/api/llm_api_map_create.dspy",
     f"/{MOD}/api/llm_api_map_delete.dspy",

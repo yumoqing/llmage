@@ -1,0 +1,15 @@
+result = [{'upappid': '', 'upappid_text': '全部'}]
+
+try:
+	async with get_sor_context(request._run_ns, 'uapi') as sor:
+		apps = await sor.sqlExe(
+			"select id, name from upapp order by name",
+			{}
+		)
+		if apps:
+			for r in apps:
+				result.append({'upappid': str(r.id), 'upappid_text': r.name or ''})
+except Exception as e:
+	debug(f'get_search_upappid error: {e}')
+
+return json.dumps(result, ensure_ascii=False)

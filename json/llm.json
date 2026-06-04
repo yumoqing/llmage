@@ -38,12 +38,12 @@
                     "valueField": "id"
                 },
                 "providerid": {
-                    "uitype": "code",
-                    "dataurl": "{{entire_url('../api/get_organizations.dspy')}}"
+                	"uitype": "code",
+                	"dataurl": "{{entire_url('../api/get_search_providerid.dspy')}}"
                 },
                 "upappid": {
-                    "uitype": "code",
-                    "dataurl": "{{entire_url('../api/get_upapps.dspy')}}"
+                	"uitype": "code",
+                	"dataurl": "{{entire_url('../api/get_search_upappid.dspy')}}"
                 }
 			}
         },
