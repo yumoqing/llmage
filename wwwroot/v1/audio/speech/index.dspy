@@ -1,0 +1,74 @@
+# OpenAI-compatible Text-to-Speech API
+# POST /v1/audio/speech
+# Required params: model, catelogid, prompt (text to synthesize)
+# Optional params: speaker (voice_id), speed, emotion
+#
+# Example request:
+# {
+#     "model": "speech-2.6-turbo",
+#     "catelogid": "tts",
+#     "prompt": "你好，欢迎使用语音合成服务",
+#     "speaker": "female-tianmei",
+#     "speed": 1.0,
+#     "emotion": "happy"
+# }
+#
+# Response (stream, hex audio chunks):
+# {
+#     "status": "SUCCEEDED",
+#     "audio": "base64_encoded_audio_data"
+# }
+
+userid = await get_user()
+userorgid = await get_userorgid()
+if userid is None:
+    debug('need login')
+    return openai_403()
+
+# Validate required parameters
+if not params_kw.model:
+    d = return_error('Missing required parameter: model')
+    return json_response(d, status=400)
+
+if not params_kw.catelogid:
+    d = return_error('Missing required parameter: catelogid')
+    return json_response(d, status=400)
+
+if not params_kw.prompt:
+    d = return_error('Missing required parameter: prompt (text to synthesize)')
+    return json_response(d, status=400)
+
+lctype = params_kw.catelogid
+
+env = request._run_ns
+async with get_sor_context(env, 'llmage') as sor:
+    # Look up llm by model name and catalog type through llm_api_map
+    sql = """select distinct a.* from llm a
+join llm_api_map m on a.id = m.llmid
+join llmcatelog b on m.llmcatelogid = b.id
+where (b.id = ${lctype}$ OR b.name = ${lctype}$)
+    and a.model=${model}$
+    and a.status = 'published'"""
+    recs = await sor.sqlExe(sql, {
+        'lctype': lctype,
+        'model': params_kw.model
+    })
+    if len(recs) == 0:
+        debug(f'{params_kw.model=} not found for catalog {lctype}')
+        return openai_400()
+    params_kw.llmid = recs[0].id
+
+debug(f'{params_kw.llmid=}')
+
+# Check balance
+f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
+if not f:
+    debug(f'{userid=} balance not enough')
+    return openai_429()
+
+# Generate task ID and attach to params
+if not params_kw.transno:
+    params_kw.transno = getID()
+
+# Call inference (TTS can be stream or sync depending on model)
+return await inference(request, env=env)

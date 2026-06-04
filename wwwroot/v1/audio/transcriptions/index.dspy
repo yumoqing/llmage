@@ -1,0 +1,71 @@
+# OpenAI-compatible Audio Transcription API (ASR)
+# POST /v1/audio/transcriptions
+# Required params: model, catelogid, audio_file (audio URL or base64)
+# Optional params: language
+#
+# Example request:
+# {
+#     "model": "qwen3-asr-flash",
+#     "catelogid": "asr",
+#     "audio_file": "https://example.com/audio.wav"
+# }
+#
+# Response:
+# {
+#     "text": "识别出的文本内容",
+#     "usage": { "duration_seconds": 5.2 }
+# }
+
+userid = await get_user()
+userorgid = await get_userorgid()
+if userid is None:
+    debug('need login')
+    return openai_403()
+
+# Validate required parameters
+if not params_kw.model:
+    d = return_error('Missing required parameter: model')
+    return json_response(d, status=400)
+
+if not params_kw.catelogid:
+    d = return_error('Missing required parameter: catelogid')
+    return json_response(d, status=400)
+
+if not params_kw.audio_file:
+    d = return_error('Missing required parameter: audio_file')
+    return json_response(d, status=400)
+
+lctype = params_kw.catelogid
+
+env = request._run_ns
+async with get_sor_context(env, 'llmage') as sor:
+    # Look up llm by model name and catalog type through llm_api_map
+    sql = """select distinct a.* from llm a
+join llm_api_map m on a.id = m.llmid
+join llmcatelog b on m.llmcatelogid = b.id
+where (b.id = ${lctype}$ OR b.name = ${lctype}$)
+    and a.model=${model}$
+    and a.status = 'published'"""
+    recs = await sor.sqlExe(sql, {
+        'lctype': lctype,
+        'model': params_kw.model
+    })
+    if len(recs) == 0:
+        debug(f'{params_kw.model=} not found for catalog {lctype}')
+        return openai_400()
+    params_kw.llmid = recs[0].id
+
+debug(f'{params_kw.llmid=}')
+
+# Check balance
+f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
+if not f:
+    debug(f'{userid=} balance not enough')
+    return openai_429()
+
+# Generate task ID and attach to params
+if not params_kw.transno:
+    params_kw.transno = getID()
+
+# Call inference (ASR is synchronous)
+return await inference(request, env=env)

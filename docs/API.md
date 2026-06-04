@@ -511,6 +511,135 @@ Music 2.0 能根据文本描述和歌词直接生成包含人声的完整歌曲�
 
 ---
 
+## POST /v1/audio/speech
+
+文本转语音（TTS）接口。
+
+### 必填参数
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `model` | string | 模型名称，如 `"speech-2.6-turbo"`, `"speech-2.6-hd"` |
+| `catelogid` | string | 目录类型ID，固定为 `"tts"` |
+| `prompt` | string | 需要合成的文本内容，最长 10,000 字符 |
+
+### 可选参数
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `speaker` | string | 说话人/音色ID，如 `"female-tianmei"` |
+| `speed` | float | 语速，默认 `1.0` |
+| `emotion` | string | 情感，如 `"happy"`, `"sad"` |
+| `transno` | string | 交易流水号 |
+
+### 请求示例
+
+```json
+{
+    "model": "speech-2.6-turbo",
+    "catelogid": "tts",
+    "prompt": "你好，欢迎使用语音合成服务",
+    "speaker": "female-tianmei",
+    "speed": 1.0,
+    "emotion": "happy"
+}
+```
+
+### 响应格式
+
+MiniMax TTS 为流式接口，逐块返回音频数据（hex编码自动转base64）：
+
+```json
+{
+    "status": "SUCCEEDED",
+    "audio": "base64_encoded_audio_data"
+}
+```
+
+### 可用模型
+
+| 模型名称 | model 参数 | 说明 |
+|---------|-----------|------|
+| MiniMax Speech 2.6 Turbo | `speech-2.6-turbo` | 极速版，更快更优惠，适用于语音聊天和数字人 |
+| MiniMax Speech 2.6 HD | `speech-2.6-hd` | 高清版，超低延时，更高自然度 |
+| MiniMax Speech 2.5 HD | `speech-2.5-hd-preview` | Preview版本 |
+| F5-TTS 本地 | `f5tts` | 本地部署，零样本声音克隆，多语言支持 |
+
+### 错误响应
+
+| 状态码 | 说明 |
+|--------|------|
+| 400 | 缺少必填参数或模型不存在 |
+| 403 | 未登录 |
+| 429 | 账户余额不足 |
+
+---
+
+## POST /v1/audio/transcriptions
+
+语音识别（ASR）接口，将音频转为文本。
+
+### 必填参数
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `model` | string | 模型名称，如 `"qwen3-asr-flash"`, `"parakeet-tdt-0.6b-v2"` |
+| `catelogid` | string | 目录类型ID，固定为 `"asr"` |
+| `audio_file` | string | 音频文件URL |
+
+### 可选参数
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `language` | string | 语言代码（部分模型支持） |
+| `transno` | string | 交易流水号 |
+
+### 请求示例
+
+```json
+{
+    "model": "qwen3-asr-flash",
+    "catelogid": "asr",
+    "audio_file": "https://example.com/audio.wav"
+}
+```
+
+### 响应格式
+
+```json
+{
+    "text": "识别出的文本内容",
+    "usage": {
+        "duration_seconds": 5.2
+    }
+}
+```
+
+### 可用模型
+
+| 模型名称 | model 参数 | 说明 |
+|---------|-----------|------|
+| 通义千问 ASR | `qwen3-asr-flash` | 多语种识别、歌唱识别、情感识别、噪声拒识，0.00026元/秒 |
+| Nvidia ASR | `parakeet-tdt-0.6b-v2` | 仅支持英文，6亿参数，支持标点/大小写/时间戳 |
+
+### 通义千问 ASR 核心功能
+
+- 多语种识别：涵盖普通话及多种方言（粤语、四川话等）
+- 复杂环境适应：自动语种检测与智能非人声过滤
+- 歌唱识别：伴随BGM下也能实现整首歌曲转写
+- 上下文增强：通过配置上下文提高识别准确率
+- 情感识别：支持惊讶、平静、愉快、悲伤、厌恶、愤怒、恐惧
+
+### 错误响应
+
+| 状态码 | 说明 |
+|--------|------|
+| 400 | 缺少必填参数或模型不存在 |
+| 403 | 未登录 |
+| 429 | 账户余额不足 |
+
+---
+
 ## GET /v1/tasks
 
 查询异步任务状态。
