@@ -1,4 +1,5 @@
 userid = await get_user()
+llmcatelogid = params_kw.get('llmcatelogid', 't2t')
 tasks = await get_today_asynctask_list(userid)
 
 async with get_sor_context(request._run_ns, 'llmage') as sor:
@@ -7,13 +8,16 @@ async with get_sor_context(request._run_ns, 'llmage') as sor:
 		t.ioinfo = json.loads(bin.decode('utf-8'))
 		
 		# 查询 llmcatelogid
-		llmcatelogid = None
+		catid = None
 		if hasattr(t, 'llmid') and t.llmid:
 			sql = '''select m.llmcatelogid from llm_api_map m where m.llmid = ${llmid}$ limit 1'''
 			recs = await sor.sqlExe(sql, {'llmid': t.llmid})
 			if recs:
-				llmcatelogid = recs[0].llmcatelogid
-		t.llmcatelogid = llmcatelogid
+				catid = recs[0].llmcatelogid
+		t.llmcatelogid = catid
+
+# 按 llmcatelogid 过滤
+tasks = [t for t in tasks if t.llmcatelogid == llmcatelogid]
 
 return {
 	'status': 'ok',
