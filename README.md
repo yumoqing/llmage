@@ -282,13 +282,15 @@ await query_task_status(request, luid, onetime=False)
 
 `GET /llmage/api/get_inference_history.dspy`
 
-跨表（llmusage + llmusage_history）分页查询当前用户的推理历史，按时间倒序返回，每页 50 条。自动通过 FileStorage 读取 ioinfo 文件内容，返回实际输入输出。
+跨表（llmusage + llmusage_history）分页查询当前用户的推理历史，按时间倒序返回，默认每页 10 条。自动通过 FileStorage 读取 ioinfo 文件内容，返回实际输入输出。
 
 **请求参数**：
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | page | int | 否 | 页码，默认 1 |
+| pagerows | int | 否 | 每页条数，默认 10 |
+| llmcatelogid | str | 否 | 按模型分类 ID 过滤，仅返回该分类下模型的记录 |
 
 **返回字段**：
 
@@ -297,7 +299,7 @@ await query_task_status(request, luid, onetime=False)
 | success | 是否成功 |
 | total | 两表合计总记录数 |
 | page | 当前页码 |
-| page_size | 每页条数（固定 50） |
+| page_size | 每页条数（默认 10，可通过 pagerows 参数指定） |
 | rows | 记录列表 |
 
 **rows 中每条记录**：
