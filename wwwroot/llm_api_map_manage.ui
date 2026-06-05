@@ -60,14 +60,15 @@
                     "name": "apiname",
                     "label": "API接口",
                     "uitype": "code",
-                    "dataurl": "{{entire_url('./api/get_apis.dspy')}}",
+                    "dataurl": "{{entire_url('./api/get_search_apiname.dspy')}}",
                     "placeholder": "请选择API接口"
                   },
                   {
                     "name": "query_apiname",
                     "label": "查询API",
-                    "uitype": "str",
-                    "placeholder": "异步查询API名，多个用逗号分隔"
+                    "uitype": "code",
+                    "dataurl": "{{entire_url('./api/get_search_apiname.dspy?allow_empty=1')}}",
+                    "placeholder": "不指定或选择查询API"
                   },
                   {
                     "name": "query_period",

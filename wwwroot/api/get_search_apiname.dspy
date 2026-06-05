@@ -1,0 +1,33 @@
+llmid = params_kw.get('llmid')
+allow_empty = params_kw.get('allow_empty', '')
+
+result = []
+if allow_empty:
+	result = [{'value': '', 'text': '不指定'}]
+
+try:
+	if not llmid:
+		return json.dumps(result, ensure_ascii=False)
+
+	# Get model's upappid from llmage db
+	dbname = get_module_dbname('llmage')
+	async with DBPools().sqlorContext(dbname) as sor:
+		llm_recs = await sor.sqlExe(
+			"select upappid from llm where id = ${llmid}$",
+			{'llmid': llmid}
+		)
+		if not llm_recs or not llm_recs[0].get('upappid'):
+			return json.dumps(result, ensure_ascii=False)
+		upappid = llm_recs[0].upappid
+
+	# Query uapi table from uapi module's db
+	async with get_sor_context(request._run_ns, 'uapi') as sor:
+		apis = await sor.sqlExe(
+			"select name as value, name as text from uapi where upappid = ${upappid}$ order by name",
+			{'upappid': upappid}
+		)
+		return json.dumps(result + list(apis), ensure_ascii=False)
+except Exception as e:
+	debug(f'get_search_apiname error: {e}')
+
+return json.dumps(result, ensure_ascii=False)
