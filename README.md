@@ -278,6 +278,72 @@ tasks = await get_today_asynctask_list(userid)
 await query_task_status(request, luid, onetime=False)
 ```
 
+### 历史推理记录查询
+
+`GET /llmage/api/get_inference_history.dspy`
+
+跨表（llmusage + llmusage_history）分页查询当前用户的推理历史，按时间倒序返回，每页 50 条。自动通过 FileStorage 读取 ioinfo 文件内容，返回实际输入输出。
+
+**请求参数**：
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| page | int | 否 | 页码，默认 1 |
+
+**返回字段**：
+
+| 字段 | 说明 |
+|------|------|
+| success | 是否成功 |
+| total | 两表合计总记录数 |
+| page | 当前页码 |
+| page_size | 每页条数（固定 50） |
+| rows | 记录列表 |
+
+**rows 中每条记录**：
+
+| 字段 | 说明 |
+|------|------|
+| id | 记录 ID |
+| llmid | 模型 ID |
+| use_date | 使用日期 |
+| use_time | 使用时间（排序依据） |
+| userid | 用户 ID |
+| usages | token 用量（JSON 对象） |
+| status | 调用状态（ok/failed 等） |
+| ioinfo | 原始 webpath |
+| io_content | 解析后的输入输出内容，包含 input 和 output；读取失败时为 null |
+| amount | 费用金额 |
+| userorgid | 组织 ID |
+| accounting_status | 记账状态 |
+
+**返回示例**：
+
+```json
+{
+  "success": true,
+  "rows": [
+    {
+      "id": "abc123",
+      "llmid": "model001",
+      "use_date": "2026-06-05",
+      "use_time": "2026-06-05 12:30:00",
+      "userid": "user001",
+      "usages": {"total_tokens": 1000, "prompt_tokens": 800, "completion_tokens": 200},
+      "status": "ok",
+      "io_content": {"input": [...], "output": [...]},
+      "amount": 0.05,
+      "accounting_status": "accounted"
+    }
+  ],
+  "total": 156,
+  "page": 1,
+  "page_size": 50
+}
+```
+
+**权限**：logined（所有已登录用户），仅返回当前登录用户自己的记录。
+
 ---
 
 ## 前端页面
