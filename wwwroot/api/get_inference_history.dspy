@@ -17,7 +17,7 @@ try:
         ns = {'userid': userid}
 
         if llmcatelogid:
-            conditions.append("llmid in (select id from llm where llmcatelogid = ${llmcatelogid}$)")
+            conditions.append("llmid in (select llmid from llm_api_map where llmcatelogid = ${llmcatelogid}$)")
             ns['llmcatelogid'] = llmcatelogid
 
         where_clause = " and ".join(conditions)
