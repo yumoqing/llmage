@@ -160,7 +160,7 @@ async def get_accounting_llmusages(luid=None):
 	dt = datetime.fromtimestamp(t)
 	tsstr = dt.strftime('%Y-%m-%d %H:%M:%S.') + f'{dt.microsecond // 1000:03d}'
 	async with get_sor_context(env, 'llmage') as sor:
-		sql = """select a.*, c.ppid 
+		sql = """select a.*, b.model, c.ppid 
 from llmusage a, llm b, llm_api_map c
 where a.llmid = b.id 
 	and a.llmid = c.llmid
@@ -332,7 +332,7 @@ async def backend_accounting():
 				tpac = await get_user_tpac(lu.userid)
 				if tpac:
 					debug(f'{lu.id=},{lu.userid=}, {tpac=}, go tpac')
-					await tpac_accounting(tpac, lu.userid, lu.llmid, lu.amount, lu.usages, lu.id)
+					await tpac_accounting(tpac, lu.userid, lu.llmid, lu.amount, lu.usages, lu.id, lu.model)
 				else:
 					debug(f'{lu.id=},{lu.userid=}, {tpac=}, go local')
 					await llm_accounting(lu)

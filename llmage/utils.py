@@ -93,13 +93,14 @@ async def get_tpac_balance(tpac, userid):
 		exception(f'{url=}, {userid=}, error:{e}')
 		return None
 
-async def tpac_accounting(tpac, userid, llmid, amount, usage, luid):
+async def tpac_accounting(tpac, userid, llmid, amount, usage, luid, model):
 	url = tpac.tpac_accounting_url
 	hc = StreamHttpClient()
 	d = {
 		'userid': userid,  
 		'llmid': llmid, 
 		'amount': amount, 
+		'model': model,
 		'usage': usage
 	}
 	status = 'failed'
