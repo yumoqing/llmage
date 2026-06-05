@@ -85,6 +85,7 @@ PATHS_LOGINED = [
 
     # api/ 目录
     f"/{MOD}/api/failed_accounting_list.dspy",
+    f"/{MOD}/api/get_inference_history.dspy",
     f"/{MOD}/api/get_apis.dspy",
     f"/{MOD}/api/get_catelogs.dspy",
     f"/{MOD}/api/get_organizations.dspy",

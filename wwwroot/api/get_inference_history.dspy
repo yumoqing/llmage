@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+import json
+
+result = {'success': False, 'rows': [], 'total': 0, 'page': 1, 'page_size': 50}
+
+try:
+    dbname = get_module_dbname('llmage')
+    userid = await get_user()
+
+    page = int(params_kw.get('page', 1))
+    page_size = 50
+
+    async with DBPools().sqlorContext(dbname) as sor:
+        # Count total from both tables
+        count_sql = """
+            select count(*) as cnt from (
+                select id from llmusage where userid = ${userid}$
+                union all
+                select id from llmusage_history where userid = ${userid}$
+            ) t
+        """
+        count_recs = await sor.sqlExe(count_sql, {'userid': userid})
+        total = count_recs[0].cnt if count_recs else 0
+
+        # UNION ALL query with pagination, time descending
+        offset = (page - 1) * page_size
+        query_sql = f"""
+            select id, llmid, use_date, use_time, userid, usages, ioinfo,
+                   status, taskid, amount, cost, userorgid, accounting_status
+            from (
+                select id, llmid, use_date, use_time, userid, usages, ioinfo,
+                       status, taskid, amount, cost, userorgid, accounting_status
+                from llmusage where userid = ${{userid}}$
+                union all
+                select id, llmid, use_date, use_time, userid, usages, ioinfo,
+                       status, taskid, amount, cost, userorgid, accounting_status
+                from llmusage_history where userid = ${{userid}}$
+            ) t
+            order by use_time desc
+            limit {page_size} offset {offset}
+        """
+        recs = await sor.sqlExe(query_sql, {'userid': userid})
+
+        rows = []
+        for r in (recs or []):
+            row = dict(r)
+            # Read ioinfo content from FileStorage
+            webpath = row.get('ioinfo')
+            io_content = None
+            if webpath:
+                try:
+                    from ahserver.filestorage import FileStorage
+                    fs = FileStorage()
+                    real_path = fs.realPath(webpath)
+                    import aiofiles
+                    async with aiofiles.open(real_path, 'rb') as f:
+                        bin_data = await f.read()
+                    io_content = json.loads(bin_data.decode('utf-8'))
+                except Exception:
+                    io_content = None
+            row['io_content'] = io_content
+            # Parse usages if it's a JSON string
+            if isinstance(row.get('usages'), str):
+                try:
+                    row['usages'] = json.loads(row['usages'])
+                except Exception:
+                    pass
+            rows.append(row)
+
+        result['rows'] = rows
+        result['total'] = total
+        result['page'] = page
+        result['page_size'] = page_size
+        result['success'] = True
+
+except Exception as e:
+    result['error'] = str(e)
+
+return json.dumps(result, ensure_ascii=False, default=str)
