@@ -135,6 +135,14 @@
                 "accounting_status",
                 "use_date"
             ]
+        },
+        {
+            "name": "idx_llmusage_userid_usetime",
+            "idxtype": "index",
+            "idxfields": [
+                "userid",
+                "use_time"
+            ]
         }
     ]
 }

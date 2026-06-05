@@ -136,6 +136,11 @@
             "name": "idx_lh_backup_time",
             "idxtype": "index",
             "idxfields": ["backup_time"]
+        },
+        {
+            "name": "idx_lh_userid_usetime",
+            "idxtype": "index",
+            "idxfields": ["userid", "use_time"]
         }
     ]
 }
