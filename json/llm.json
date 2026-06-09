@@ -97,7 +97,7 @@
 					"url":"{{entire_url('../api/llm_status_update.dspy')}}",
 					"params":{
 						"id":"${id}",
-						"status":"published"
+						"action":"published"
 					}
 				}
 			},
@@ -115,7 +115,7 @@
 					"url":"{{entire_url('../api/llm_status_update.dspy')}}",
 					"params":{
 						"id":"${id}",
-						"status":"unpublished"
+						"action":"unpublished"
 					}
 				}
 			}
