@@ -89,7 +89,7 @@
 				"actiontype":"urlwidget",
 				"target":"PopupWindow",
 				"popup_options":{
-					"title":"上架确认",
+					"title":"上架",
 					"cwidth":20,
 					"cheight":8
 				},
@@ -107,7 +107,7 @@
 				"actiontype":"urlwidget",
 				"target":"PopupWindow",
 				"popup_options":{
-					"title":"下架确认",
+					"title":"下架",
 					"cwidth":20,
 					"cheight":8
 				},
