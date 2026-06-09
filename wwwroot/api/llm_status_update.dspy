@@ -3,7 +3,6 @@ action = params_kw.action
 try:
     dbname = get_module_dbname('llmage')
     record_id = params_kw.get('id')
-    action = params_kw.get('status')
     if not record_id:
         result['message'] = '缺少id'
     elif action not in ('published', 'unpublished'):
