@@ -20,6 +20,6 @@ return {
 	"widgettype": "Text",
 	"options": {
 		"otext": result['message'],
-		"i18n": true
+		"i18n": True
 	}
 }
