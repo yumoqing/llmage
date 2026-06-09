@@ -1,99 +1,93 @@
-#!/usr/bin/env python3
-import json
-import asyncio
-
 result = {'success': False, 'rows': [], 'total': 0, 'page': 1, 'page_size': 10}
 
 try:
-    dbname = get_module_dbname('llmage')
-    userid = await get_user()
+	dbname = get_module_dbname('llmage')
+	userid = await get_user()
 
-    page = int(params_kw.get('page', 1))
-    page_size = int(params_kw.get('pagerows', 10))
-    llmcatelogid = params_kw.get('llmcatelogid')
+	page = int(params_kw.get('page', 1))
+	page_size = int(params_kw.get('pagerows', 10))
+	llmcatelogid = params_kw.get('llmcatelogid')
 
-    async with DBPools().sqlorContext(dbname) as sor:
-        # Build filter conditions
-        conditions = ["userid = ${userid}$"]
-        ns = {'userid': userid}
+	async with DBPools().sqlorContext(dbname) as sor:
+		# Build filter conditions
+		conditions = ["userid = ${userid}$"]
+		ns = {'userid': userid}
+		if llmcatelogid:
+			conditions.append("llmid in (select llmid from llm_api_map where llmcatelogid = ${llmcatelogid}$)")
+			ns['llmcatelogid'] = llmcatelogid
 
-        if llmcatelogid:
-            conditions.append("llmid in (select llmid from llm_api_map where llmcatelogid = ${llmcatelogid}$)")
-            ns['llmcatelogid'] = llmcatelogid
+		where_clause = " and ".join(conditions)
+		# Count total from both tables (并行两个 count 查询)
+		sql1 = f"select count(*) as cnt from llmusage where {where_clause}"
+		sql2 = f"select count(*) as cnt from llmusage_history where {where_clause}"
+		cnt1_recs = await sor.sqlExe(sql1, ns.copy())
+		cnt2_recs = await sor.sqlExe(sql2, ns.copy())
+		total = (cnt1_recs[0].cnt if cnt1_recs else 0) + (cnt2_recs[0].cnt if cnt2_recs else 0)
+		# 优化点 1: 分别查询两张表, 让各自走 (userid, use_time) 复合索引
+		# 每表取前 offset+page_size 条 (已按 use_time desc 排好)
+		offset = (page - 1) * page_size
+		fetch = offset + page_size
+		select_cols = ("id, llmid, use_date, use_time, userid, usages, ioinfo, "
+					   "status, taskid, amount, cost, userorgid, accounting_status")
 
-        where_clause = " and ".join(conditions)
+		q1 = f"select {select_cols} from llmusage where {where_clause} order by use_time desc limit {fetch}"
+		q2 = f"select {select_cols} from llmusage_history where {where_clause} order by use_time desc limit {fetch}"
+		recs1 = await sor.sqlExe(q1, ns)
+		recs2 = await sor.sqlExe(q2, ns)
 
-        # Count total from both tables (并行两个 count 查询)
-        count_sql = f"select count(*) as cnt from {{table}} where {where_clause}"
-        cnt1_recs, cnt2_recs = await asyncio.gather(
-            sor.sqlExe(count_sql.format(table='llmusage'), ns),
-            sor.sqlExe(count_sql.format(table='llmusage_history'), ns),
-        )
-        total = (cnt1_recs[0].cnt if cnt1_recs else 0) + (cnt2_recs[0].cnt if cnt2_recs else 0)
+		# 优化点 2: Python 归并两个已排序序列 (O(n) 比 SQL UNION+sort 快)
+		merged = []
+		i = j = 0
+		rows1 = [dict(r) for r in (recs1 or [])]
+		rows2 = [dict(r) for r in (recs2 or [])]
+		while i < len(rows1) and j < len(rows2):
+			if (rows1[i].get('use_time') or '') >= (rows2[j].get('use_time') or ''):
+				merged.append(rows1[i]); i += 1
+			else:
+				merged.append(rows2[j]); j += 1
+		merged.extend(rows1[i:])
+		merged.extend(rows2[j:])
 
-        # 优化点 1: 分别查询两张表, 让各自走 (userid, use_time) 复合索引
-        # 每表取前 offset+page_size 条 (已按 use_time desc 排好)
-        offset = (page - 1) * page_size
-        fetch = offset + page_size
-        select_cols = ("id, llmid, use_date, use_time, userid, usages, ioinfo, "
-                       "status, taskid, amount, cost, userorgid, accounting_status")
+		# 应用分页
+		page_rows = merged[offset:offset + page_size]
 
-        q1 = f"select {select_cols} from llmusage where {where_clause} order by use_time desc limit {fetch}"
-        q2 = f"select {select_cols} from llmusage_history where {where_clause} order by use_time desc limit {fetch}"
-        recs1, recs2 = await asyncio.gather(
-            sor.sqlExe(q1, ns),
-            sor.sqlExe(q2, ns),
-        )
+		# 优化点 3: 并发读取 ioinfo 文件 (不再串行 await)
+		import aiofiles
+		from ahserver.filestorage import FileStorage
+		fs = FileStorage()
 
-        # 优化点 2: Python 归并两个已排序序列 (O(n) 比 SQL UNION+sort 快)
-        merged = []
-        i = j = 0
-        rows1 = [dict(r) for r in (recs1 or [])]
-        rows2 = [dict(r) for r in (recs2 or [])]
-        while i < len(rows1) and j < len(rows2):
-            if (rows1[i].get('use_time') or '') >= (rows2[j].get('use_time') or ''):
-                merged.append(rows1[i]); i += 1
-            else:
-                merged.append(rows2[j]); j += 1
-        merged.extend(rows1[i:])
-        merged.extend(rows2[j:])
+		async def _load_io(row):
+			webpath = row.get('ioinfo')
+			io_content = None
+			if webpath:
+				try:
+					real_path = fs.realPath(webpath)
+					async with aiofiles.open(real_path, 'rb') as f:
+						bin_data = await f.read()
+					io_content = json.loads(bin_data.decode('utf-8'))
+				except Exception:
+					io_content = None
+			row['io_content'] = io_content
+			if isinstance(row.get('usages'), str):
+				try:
+					row['usages'] = json.loads(row['usages'])
+				except Exception:
+					pass
+			return row
 
-        # 应用分页
-        page_rows = merged[offset:offset + page_size]
-
-        # 优化点 3: 并发读取 ioinfo 文件 (不再串行 await)
-        import aiofiles
-        from ahserver.filestorage import FileStorage
-        fs = FileStorage()
-
-        async def _load_io(row):
-            webpath = row.get('ioinfo')
-            io_content = None
-            if webpath:
-                try:
-                    real_path = fs.realPath(webpath)
-                    async with aiofiles.open(real_path, 'rb') as f:
-                        bin_data = await f.read()
-                    io_content = json.loads(bin_data.decode('utf-8'))
-                except Exception:
-                    io_content = None
-            row['io_content'] = io_content
-            if isinstance(row.get('usages'), str):
-                try:
-                    row['usages'] = json.loads(row['usages'])
-                except Exception:
-                    pass
-            return row
-
-        rows = await asyncio.gather(*[_load_io(r) for r in page_rows])
-
-        result['rows'] = list(rows)
-        result['total'] = total
-        result['page'] = page
-        result['page_size'] = page_size
-        result['success'] = True
+		rows = []
+		for r in page_rows:
+			d = await _load_io(r)
+			rows.append(d)
+		result['rows'] = list(rows)
+		result['total'] = total
+		result['page'] = page
+		result['page_size'] = page_size
+		result['success'] = True
 
 except Exception as e:
-    result['error'] = str(e)
+	exception(f'{e}{format_exc()}')
+	result['error'] = str(e)
 
 return json.dumps(result, ensure_ascii=False, default=str)
+
