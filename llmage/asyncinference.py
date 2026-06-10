@@ -75,7 +75,8 @@ async def async_uapi_request(request, llm,
 			estr = erase_apikey(e)
 			ed = {"error": f"ERROR:{estr}", "status": "FAILED"}
 			exception(f'{ed}')
-			yield f'{ed}\n'
+			estr = json.dumps(ed, ensure_ascii=False)
+			yield f'{estr}\n'
 			return
 		if isinstance(b, bytes):
 			b = b.decode('utf-8')
