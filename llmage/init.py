@@ -9,6 +9,8 @@ from .utils import (
 	llm_query_orders,
 	read_webpath,
 	llm_query_price,
+	get_user_tpac,
+	get_tpac_balance,
 	get_llm_by_model,
 	get_llms_by_catelog,
 	get_llms_sort_by_provider,
@@ -65,6 +67,8 @@ def load_llmage():
 	env.get_llmage_llm = get_llmage_llm
 	env.invalidate_uapi_cache = invalidate_uapi_cache
 	env.inference = inference
+	env.get_user_tpac = get_user_tpac
+	env.get_tpac_balance = get_tpac_balance
 	env.inference_generator = inference_generator
 	env.get_llms_by_catelog = get_llms_by_catelog
 	env.get_llmcatelogs = get_llmcatelogs
