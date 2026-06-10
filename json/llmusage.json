@@ -9,6 +9,7 @@
         },
         "editexclouded": ["id"],
         "editable": {
+			"get_data_url": "{{entire_url(‘get_llmusage.dspy')}}?pagerows=50",
             "new_data_url": "{{entire_url('../api/llmusage_create.dspy')}}",
             "update_data_url": "{{entire_url('../api/llmusage_update.dspy')}}",
             "delete_data_url": "{{entire_url('../api/llmusage_delete.dspy')}}"
