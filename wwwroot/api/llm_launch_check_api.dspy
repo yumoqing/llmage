@@ -46,7 +46,7 @@ if action == 'check':
 			select a.*, e.ioid, e.stream
 			from llm a
 			join upapp c on a.upappid = c.id
-			join uapi e on c.apisetid = e.apisetid and a.apiname = e.name
+			join uapi e on c.id = e.upappid and a.apiname = e.name
 			where a.id=${llmid}$""", {'llmid': llmid})
 		if recs:
 			await add_check('API映射(uapi)', True, f'ioid={recs[0].ioid}, stream={recs[0].stream}')
