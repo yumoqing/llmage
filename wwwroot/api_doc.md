@@ -494,6 +494,52 @@ GET /llmage/v1/models
 
 ---
 
+## GET /v1/pricing
+
+获取模型定价展示信息。
+
+### 必填参数
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `model` | string | 模型名称，如 `"qwen3.7-max"` |
+
+### 可选参数
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `catelogid` | string | 目录类型ID，默认 `"t2t"` |
+
+### 请求示例
+
+```
+GET /llmage/v1/pricing?model=qwen3.7-max
+```
+
+### 响应格式
+
+```json
+{
+    "status": "ok",
+    "data": {
+        "ppid": "pp_xxx",
+        "name": "qwen3.7-max",
+        "pricing_type": "per_use",
+        "display_text": "【通义千问 qwen3.7-max】定价:\n  - 输入Token: 12 元/百万 [模型=qwen3.7-max]\n  - 输出Token: 48 元/百万 [模型=qwen3.7-max]",
+        "items": [...]
+    }
+}
+```
+
+### 错误响应
+
+| 状态 | 说明 |
+|------|------|
+| error | 缺少 model 参数 |
+| error | 模型不存在或无定价配置 |
+
+---
+
 ## 通用说明
 
 ### catelogid 目录类型ID对照表
