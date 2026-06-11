@@ -361,6 +361,18 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 		return d
 	return []
 	
+async def get_llmcatelogid(llmid):
+    """Get the first llmcatelogid for a given llmid from llm_api_map"""
+    if not llmid:
+        return None
+    llmage_dbname = get_serverenv('get_module_dbname')('llmage')
+    async with DBPools().sqlorContext(llmage_dbname) as sor:
+        recs = await sor.sqlExe("select llmcatelogid from llm_api_map where llmid=${llmid}$ limit 1", {'llmid': llmid})
+        if recs:
+            return recs[0].llmcatelogid
+    return None
+
+
 async def get_llm(llmid, catelogid=None):
     """Get LLM with full uapi info for vendor API calls.
     Refactored to use get_llmage_llm() + cached uapi/uapiio lookups

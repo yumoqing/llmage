@@ -19,6 +19,7 @@ from .utils import (
 	get_llmproviders,
 	get_llm,
 	get_llmage_llm,
+	get_llmcatelogid,
 	invalidate_uapi_cache,
 )
 
@@ -65,6 +66,7 @@ def load_llmage():
 	env.query_task_status = query_task_status
 	env.get_llm = get_llm
 	env.get_llmage_llm = get_llmage_llm
+	env.get_llmcatelogid = get_llmcatelogid
 	env.invalidate_uapi_cache = invalidate_uapi_cache
 	env.inference = inference
 	env.get_user_tpac = get_user_tpac

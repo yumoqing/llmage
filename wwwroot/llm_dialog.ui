@@ -6,6 +6,7 @@
 {% set llm = get_llm(params_kw.id) %}
 {% set oops=debug(json.dumps(llm, ensure_ascii=Fasle)) %}
 {% set kdbs = get_user_kdbs(request) %}
+{% set llmcatelogid = get_llmcatelogid(params_kw.id) %}
 {% if llm %}
 {
 	"widgettype":"LlmIO",
@@ -18,7 +19,7 @@
 		"kdb_setting":{},
 		"get_kdb_url": "{{entire_url('/rag/get_my_kdbs.dspy')}}",
 {% endif %}
-		"list_models_url":"{{entire_url('list_paging_catelog_llms.dspy')}}",
+		"list_models_url":"{{entire_url('list_paging_catelog_llms.dspy')}}{% if llmcatelogid %}?llmcatelogid={{llmcatelogid}}{% endif %}",
 		"estimate_url":"{{entire_url('model_estimate.dspy')}}",
 		"input_fields":{{llm.input_fields}},
 		"models":[
