@@ -19,10 +19,10 @@ join llmcatelog b on m.llmcatelogid = b.id
 join upapp c on a.upappid = c.id
 join uapi e on c.id = e.upappid and m.apiname = e.name
 where a.status = 'published'
+	and m.llmcatelogid = ${llmcatelogid}$
 ) x left join historyformat y on x.hfid = y.id
     left join uapiio z on x.ioid = z.id
-where m.llmcatelogid = ${llmcatelogid}$
-	and x.id != ${llmid}$
+where x.id != ${llmid}$
 """
 	ns = params_kw.copy()
 	ns.page = page
