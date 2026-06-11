@@ -6,6 +6,17 @@ page = int(params_kw.get('page', 1))
 dbname = get_module_dbname('llmage')
 db = DBPools()
 async with db.sqlorContext(dbname) as sor:
+	# If llmcatelogid not provided, derive it from llmid via llm_api_map
+	llmcatelogid = params_kw.get('llmcatelogid')
+	if not llmcatelogid:
+		llmid = params_kw.get('llmid')
+		if llmid:
+			recs = await sor.sqlExe("select llmcatelogid from llm_api_map where llmid=${llmid}$ limit 1", {'llmid': llmid})
+			if recs:
+				llmcatelogid = recs[0].llmcatelogid
+	if not llmcatelogid:
+		return {}
+	params_kw.llmcatelogid = llmcatelogid
 	sql = """select x.*,
 z.input_fields,
 y.system_message,
