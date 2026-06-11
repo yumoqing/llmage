@@ -258,9 +258,14 @@ where 1=1
 """
 		ns = {}
 		if llmid:
-			sql += " and a.id = ${llmid}$ and m.isdefaultcatelog = '1'"
+			sql += " and a.id = ${llmid}$"
 			ns['llmid'] = llmid
-		if catelogid:
+			if catelogid:
+				sql += " and m.llmcatelogid = ${catelogid}$"
+				ns['catelogid'] = catelogid
+			else:
+				sql += " and m.isdefaultcatelog = '1'"
+		elif catelogid:
 			sql += " and m.llmcatelogid = ${catelogid}$"
 			ns['catelogid'] = catelogid
 		sql += " order by m.llmcatelogid, a.id"

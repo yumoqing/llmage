@@ -33,14 +33,18 @@ where a.status = 'published'
 	and m.llmcatelogid = ${llmcatelogid}$
 ) x left join historyformat y on x.hfid = y.id
     left join uapiio z on x.ioid = z.id
-where x.id != ${llmid}$
+where 1=1
 """
+	llmid = params_kw.get('llmid')
+	if llmid:
+		sql += " and x.id != ${llmid}$"
 	ns = params_kw.copy()
 	ns.page = page
 	ns.pagerows = pagerows
 	recs = await sor.sqlPaging(sql, ns)
 	for r in recs.get('rows', []):
 		r.llmid = r.id
+		r.llmcatelogid = llmcatelogid
 		r.modelname = r.name
 		r.description = ''.join(''.join(r.description.split('\n')).split('\r'))
 		r.response_mode = r.stream
