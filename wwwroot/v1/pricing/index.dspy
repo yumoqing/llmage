@@ -1,0 +1,34 @@
+# GET /llmage/v1/pricing
+# Get model pricing display information
+# Required params: model (model name, e.g. qwen3.7-max)
+# Optional params: catelogid (default: t2t)
+#
+# Example: /llmage/v1/pricing?model=qwen3.7-max
+# Returns: { "status": "ok", "data": { "display_text": "...", ... } }
+
+model = params_kw.model
+if not model:
+	return json.dumps({"status": "error", "message": "model parameter required"}, ensure_ascii=False)
+
+catelogid = params_kw.catelogid or 't2t'
+env = request._run_ns
+
+try:
+	async with get_sor_context(env, 'llmage') as sor:
+		sql = """select m.ppid from llm a
+	join llm_api_map m on a.id = m.llmid
+	where a.model = ${model}$
+		and a.status = 'published'
+		and m.ppid is not null
+		and m.isdefaultcatelog = '1'
+	"""
+		recs = await sor.sqlExe(sql, {'model': model})
+		if len(recs) == 0:
+			return json.dumps({"status": "error", "message": f"model '{model}' not found or has no pricing"}, ensure_ascii=False)
+		ppid = recs[0].ppid
+
+	result = await env.get_pricing_display(ppid)
+	return json.dumps({"status": "ok", "data": result}, ensure_ascii=False, default=str)
+except Exception as e:
+	exception(f'get pricing for {model} failed: {e}\n{format_exc()}')
+	return json.dumps({"status": "error", "message": str(e)}, ensure_ascii=False)
