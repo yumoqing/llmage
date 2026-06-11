@@ -116,8 +116,9 @@ async def _inference_generator(request, callerid, callerorgid,
 	if not params_kw.transno:
 		params_kw.transno = getID()
 	llmid = params_kw.llmid
+	catelogid = params_kw.get('llmcatelogid', None)
 	f = None
-	llm = await get_llm(llmid)
+	llm = await get_llm(llmid, catelogid)
 	if llm is None:
 		errmsg = f'{{"status": "FAILED", "error":"llmid:{llmid}没找到模型"}}\n'
 		exception(errmsg)

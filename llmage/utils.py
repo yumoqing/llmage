@@ -361,16 +361,21 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 		return d
 	return []
 	
-async def get_llmcatelogid(llmid):
-    """Get the first llmcatelogid for a given llmid from llm_api_map"""
+async def get_llm_catelogs(llmid):
+    """Get all catelog entries for a given llmid from llm_api_map + llmcatelog.
+    Returns list of {catelogid, catelogname, isdefaultcatelog}
+    """
     if not llmid:
-        return None
+        return []
     llmage_dbname = get_serverenv('get_module_dbname')('llmage')
     async with DBPools().sqlorContext(llmage_dbname) as sor:
-        recs = await sor.sqlExe("select llmcatelogid from llm_api_map where llmid=${llmid}$ limit 1", {'llmid': llmid})
-        if recs:
-            return recs[0].llmcatelogid
-    return None
+        sql = """select m.llmcatelogid as catelogid, lc.name as catelogname, m.isdefaultcatelog
+from llm_api_map m
+join llmcatelog lc on m.llmcatelogid = lc.id
+where m.llmid = ${llmid}$
+order by m.isdefaultcatelog desc"""
+        recs = await sor.sqlExe(sql, {'llmid': llmid})
+        return [dict(catelogid=r.catelogid, catelogname=r.catelogname, isdefault=r.isdefaultcatelog == '1') for r in recs]
 
 
 async def get_llm(llmid, catelogid=None):

@@ -3,11 +3,82 @@
 {% set userorgid = get_userorgid() %}
 {% if params_kw.id %}
 {% if checkCustomerBalance(params_kw.id, userid, userorgid) %}
-{% set llm = get_llm(params_kw.id) %}
-{% set oops=debug(json.dumps(llm, ensure_ascii=Fasle)) %}
+{% set catelogs = get_llm_catelogs(params_kw.id) %}
+{% set active_catelogid = params_kw.get('catelogid', '') %}
+{% if not active_catelogid and catelogs %}
+{% for c in catelogs %}{% if c.isdefault %}{% set active_catelogid = c.catelogid %}{% endif %}{% endfor %}
+{% if not active_catelogid and catelogs %}{% set active_catelogid = catelogs[0].catelogid %}{% endif %}
+{% endif %}
+{% set llm = get_llm(params_kw.id, active_catelogid) %}
 {% set kdbs = get_user_kdbs(request) %}
-{% set llmcatelogid = get_llmcatelogid(params_kw.id) %}
 {% if llm %}
+{% if len(catelogs) > 1 %}
+{
+	"widgettype":"VBox",
+	"options":{
+		"width":"100%",
+		"height":"100%"
+	},
+	"subwidgets":[
+		{
+			"widgettype":"HBox",
+			"options":{
+				"cheight":3,
+				"css":"card",
+				"padding":"8px"
+			},
+			"subwidgets":[
+{% for c in catelogs %}
+				{
+					"widgettype":"Button",
+					"options":{
+						"label":"{{c.catelogname}}",
+						"actiontype":"link",
+{% if c.catelogid == active_catelogid %}
+						"css":"primary",
+{% endif %}
+						"url":"{{entire_url('/llmage/llm_dialog.ui')}}?id={{params_kw.id}}&catelogid={{c.catelogid}}"
+					}
+				}{% if not loop.last %},{% endif %}
+{% endfor %}
+			]
+		},
+		{
+			"widgettype":"LlmIO",
+			"options":{
+				"width":"100%",
+				"height":"100%",
+				"title":"{{llm.name}}",
+{% if len(kdbs) > 0 %}
+				"enabled_kdb": true,
+				"kdb_setting":{},
+				"get_kdb_url": "{{entire_url('/rag/get_my_kdbs.dspy')}}",
+{% endif %}
+				"list_models_url":"{{entire_url('list_paging_catelog_llms.dspy')}}?llmcatelogid={{active_catelogid}}",
+				"estimate_url":"{{entire_url('model_estimate.dspy')}}",
+				"input_fields":{{llm.input_fields}},
+				"models":[
+					{
+						"llmid":"{{llm.id}}",
+						"llmcatelogid":"{{active_catelogid}}",
+						"response_mode": "{{llm.stream}}",
+						"icon":"{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}",
+						"url":"{{entire_url('/llmage/llminference.dspy')}}",
+{% if llm.stream == 'stream' %}
+						"stream": true,
+{% endif %}
+{% if llm.stream =='async' %}
+						"query_url": "{{entire_url('/llmage/tasks')}}",
+{% endif %}
+						"model":"{{llm.model}}",
+						"modelname":"{{llm.name}}"
+					}
+				]
+			}
+		}
+	]
+}
+{% else %}
 {
 	"widgettype":"LlmIO",
 	"options":{
@@ -19,12 +90,15 @@
 		"kdb_setting":{},
 		"get_kdb_url": "{{entire_url('/rag/get_my_kdbs.dspy')}}",
 {% endif %}
-		"list_models_url":"{{entire_url('list_paging_catelog_llms.dspy')}}{% if llmcatelogid %}?llmcatelogid={{llmcatelogid}}{% endif %}",
+		"list_models_url":"{{entire_url('list_paging_catelog_llms.dspy')}}{% if active_catelogid %}?llmcatelogid={{active_catelogid}}{% endif %}",
 		"estimate_url":"{{entire_url('model_estimate.dspy')}}",
 		"input_fields":{{llm.input_fields}},
 		"models":[
 			{
 				"llmid":"{{llm.id}}",
+{% if active_catelogid %}
+				"llmcatelogid":"{{active_catelogid}}",
+{% endif %}
 				"response_mode": "{{llm.stream}}",
 				"icon":"{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}",
 				"url":"{{entire_url('/llmage/llminference.dspy')}}",
@@ -40,6 +114,7 @@
 		]
 	}
 }
+{% endif %}
 {% else %}
 {
 	"widgettype":"Text",
