@@ -172,6 +172,7 @@ PATHS_LOGINED = [
     f"/{MOD}/v1/music/generations/index.dspy",
     f"/{MOD}/v1/audio/speech/index.dspy",
     f"/{MOD}/v1/audio/transcriptions/index.dspy",
+    f"/{MOD}/v1/pricing/index.dspy",
 
     # 其他子目录
     f"/{MOD}/list_llmcatelogs/index.dspy",
@@ -194,6 +195,7 @@ PATHS_V1_CUSTOMER = [
     f"/{MOD}/v1/music/generations/index.dspy",
     f"/{MOD}/v1/audio/speech/index.dspy",
     f"/{MOD}/v1/audio/transcriptions/index.dspy",
+    f"/{MOD}/v1/pricing/index.dspy",
     f"/{MOD}/v1/models/index.dspy",
     f"/{MOD}/v1/tasks/index.dspy",
 ]
