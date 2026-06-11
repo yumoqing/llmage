@@ -45,8 +45,9 @@ if action == 'check':
 		recs = await sor.sqlExe("""
 			select a.*, e.ioid, e.stream
 			from llm a
+			join llm_api_map m on a.id = m.llmid
 			join upapp c on a.upappid = c.id
-			join uapi e on c.id = e.upappid and a.apiname = e.name
+			join uapi e on c.id = e.upappid and m.apiname = e.name
 			where a.id=${llmid}$""", {'llmid': llmid})
 		if recs:
 			await add_check('API映射(uapi)', True, f'ioid={recs[0].ioid}, stream={recs[0].stream}')

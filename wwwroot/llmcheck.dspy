@@ -24,8 +24,9 @@ where a.id=${llmid}$
 
 	sql = """select a.*, e.ioid, e.stream
 from llm a
+join llm_api_map m on a.id = m.llmid
 join upapp c on a.upappid = c.id
-join uapi e on c.id = e.upappid and a.apiname = e.name
+join uapi e on c.id = e.upappid and m.apiname = e.name
 where a.id=${llmid}$
 	and a.expired_date > ${today}$
 	and a.enabled_date <= ${today}$"""
@@ -38,8 +39,9 @@ where a.id=${llmid}$
 
 	sql = """select a.*, e.ioid, e.stream
 from llm a
+join llm_api_map m on a.id = m.llmid
 join upapp c on a.upappid = c.id
-join uapi e on c.id = e.upappid and a.apiname = e.name
+join uapi e on c.id = e.upappid and m.apiname = e.name
 join uapiio b on e.ioid = b.id
 where a.id=${llmid}$
 	and a.expired_date > ${today}$
