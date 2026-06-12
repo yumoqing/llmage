@@ -75,7 +75,7 @@
                                 "wid": "self",
                                 "event": "click",
                                 "actiontype": "script",
-                                "target": "failed_table",
+                                "target": "body.failed_table",
                                 "script": "var root = bricks.app.root; var sd = bricks.getWidgetById('start_date', root); var ed = bricks.getWidgetById('end_date', root); var hf = bricks.getWidgetById('handled_filter', root); var params = {}; if(hf && hf.getValue()) params.handled = hf.getValue(); if(sd && sd.getValue()) params.start_date = sd.getValue(); if(ed && ed.getValue()) params.end_date = ed.getValue(); await this.render(params);"
                             }]
                         }
