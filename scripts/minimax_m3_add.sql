@@ -10,7 +10,7 @@
 -- 1. 新增 uapi: minimax t2t (纯文本对话, OpenAI兼容)
 --    复用ioid: Is8l4TGkcZcqFSjbbeIK2 (文本会话, 共享)
 -- ============================================================
-INSERT INTO `uapi` (`id`, `name`, `need_auth`, `stream`, `path`, `httpmethod`, `chunk_match`, `headers`, `params`, `data`, `response`, `ioid`, `callbackurl`, `upappid`)
+REPLACE INTO `uapi` (`id`, `name`, `need_auth`, `stream`, `path`, `httpmethod`, `chunk_match`, `headers`, `params`, `data`, `response`, `ioid`, `callbackurl`, `upappid`)
 VALUES (
   'mm_minimax_t2t',
   't2t',
@@ -88,7 +88,7 @@ VALUES (
 -- 2. 新增 uapi: minimax tm2t (多模态对话, 支持图片/视频/音频)
 --    复用ioid: t-ujII59ku45tIPcdXu4O (文本媒体转文本, 共享)
 -- ============================================================
-INSERT INTO `uapi` (`id`, `name`, `need_auth`, `stream`, `path`, `httpmethod`, `chunk_match`, `headers`, `params`, `data`, `response`, `ioid`, `callbackurl`, `upappid`)
+INSERT IGNORE INTO `uapi` (`id`, `name`, `need_auth`, `stream`, `path`, `httpmethod`, `chunk_match`, `headers`, `params`, `data`, `response`, `ioid`, `callbackurl`, `upappid`)
 VALUES (
   'mm_minimax_tm2t',
   'tm2t',
@@ -168,7 +168,7 @@ VALUES (
 -- ============================================================
 -- 3. 新增 llm: MiniMax-M3
 -- ============================================================
-INSERT INTO `llm` (`id`, `name`, `model`, `description`, `iconid`, `upappid`, `providerid`, `ownerid`, `enabled_date`, `expired_date`, `min_balance`, `status`)
+INSERT IGNORE INTO `llm` (`id`, `name`, `model`, `description`, `iconid`, `upappid`, `providerid`, `ownerid`, `enabled_date`, `expired_date`, `min_balance`, `status`)
 VALUES (
   'mm3_MiniMax_M3',
   'MiniMax M3',
@@ -187,7 +187,7 @@ VALUES (
 -- ============================================================
 -- 4. 新增 llm: MiniMax-M2.7-highspeed
 -- ============================================================
-INSERT INTO `llm` (`id`, `name`, `model`, `description`, `iconid`, `upappid`, `providerid`, `ownerid`, `enabled_date`, `expired_date`, `min_balance`, `status`)
+INSERT IGNORE INTO `llm` (`id`, `name`, `model`, `description`, `iconid`, `upappid`, `providerid`, `ownerid`, `enabled_date`, `expired_date`, `min_balance`, `status`)
 VALUES (
   'mm_m27_highspeed',
   'MiniMax M2.7 Highspeed',
@@ -207,7 +207,7 @@ VALUES (
 -- 5. 新增 llm_api_map: MiniMax-M3 (t2t)
 --    apiname='t2t' → 匹配 uapi name='t2t' + upappid='minimax'
 -- ============================================================
-INSERT INTO `llm_api_map` (`id`, `llmid`, `llmcatelogid`, `apiname`, `query_apiname`, `query_period`, `ppid`, `isdefaultcatelog`)
+INSERT IGNORE INTO `llm_api_map` (`id`, `llmid`, `llmcatelogid`, `apiname`, `query_apiname`, `query_period`, `ppid`, `isdefaultcatelog`)
 VALUES (
   'mm3_map_t2t',
   'mm3_MiniMax_M3',
@@ -222,7 +222,7 @@ VALUES (
 -- ============================================================
 -- 6. 新增 llm_api_map: MiniMax-M3 (tm2t, 多模态)
 -- ============================================================
-INSERT INTO `llm_api_map` (`id`, `llmid`, `llmcatelogid`, `apiname`, `query_apiname`, `query_period`, `ppid`, `isdefaultcatelog`)
+INSERT IGNORE INTO `llm_api_map` (`id`, `llmid`, `llmcatelogid`, `apiname`, `query_apiname`, `query_period`, `ppid`, `isdefaultcatelog`)
 VALUES (
   'mm3_map_tm2t',
   'mm3_MiniMax_M3',
@@ -237,7 +237,7 @@ VALUES (
 -- ============================================================
 -- 7. 新增 llm_api_map: MiniMax-M2.7-highspeed (t2t)
 -- ============================================================
-INSERT INTO `llm_api_map` (`id`, `llmid`, `llmcatelogid`, `apiname`, `query_apiname`, `query_period`, `ppid`, `isdefaultcatelog`)
+INSERT IGNORE INTO `llm_api_map` (`id`, `llmid`, `llmcatelogid`, `apiname`, `query_apiname`, `query_period`, `ppid`, `isdefaultcatelog`)
 VALUES (
   'mm_m27hs_map_t2t',
   'mm_m27_highspeed',
@@ -280,7 +280,7 @@ WHERE `llmid` = 'Si2g0XJ9ym3P5jlrdmcfB' AND (`ppid` IS NULL OR `ppid` = '');
 -- ============================================================
 -- 9. 新增 pricing_program: MiniMax TTS定价 (元/万字符)
 -- ============================================================
-INSERT INTO `pricing_program` (`id`, `name`, `ownerid`, `providerid`, `pricing_belong`, `discount`, `description`, `pricing_spec`)
+INSERT IGNORE INTO `pricing_program` (`id`, `name`, `ownerid`, `providerid`, `pricing_belong`, `discount`, `description`, `pricing_spec`)
 VALUES (
   'mm_tts_pricing',
   'MiniMax语音合成定价',
@@ -295,7 +295,7 @@ VALUES (
 -- ============================================================
 -- 10. 新增 pricing_program_timing: MiniMax TTS
 -- ============================================================
-INSERT INTO `pricing_program_timing` (`id`, `ppid`, `name`, `enabled_date`, `expired_date`, `pricing_data`)
+INSERT IGNORE INTO `pricing_program_timing` (`id`, `ppid`, `name`, `enabled_date`, `expired_date`, `pricing_data`)
 VALUES (
   'mm_tts_timing',
   'mm_tts_pricing',
