@@ -306,8 +306,20 @@ VALUES (
 );
 
 -- ============================================================
--- 11. 更新 5jmzup timing: 添加 MiniMax-M3 定价
+-- 11a. 更新 5jmzup fields: 添加 prompt_tokens 字段定义
+--      用于分段定价的 range filter，需要 value_mode: between
+-- ============================================================
+UPDATE `pricing_program_timing`
+SET `pricing_data` = REPLACE(`pricing_data`, 
+  '  model:\n    type: string\n    role: filter\n    label: model',
+  '  model:\n    type: string\n    role: filter\n    label: model\n  prompt_tokens:\n    type: int\n    role: filter\n    label: prompt_tokens\n    value_mode: between')
+WHERE `ppid` = '5jmzupARABxkDFwUraFiQ' AND `enabled_date` = '2026-04-12';
+
+-- ============================================================
+-- 11b. 更新 5jmzup timing: 添加 MiniMax-M3 分段定价
 --     M3 ≤512K永久五折: 输入2.1/输出8.4/缓存0.42 元/百万tokens
+--     M3 512K~1M: 输入4.2/输出16.8/缓存0.84
+--     使用 prompt_tokens range filter 区分两个计价段
 -- ============================================================
 UPDATE `pricing_program_timing`
 SET `pricing_data` = CONCAT(`pricing_data`, '
@@ -316,16 +328,43 @@ SET `pricing_data` = CONCAT(`pricing_data`, '
   unit: 百万
   filters:
   - model: MiniMax-M3
+    prompt_tokens: 0 =~ 524288
+    value_mode: between
 - price_factors: completion_tokens
   unit_prices: 8.4
   unit: 百万
   filters:
   - model: MiniMax-M3
+    prompt_tokens: 0 =~ 524288
+    value_mode: between
 - price_factors: cached_tokens
   unit_prices: 0.42
   unit: 百万
   filters:
   - model: MiniMax-M3
+    prompt_tokens: 0 =~ 524288
+    value_mode: between
+- price_factors: prompt_tokens
+  unit_prices: 4.2
+  unit: 百万
+  filters:
+  - model: MiniMax-M3
+    prompt_tokens: 524288 =~ 1048576
+    value_mode: between
+- price_factors: completion_tokens
+  unit_prices: 16.8
+  unit: 百万
+  filters:
+  - model: MiniMax-M3
+    prompt_tokens: 524288 =~ 1048576
+    value_mode: between
+- price_factors: cached_tokens
+  unit_prices: 0.84
+  unit: 百万
+  filters:
+  - model: MiniMax-M3
+    prompt_tokens: 524288 =~ 1048576
+    value_mode: between
 ')
 WHERE `ppid` = '5jmzupARABxkDFwUraFiQ' AND `enabled_date` = '2026-04-12';
 
