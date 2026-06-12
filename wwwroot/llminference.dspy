@@ -11,6 +11,8 @@ userorgid = await get_userorgid()
 if userid is None:
 	return UiError(title='llm inference', message='Please login first')
 f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
+if not f:
+	return UiError(title='llm inference', message='余额不足或模型未配置定价')
 kdbids = params_kw.kdbids
 if kdbids:
 	data = {
