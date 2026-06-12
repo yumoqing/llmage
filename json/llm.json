@@ -38,11 +38,15 @@
                 },
                 "providerid": {
                 	"uitype": "code",
-                	"dataurl": "{{entire_url('../api/get_search_providerid.dspy')}}"
+                	"dataurl": "{{entire_url('../api/get_search_providerid.dspy')}}",
+                	"valueField": "providerid",
+                	"textField": "providerid_text"
                 },
                 "upappid": {
                 	"uitype": "code",
-                	"dataurl": "{{entire_url('../api/get_search_upappid.dspy')}}"
+                	"dataurl": "{{entire_url('../api/get_search_upappid.dspy')}}",
+                	"valueField": "upappid",
+                	"textField": "upappid_text"
                 }
 			}
         },

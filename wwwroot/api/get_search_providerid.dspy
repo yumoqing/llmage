@@ -1,12 +1,12 @@
-result = [{'value': '', 'text': '全部'}]
+result = [{'providerid': '', 'providerid_text': '全部'}]
 
 try:
 	async with get_sor_context(request._run_ns, 'rbac') as sor:
 		orgs = await sor.sqlExe(
-			"select id as value, orgname as text from organization order by orgname",
+			"select id as providerid, orgname as providerid_text from organization order by orgname",
 			{}
 		)
-		return json.dumps([{'value': '', 'text': '全部'}] + list(orgs), ensure_ascii=False)
+		return json.dumps([{'providerid': '', 'providerid_text': '全部'}] + list(orgs), ensure_ascii=False)
 except Exception as e:
 	debug(f'get_search_providerid error: {e}')
 

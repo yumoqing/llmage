@@ -7,11 +7,15 @@
             "alters": {
                 "apiname": {
                     "uitype": "code",
-                    "dataurl": "{{entire_url('../api/get_search_apiname.dspy')}}?llmid={{params_kw.llmid}}"
+                    "dataurl": "{{entire_url('../api/get_search_apiname.dspy')}}?llmid={{params_kw.llmid}}",
+                    "valueField": "apiname",
+                    "textField": "apiname_text"
                 },
                 "query_apiname": {
                     "uitype": "code",
-                    "dataurl": "{{entire_url('../api/get_search_apiname.dspy?allow_empty=1')}}?llmid={{params_kw.llmid}}"
+                    "dataurl": "{{entire_url('../api/get_search_apiname.dspy?allow_empty=1')}}?llmid={{params_kw.llmid}}",
+                    "valueField": "apiname",
+                    "textField": "apiname_text"
                 }
             }
         },
