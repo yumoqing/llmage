@@ -26,7 +26,7 @@
 					"options":{
 						"css":"card plaza-card",
 						"cwidth":25,
-						"cheight":12
+						"cheight":16
 					},
 					"subwidgets":[
 						{
@@ -57,6 +57,25 @@
 								"wrap":true,
 								"halign":"left"
 							}
+						},
+						{
+							"widgettype":"Filler",
+							"options":{
+								"css":"pricing-box"
+							},
+							"subwidgets":[
+{% for pricing_text in llm.pricing_display %}
+								{
+									"widgettype":"Text",
+									"options":{
+										"text":{{json.dumps(pricing_text, ensure_ascii=False)}},
+										"wrap":true,
+										"halign":"left",
+										"css":"pricing-text"
+									}
+								}{% if not loop.last %},{% endif %}
+{% endfor %}
+							]
 						}
 					],
 					"binds":[

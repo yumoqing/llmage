@@ -353,6 +353,21 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 		cid = ''
 		x = None
 		for r in recs:
+			# 查询该模型的所有定价信息
+			pp_sql = """select distinct m.ppid 
+				from llm_api_map m 
+				where m.llmid = ${llmid}$ and m.ppid is not null"""
+			pp_recs = await sor.sqlExe(pp_sql, {'llmid': r.id})
+			
+			pricing_list = []
+			for pp in pp_recs:
+				try:
+					pd = await env.get_pricing_display(pp.ppid)
+					pricing_list.append(pd.get('display_text', ''))
+				except:
+					pass
+			r.pricing_display = pricing_list
+			
 			if cid != r.catelog_id:
 				x = {
 					'catelogid': r.catelog_id,

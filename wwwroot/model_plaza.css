@@ -103,3 +103,26 @@
 	line-height: 1.5;
 	opacity: 0.85;
 }
+
+/* Pricing display area */
+.pricing-box {
+	margin-top: 8px;
+	padding-top: 8px;
+	border-top: 1px solid var(--sage-border, #e2e8f0);
+	gap: 6px;
+}
+
+.pricing-text {
+	font-size: 0.85em;
+	line-height: 1.4;
+	opacity: 0.75;
+	white-space: pre-wrap;
+}
+
+[data-theme="dark"] .pricing-box {
+	border-top-color: #475569;
+}
+
+[data-theme="dark"] .pricing-text {
+	color: #94A3B8;
+}
