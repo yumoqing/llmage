@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-import json
-from datetime import datetime
-
 result = {'success': False, 'message': ''}
 
 try:
@@ -11,14 +7,12 @@ try:
         result['message'] = '缺少llmusageid参数'
     else:
         async with DBPools().sqlorContext(dbname) as sor:
-            # 1. 重置 llmusage 记账状态为 created，让后台循环重新处理
             await sor.U('llmusage', {
                 'id': luid,
                 'accounting_status': 'created'
             })
-            
-            # 2. 更新失败记录：标记已处理，增加重试次数
-            now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            now = curDateString() + ' ' + timestampstr().split(' ')[1] if ' ' not in curDateString() else curDateString()
             await sor.execute("""
                 UPDATE llmusage_accounting_failed 
                 SET handled = '1', 
@@ -27,10 +21,10 @@ try:
                     handled_note = CONCAT(IFNULL(handled_note, ''), '[', ${now}$, '] 触发重试; ')
                 WHERE llmusageid = ${luid}$
             """, {'luid': luid, 'now': now})
-            
+
             result['success'] = True
             result['message'] = '已重置为待记账状态，后台循环将重新处理'
 except Exception as e:
     result['message'] = str(e)
 
-return json.dumps(result, ensure_ascii=False, default=str)
+return json.dumps(result, ensure_ascii=False)

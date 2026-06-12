@@ -1,20 +1,14 @@
-#!/usr/bin/env python3
-import json
-import os
-
 result = {'success': False, 'rows': [], 'total': 0, 'page': 1, 'page_size': 50}
 
 try:
     dbname = get_module_dbname('llmage')
-    user_orgid = await get_userorgid()
 
-    # Extract filter parameters from params_kw
     filters = {}
     if params_kw.get('userorgid'):
         filters['userorgid'] = params_kw.get('userorgid')
     if params_kw.get('llmid'):
         filters['llmid'] = params_kw.get('llmid')
-    if params_kw.get('handled') is not None:
+    if params_kw.get('handled') is not None and params_kw.get('handled') != '':
         filters['handled'] = params_kw.get('handled')
     if params_kw.get('start_date'):
         filters['start_date'] = params_kw.get('start_date')
@@ -25,11 +19,9 @@ try:
     page_size = int(params_kw.get('page_size', 50))
 
     async with DBPools().sqlorContext(dbname) as sor:
-        # Build dynamic SQL
         conditions = []
         ns = {}
 
-        # Default: show unhandled records
         if 'handled' not in filters:
             conditions.append("handled='0'")
 
@@ -53,18 +45,22 @@ try:
         if conditions:
             where = "where " + " and ".join(conditions)
 
-        # Count total
         count_sql = f"select count(*) as cnt from llmusage_accounting_failed {where}"
         count_recs = await sor.sqlExe(count_sql, ns)
         total = count_recs[0].cnt if count_recs else 0
 
-        # Query with pagination
         offset = (page - 1) * page_size
         query_sql = f"""select * from llmusage_accounting_failed {where}
 order by failed_time desc limit {page_size} offset {offset}"""
         recs = await sor.sqlExe(query_sql, ns)
 
-        result['rows'] = [dict(r) for r in (recs or [])]
+        rows = []
+        for r in (recs or []):
+            d = dict(r)
+            d['handled'] = '已处理' if d.get('handled') == '1' else '未处理'
+            rows.append(d)
+
+        result['rows'] = rows
         result['total'] = total
         result['page'] = page
         result['page_size'] = page_size

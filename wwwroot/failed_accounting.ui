@@ -27,7 +27,7 @@
                     "options": {"spacing": 4},
                     "subwidgets": [
                         {"widgettype": "Text", "options": {"text": "开始日期", "fontSize": "12px"}},
-                        {"widgettype": "UiDate", "id": "start_date", "options": {"width": "150px"}}
+                        {"widgettype": "UiDate", "id": "start_date", "options": {"cwidth": 10}}
                     ]
                 },
                 {
@@ -35,7 +35,7 @@
                     "options": {"spacing": 4},
                     "subwidgets": [
                         {"widgettype": "Text", "options": {"text": "结束日期", "fontSize": "12px"}},
-                        {"widgettype": "UiDate", "id": "end_date", "options": {"width": "150px"}}
+                        {"widgettype": "UiDate", "id": "end_date", "options": {"cwidth": 10}}
                     ]
                 },
                 {
@@ -44,10 +44,10 @@
                     "subwidgets": [
                         {"widgettype": "Text", "options": {"text": "处理状态", "fontSize": "12px"}},
                         {
-                            "widgettype": "Combobox",
+                            "widgettype": "UiCode",
                             "id": "handled_filter",
                             "options": {
-                                "width": "120px",
+                                "cwidth": 8,
                                 "data": [
                                     {"value": "", "text": "全部"},
                                     {"value": "0", "text": "未处理"},
@@ -69,7 +69,7 @@
                                 "label": "查询",
                                 "bgcolor": "#1976d2",
                                 "color": "#ffffff",
-                                "width": "80px"
+                                "cwidth": 5
                             },
                             "binds": [{
                                 "wid": "self",
@@ -93,7 +93,7 @@
                                 "label": "重试",
                                 "bgcolor": "#4caf50",
                                 "color": "#ffffff",
-                                "width": "80px"
+                                "cwidth": 5
                             },
                             "binds": [{
                                 "wid": "self",
@@ -127,8 +127,7 @@
                     {"name": "failed_reason", "title": "失败原因", "width": "30%"},
                     {"name": "failed_time", "title": "失败时间", "width": "160px"},
                     {"name": "retry_count", "title": "重试次数", "width": "80px"},
-                    {"name": "handled", "title": "状态", "width": "80px",
-                     "formatter": "function(v){return v==='1'?'已处理':'未处理';}"}
+                    {"name": "handled", "title": "状态", "width": "80px"}
                 ]
             }
         }
