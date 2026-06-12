@@ -76,7 +76,7 @@
                                 "event": "click",
                                 "actiontype": "script",
                                 "target": "failed_table",
-                                "script": "var sd = this.root.getElementById('start_date'); var ed = this.root.getElementById('end_date'); var hf = this.root.getElementById('handled_filter'); var params = {handled: hf.value}; if(sd.value) params.start_date = sd.value; if(ed.value) params.end_date = ed.value; this.root.getElementById('failed_table').load(params);"
+                                "script": "var root = bricks.app.root; var sd = bricks.getWidgetById('start_date', root); var ed = bricks.getWidgetById('end_date', root); var hf = bricks.getWidgetById('handled_filter', root); var params = {}; if(hf && hf.getValue()) params.handled = hf.getValue(); if(sd && sd.getValue()) params.start_date = sd.getValue(); if(ed && ed.getValue()) params.end_date = ed.getValue(); await this.render(params);"
                             }]
                         }
                     ]
@@ -100,7 +100,7 @@
                                 "event": "click",
                                 "actiontype": "script",
                                 "target": "self",
-                                "script": "var dv = this.root.getElementById('failed_table'); var row = dv.selected_row || (dv.selected_rows && dv.selected_rows[0]); if(!row || !row.llmusageid) { alert('请先选中一条记录'); return; } var url = bricks.build_url ? bricks.build_url('/llmage/api/retry_accounting.dspy') : '/llmage/api/retry_accounting.dspy'; fetch(url + '?id=' + row.llmusageid).then(function(r){return r.json();}).then(function(d){ if(d.success) { alert(d.message); dv.load({}); } else { alert('失败: ' + d.message); } }).catch(function(e){ alert('请求异常: ' + e); });"
+                                "script": "var dv = bricks.getWidgetById('failed_table', bricks.app.root); if(!dv || !dv.select_row || !dv.select_row.user_data) { alert('请先选中一条记录'); return; } var row = dv.select_row.user_data; if(!row.llmusageid) { alert('记录缺少llmusageid'); return; } var resp = await fetch('{{entire_url('/llmage/api/retry_accounting.dspy')}}?id=' + row.llmusageid); var d = await resp.json(); if(d.success) { alert(d.message); await dv.render({}); } else { alert('失败: ' + d.message); }"
                             }]
                         }
                     ]
