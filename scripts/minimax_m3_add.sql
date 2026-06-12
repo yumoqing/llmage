@@ -3,29 +3,170 @@
 -- 生成时间: 2026-06-12
 -- 数据来源: token.opencomputing.cn 实时查询 (bugfix/execute_sql)
 -- 参考: qwen3.7-max (llm:u1EtkR9xRcmwMvdoCZRC8, ppid:5i1JIpqERgCWqKQ4DCegD)
+-- 接口: 使用uapi模块, upappid=minimax, baseurl=https://api.minimaxi.com/v1
 -- ============================================================
 
 -- ============================================================
--- 1. 新增 httpapi: MiniMax OpenAI兼容接口 (M3/M2.7-highspeed使用)
---    API地址由upapp.baseurl控制: https://api.minimaxi.com/v1/chat/completions
+-- 1. 新增 uapi: minimax t2t (纯文本对话, OpenAI兼容)
+--    复用ioid: Is8l4TGkcZcqFSjbbeIK2 (文本会话, 共享)
 -- ============================================================
-INSERT INTO `httpapi` (`id`, `apiname`, `label`, `providerid`, `apiinfo`, `apinote`, `use_session`, `response_mode`, `system_msg_format`, `user_msg_format`, `llm_msg_format`)
+INSERT INTO `uapi` (`id`, `name`, `need_auth`, `stream`, `path`, `httpmethod`, `chunk_match`, `headers`, `params`, `data`, `response`, `ioid`, `callbackurl`, `upappid`)
 VALUES (
-  'mm3_openai_t2t',
-  'minimax_openai t2t',
-  'MiniMax M3 OpenAI兼容',
+  'mm_minimax_t2t',
+  't2t',
   '0',
-  '{"response_mode":"stream", "use_session":true, "method":"POST", "chunk_match":"data: ", "headers":[ { "name":"Content-Type", "value":"application/json" }, { "name":"Authorization", "value":"Bearer ${apikey}" } ], "data":[ { "name":"model", "value":"${model}" }, { "name":"messages", "value":"${messages}" }, { "name":"stream", "value":true } ], "resp":[ { "name":"content", "value":"choices[0].delta.content" }, { "name":"usage", "value":"usage" } ] }',
-  'MiniMax M3/M2.7-highspeed OpenAI Chat Completions兼容API',
-  '1',
   'stream',
-  '',
-  '',
-  '{ "role":"user", "content":"${prompt}" }'
+  '/chat/completions',
+  'POST',
+  'data: ',
+  '{
+    "Authorization": "Bearer {{apikey}}",
+    "Content-Type": "application/json"
+}',
+  NULL,
+  '{
+{% if stream %}
+    "stream_options":{
+        "include_usage": true
+    },
+{% endif %}
+{% if tools %}
+    "tools": {{json.dumps(tools, ensure_ascii=False)}},
+{% endif %}
+{% if tool_choice %}
+    "tool_choice": "{{tool_choice}}",
+{% endif %}
+{% if messages %}
+    "messages": {{json.dumps(messages, ensure_ascii=False)}},
+{% else %}
+    "messages": [
+{% if sys_prompt %}
+        {
+            "role": "system",
+            "content": {{json.dumps(sys_prompt, ensure_ascii=False)}}
+        },
+{% endif %}
+        {
+            "role": "user",
+            "content": {{json.dumps(prompt, ensure_ascii=False)}}
+        }
+    ],
+{% endif %}
+{% if stream %}
+    "stream":true,
+{% endif %}
+    "model": "{{model}}"
+}
+',
+  '{
+    "id": "{{id}}",
+    "object": "{{object}}",
+    "created": {{created}},
+    "choices": {{json.dumps(choices, ensure_ascii=False)}},
+    "model": "{{model}}",
+{% if object == "chat.completion" %}
+    "reasoning_content": {{json.dumps(choices[0].message.reasoning_content, ensure_ascii=False)}},
+    "content":{{json.dumps(choices[0].message.content, ensure_ascii=False)}},
+{% elif len(choices)>0 %}
+    "reasoning_content": {{json.dumps(choices[0].delta.reasoning_content, ensure_ascii=False)}},
+    "content":{{json.dumps(choices[0].delta.content, ensure_ascii=False)}},
+{% endif %}
+{% if usage %}
+{% set usage1 = usage.update({"model": model}) %}
+    "finish": "1",
+    "usage":{{json.dumps(usage)}}
+{% else %}
+    "finish":"0"
+{% endif %}
+}',
+  'Is8l4TGkcZcqFSjbbeIK2',
+  NULL,
+  'minimax'
 );
 
 -- ============================================================
--- 2. 新增 llm: MiniMax-M3
+-- 2. 新增 uapi: minimax tm2t (多模态对话, 支持图片/视频/音频)
+--    复用ioid: t-ujII59ku45tIPcdXu4O (文本媒体转文本, 共享)
+-- ============================================================
+INSERT INTO `uapi` (`id`, `name`, `need_auth`, `stream`, `path`, `httpmethod`, `chunk_match`, `headers`, `params`, `data`, `response`, `ioid`, `callbackurl`, `upappid`)
+VALUES (
+  'mm_minimax_tm2t',
+  'tm2t',
+  '0',
+  'stream',
+  '/chat/completions',
+  'POST',
+  'data: ',
+  '{
+    "Authorization": "Bearer {{apikey}}",
+    "Content-Type": "application/json"
+}',
+  NULL,
+  '{
+    "model": "{{model}}",
+    "stream_options":{
+        "include_usage": true
+    },
+    "messages": [
+{% if sys_prompt %}
+        {
+            "role": "system",
+            "content": {{json.dumps(sys_prompt, ensure_ascii=False)}}
+        },
+{% endif %}
+        {
+            "role": "user",
+            "content": [
+{% if image_file %}
+                {
+                    "type": "image_url",
+                    "image_url":"{{b64media2url(request, image_file)}}"
+                },
+{% endif %}
+{% if video_file %}
+                {
+                    "type": "video_url",
+                    "video_url":"{{b64media2url(request, video_file)}}"
+                },
+{% endif %}
+{% if audio_file %}
+                {
+                    "type": "audio_url",
+                    "audio_url":"{{b64media2url(request, audio_file)}}"
+                },
+{% endif %}
+                {
+                    "type": "text",
+                    "text": {{json.dumps(prompt, ensure_ascii=False)}}
+                }
+            ]
+        }
+    ],
+    "stream":true
+}',
+  '{
+    "model": "{{model}}",
+{% if object == "chat.completion" %}
+    "reasoning_content": {{json.dumps(choices[0].message.reasoning_content, ensure_ascii=False)}},
+    "content":{{json.dumps(choices[0].message.content, ensure_ascii=False)}},
+{% elif len(choices)>0 %}
+    "reasoning_content": {{json.dumps(choices[0].delta.reasoning_content, ensure_ascii=False)}},
+    "content":{{json.dumps(choices[0].delta.content, ensure_ascii=False)}},
+{% endif %}
+{% if usage %}
+    "finish": "1",
+    "usage": {{json.dumps(usage)}}
+{% else %}
+    "finish":"0"
+{% endif %}
+}',
+  't-ujII59ku45tIPcdXu4O',
+  NULL,
+  'minimax'
+);
+
+-- ============================================================
+-- 3. 新增 llm: MiniMax-M3
 -- ============================================================
 INSERT INTO `llm` (`id`, `name`, `model`, `description`, `iconid`, `upappid`, `providerid`, `ownerid`, `enabled_date`, `expired_date`, `min_balance`, `status`)
 VALUES (
@@ -44,7 +185,7 @@ VALUES (
 );
 
 -- ============================================================
--- 3. 新增 llm: MiniMax-M2.7-highspeed
+-- 4. 新增 llm: MiniMax-M2.7-highspeed
 -- ============================================================
 INSERT INTO `llm` (`id`, `name`, `model`, `description`, `iconid`, `upappid`, `providerid`, `ownerid`, `enabled_date`, `expired_date`, `min_balance`, `status`)
 VALUES (
@@ -63,14 +204,15 @@ VALUES (
 );
 
 -- ============================================================
--- 4. 新增 llm_api_map: MiniMax-M3 → 5jmzup (minimax专用文本定价)
+-- 5. 新增 llm_api_map: MiniMax-M3 (t2t)
+--    apiname='t2t' → 匹配 uapi name='t2t' + upappid='minimax'
 -- ============================================================
 INSERT INTO `llm_api_map` (`id`, `llmid`, `llmcatelogid`, `apiname`, `query_apiname`, `query_period`, `ppid`, `isdefaultcatelog`)
 VALUES (
   'mm3_map_t2t',
   'mm3_MiniMax_M3',
   't2t',
-  'minimax_openai t2t',
+  't2t',
   NULL,
   NULL,
   '5jmzupARABxkDFwUraFiQ',
@@ -78,14 +220,29 @@ VALUES (
 );
 
 -- ============================================================
--- 5. 新增 llm_api_map: MiniMax-M2.7-highspeed → 5jmzup
+-- 6. 新增 llm_api_map: MiniMax-M3 (tm2t, 多模态)
+-- ============================================================
+INSERT INTO `llm_api_map` (`id`, `llmid`, `llmcatelogid`, `apiname`, `query_apiname`, `query_period`, `ppid`, `isdefaultcatelog`)
+VALUES (
+  'mm3_map_tm2t',
+  'mm3_MiniMax_M3',
+  'tm2t',
+  'tm2t',
+  NULL,
+  NULL,
+  '5jmzupARABxkDFwUraFiQ',
+  '0'
+);
+
+-- ============================================================
+-- 7. 新增 llm_api_map: MiniMax-M2.7-highspeed (t2t)
 -- ============================================================
 INSERT INTO `llm_api_map` (`id`, `llmid`, `llmcatelogid`, `apiname`, `query_apiname`, `query_period`, `ppid`, `isdefaultcatelog`)
 VALUES (
   'mm_m27hs_map_t2t',
   'mm_m27_highspeed',
   't2t',
-  'minimax_openai t2t',
+  't2t',
   NULL,
   NULL,
   '5jmzupARABxkDFwUraFiQ',
@@ -93,35 +250,35 @@ VALUES (
 );
 
 -- ============================================================
--- 6. 补充现有模型 llm_api_map.ppid
+-- 8. 补充现有模型 llm_api_map.ppid
 -- ============================================================
 
--- 6a. MiniMax-Hailuo-2.3 (视频i2v) → 0V89 (已有Hailuo-2.3定价条目)
+-- 8a. MiniMax-Hailuo-2.3 (视频i2v) → 0V89
 UPDATE `llm_api_map` SET `ppid` = '0V89eilc_UQ2KiZIRJO8M'
 WHERE `llmid` = 'AU1f40HV3tqFjxcVWWpyR' AND (`ppid` IS NULL OR `ppid` = '');
 
--- 6b. Minimax海螺参考生视频 S2V-01 (视频i2v) → 0V89
+-- 8b. Minimax海螺参考生视频 S2V-01 (视频i2v) → 0V89
 UPDATE `llm_api_map` SET `ppid` = '0V89eilc_UQ2KiZIRJO8M'
 WHERE `llmid` = 'oks-VG9D8p2b0Agvs-LeQ' AND (`ppid` IS NULL OR `ppid` = '');
 
--- 6c. music-2.0 (音乐) → fQzk (已有音乐定价 ¥1/首)
+-- 8c. music-2.0 (音乐) → fQzk
 UPDATE `llm_api_map` SET `ppid` = 'fQzkUeS6t6NBz_Fu4Fi77'
 WHERE `llmid` = 'ns7egG9aXi91wjI62yKfu' AND (`ppid` IS NULL OR `ppid` = '');
 
--- 6d. speech-2.6-hd (TTS) → mm_tts_pricing (新建)
+-- 8d. speech-2.6-hd (TTS) → mm_tts_pricing
 UPDATE `llm_api_map` SET `ppid` = 'mm_tts_pricing'
 WHERE `llmid` = 'q6rdMUsGD1z3S3NyZh_A_' AND (`ppid` IS NULL OR `ppid` = '');
 
--- 6e. speech-2.6-turbo (TTS) → mm_tts_pricing
+-- 8e. speech-2.6-turbo (TTS) → mm_tts_pricing
 UPDATE `llm_api_map` SET `ppid` = 'mm_tts_pricing'
 WHERE `llmid` = 'CEYD4YWRxjCj4k_6bpzIM' AND (`ppid` IS NULL OR `ppid` = '');
 
--- 6f. speech-2.5-hd-preview (TTS) → mm_tts_pricing
+-- 8f. speech-2.5-hd-preview (TTS) → mm_tts_pricing
 UPDATE `llm_api_map` SET `ppid` = 'mm_tts_pricing'
 WHERE `llmid` = 'Si2g0XJ9ym3P5jlrdmcfB' AND (`ppid` IS NULL OR `ppid` = '');
 
 -- ============================================================
--- 7. 新增 pricing_program: MiniMax TTS定价 (元/万字符)
+-- 9. 新增 pricing_program: MiniMax TTS定价 (元/万字符)
 -- ============================================================
 INSERT INTO `pricing_program` (`id`, `name`, `ownerid`, `providerid`, `pricing_belong`, `discount`, `description`, `pricing_spec`)
 VALUES (
@@ -136,7 +293,7 @@ VALUES (
 );
 
 -- ============================================================
--- 8. 新增 pricing_program_timing: MiniMax TTS
+-- 10. 新增 pricing_program_timing: MiniMax TTS
 -- ============================================================
 INSERT INTO `pricing_program_timing` (`id`, `ppid`, `name`, `enabled_date`, `expired_date`, `pricing_data`)
 VALUES (
@@ -149,9 +306,8 @@ VALUES (
 );
 
 -- ============================================================
--- 9. 更新 5jmzup timing: 添加 MiniMax-M3 定价
---    M3 ≤512K永久五折: 输入2.1/输出8.4/缓存0.42
---    M3 512K~1M: 输入4.2/输出16.8/缓存0.84
+-- 11. 更新 5jmzup timing: 添加 MiniMax-M3 定价
+--     M3 ≤512K永久五折: 输入2.1/输出8.4/缓存0.42 元/百万tokens
 -- ============================================================
 UPDATE `pricing_program_timing`
 SET `pricing_data` = CONCAT(`pricing_data`, '
@@ -174,7 +330,7 @@ SET `pricing_data` = CONCAT(`pricing_data`, '
 WHERE `ppid` = '5jmzupARABxkDFwUraFiQ' AND `enabled_date` = '2026-04-12';
 
 -- ============================================================
--- 10. 更新 pricing_program 5jmzup: 添加M3到模型选项
+-- 12. 更新 pricing_program 5jmzup: 添加M3到模型选项
 -- ============================================================
 UPDATE `pricing_program`
 SET `pricing_spec` = 'fields:\n  model:\n    type: str\n    label: 模型\n    options:\n      - MiniMax-M3\n      - MiniMax-M2.7\n      - MiniMax-M2.7-highspeed\n      - MiniMax-M2.5\n      - MiniMax-M2.5-highspeed\n      - M2-her\n  formula:\n    type: str\n    label: 公式\n'
@@ -184,9 +340,9 @@ WHERE `id` = '5jmzupARABxkDFwUraFiQ';
 -- ============================================================
 -- ROLLBACK 语句 (如需回滚)
 -- ============================================================
--- DELETE FROM `httpapi` WHERE `id` = 'mm3_openai_t2t';
+-- DELETE FROM `uapi` WHERE `id` IN ('mm_minimax_t2t', 'mm_minimax_tm2t');
 -- DELETE FROM `llm` WHERE `id` IN ('mm3_MiniMax_M3', 'mm_m27_highspeed');
--- DELETE FROM `llm_api_map` WHERE `id` IN ('mm3_map_t2t', 'mm_m27hs_map_t2t');
+-- DELETE FROM `llm_api_map` WHERE `id` IN ('mm3_map_t2t', 'mm3_map_tm2t', 'mm_m27hs_map_t2t');
 -- UPDATE `llm_api_map` SET `ppid` = NULL WHERE `llmid` = 'AU1f40HV3tqFjxcVWWpyR';
 -- UPDATE `llm_api_map` SET `ppid` = NULL WHERE `llmid` = 'oks-VG9D8p2b0Agvs-LeQ';
 -- UPDATE `llm_api_map` SET `ppid` = NULL WHERE `llmid` = 'ns7egG9aXi91wjI62yKfu';
