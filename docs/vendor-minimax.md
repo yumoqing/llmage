@@ -82,35 +82,19 @@
 |------|------|
 | Music-2.6/2.5/2.0 | ¥1.0 |
 
-## httpapi配置
+## uapi配置 (uapi模块)
 
-### minimax_openai t2t (新增, id=mm3_openai_t2t)
+### minimax t2t (新增, id=mm_minimax_t2t)
+- path: /chat/completions (upapp.baseurl拼接)
+- 完整URL: https://api.minimaxi.com/v1/chat/completions
+- ioid: Is8l4TGkcZcqFSjbbeIK2 (文本会话, 共享)
+- stream: stream, chunk_match: data:
+- headers: Bearer {{apikey}}, Content-Type: application/json
 
-M3/M2.7-highspeed使用的OpenAI Chat Completions兼容接口。
-API地址由upapp.minimax.baseurl决定: https://api.minimaxi.com/v1/chat/completions
-
-apiinfo:
-```json
-{
-  "response_mode": "stream",
-  "use_session": true,
-  "method": "POST",
-  "chunk_match": "data: ",
-  "headers": [
-    {"name": "Content-Type", "value": "application/json"},
-    {"name": "Authorization", "value": "Bearer ${apikey}"}
-  ],
-  "data": [
-    {"name": "model", "value": "${model}"},
-    {"name": "messages", "value": "${messages}"},
-    {"name": "stream", "value": true}
-  ],
-  "resp": [
-    {"name": "content", "value": "choices[0].delta.content"},
-    {"name": "usage", "value": "usage"}
-  ]
-}
-```
+### minimax tm2t (新增, id=mm_minimax_tm2t)
+- 多模态对话, 支持image_file/video_file/audio_file
+- ioid: t-ujII59ku45tIPcdXu4O (文本媒体转文本, 共享)
+- 与ali-qwen的tm2t模板相同(b64media2url处理)
 
 ## SQL文件
 
