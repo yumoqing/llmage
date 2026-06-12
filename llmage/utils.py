@@ -217,12 +217,33 @@ where a.enabled_date <= ${today}$
 	and a.status = 'published'
 	and a.providerid = b.id
 	order by a.providerid, a.id
-	"""									 
+	"""													 
 		recs = await sor.sqlExe(sql, {'today': today})
+		# 批量查询所有模型的 ppid 映射
+		llm_ids = [r.id for r in recs]
+		pp_map = {}  # llmid -> [ppid, ...]
+		if llm_ids:
+			placeholders = ','.join([f"'{lid}'" for lid in llm_ids])
+			pp_sql = f"select distinct llmid, ppid from llm_api_map where llmid in ({placeholders}) and ppid is not null"
+			pp_recs = await sor.sqlExe(pp_sql, {})
+			for pp in pp_recs:
+				pp_map.setdefault(pp.llmid, []).append(pp.ppid)
+
 		d = []
 		x = None
 		oldpid = '-111'
 		for l in recs:
+			# 获取定价展示文本
+			pricing_list = []
+			for ppid in pp_map.get(l.id, []):
+				try:
+					pd = await env.get_pricing_display(ppid)
+					if pd:
+						pricing_list.append(pd.get('display_text', ''))
+				except:
+					pass
+			l.pricing_display = pricing_list
+
 			if l.providerid != oldpid:
 				x = {
 					'id': l.providerid,
@@ -349,21 +370,26 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 		sql += " order by m.llmcatelogid, a.id"
 		
 		recs = await sor.sqlExe(sql, params)
+		# 批量查询所有模型的 ppid 映射（避免 N+1 查询）
+		llm_ids = [r.id for r in recs]
+		pp_map = {}
+		if llm_ids:
+			placeholders = ','.join([f"'{lid}'" for lid in llm_ids])
+			pp_sql = f"select distinct llmid, ppid from llm_api_map where llmid in ({placeholders}) and ppid is not null"
+			pp_recs = await sor.sqlExe(pp_sql, {})
+			for pp in pp_recs:
+				pp_map.setdefault(pp.llmid, []).append(pp.ppid)
+
 		d = []
 		cid = ''
 		x = None
 		for r in recs:
-			# 查询该模型的所有定价信息
-			pp_sql = """select distinct m.ppid 
-				from llm_api_map m 
-				where m.llmid = ${llmid}$ and m.ppid is not null"""
-			pp_recs = await sor.sqlExe(pp_sql, {'llmid': r.id})
-			
 			pricing_list = []
-			for pp in pp_recs:
+			for ppid in pp_map.get(r.id, []):
 				try:
-					pd = await env.get_pricing_display(pp.ppid)
-					pricing_list.append(pd.get('display_text', ''))
+					pd = await env.get_pricing_display(ppid)
+					if pd:
+						pricing_list.append(pd.get('display_text', ''))
 				except:
 					pass
 			r.pricing_display = pricing_list
