@@ -27,14 +27,14 @@
                         ]
                     },
                     {
-                        "name": "llmid",
+                        "name": "filter_llmid",
                         "label": "模型",
                         "uitype": "str",
                         "placeholder": "模型ID或名称",
                         "cwidth": 12
                     },
                     {
-                        "name": "userid",
+                        "name": "filter_userid",
                         "label": "用户",
                         "uitype": "str",
                         "placeholder": "用户ID",

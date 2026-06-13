@@ -1,0 +1,161 @@
+
+ns = params_kw.copy()
+
+
+debug(f'get_llmusage_accounting_failed.dspy:{ns=}')
+if not ns.get('page'):
+	ns['page'] = 1 
+if not ns.get('sort'):
+
+
+	ns['sort'] = 'failed_time desc'
+
+# InlineForm filter conditions
+extra_conds = []
+if ns.get('handled') and ns['handled'] != '':
+	extra_conds.append("handled = ${filter_handled}$")
+	ns['filter_handled'] = ns['handled']
+if ns.get('filter_llmid') and ns['filter_llmid'] != '':
+	extra_conds.append("llmid like ${filter_llmid}$")
+	ns['filter_llmid'] = f"%{ns['filter_llmid']}%"
+if ns.get('filter_userid') and ns['filter_userid'] != '':
+	extra_conds.append("userid like ${filter_userid}$")
+	ns['filter_userid'] = f"%{ns['filter_userid']}%"
+if ns.get('use_date') and ns['use_date'] != '':
+	extra_conds.append("use_date = ${filter_use_date}$")
+	ns['filter_use_date'] = ns['use_date']
+if ns.get('failed_reason') and ns['failed_reason'] != '':
+	extra_conds.append("failed_reason like ${filter_failed_reason}$")
+	ns['filter_failed_reason'] = f"%{ns['failed_reason']}%"
+
+extra_filterstr = ''
+if extra_conds:
+	extra_filterstr = ' and ' + ' and '.join(extra_conds)
+
+sql = f'''select * from llmusage_accounting_failed where 1=1 {extra_filterstr} [[filterstr]]'''
+
+filterjson = params_kw.get('data_filter')
+if filterjson and isinstance(filterjson, str):
+	try:
+		filterjson = json.loads(filterjson)
+	except (json.JSONDecodeError, TypeError):
+		filterjson = None
+fields_str=r'''[
+    {
+        "name": "id",
+        "title": "id",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "llmusageid",
+        "title": "使用记录id",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "llmid",
+        "title": "模型id",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "userid",
+        "title": "用户id",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "userorgid",
+        "title": "用户机构id",
+        "type": "str",
+        "length": 32
+    },
+    {
+        "name": "use_date",
+        "title": "使用日期",
+        "type": "date"
+    },
+    {
+        "name": "use_time",
+        "title": "使用时间",
+        "type": "timestamp"
+    },
+    {
+        "name": "amount",
+        "title": "交易金额",
+        "type": "double",
+        "length": 18,
+        "dec": 5
+    },
+    {
+        "name": "cost",
+        "title": "交易成本",
+        "type": "double",
+        "length": 18,
+        "dec": 5
+    },
+    {
+        "name": "failed_reason",
+        "title": "失败原因",
+        "type": "text"
+    },
+    {
+        "name": "failed_time",
+        "title": "失败时间",
+        "type": "timestamp"
+    },
+    {
+        "name": "retry_count",
+        "title": "重试次数",
+        "type": "int"
+    },
+    {
+        "name": "handled",
+        "title": "是否已处理",
+        "type": "str",
+        "length": 1,
+        "default": "0"
+    },
+    {
+        "name": "handled_time",
+        "title": "处理时间",
+        "type": "timestamp"
+    },
+    {
+        "name": "handled_note",
+        "title": "处理备注",
+        "type": "text"
+    }
+]'''
+ori_fields = json.loads(fields_str)
+if not filterjson:
+	fields = [ f['name'] for f in ori_fields ]
+	filterjson = default_filterjson(fields, ns)
+filterdic = ns.copy()
+filterdic['filterstr'] = ''
+filterdic['userorgid'] = '${userorgid}$'
+filterdic['userid'] = '${userid}$'
+if filterjson:
+	dbf = DBFilter(filterjson)
+	conds = dbf.gen(ns)
+	if conds:
+		ns.update(dbf.consts)
+		conds = f' and {conds}'
+		filterdic['filterstr'] = conds
+ac = ArgsConvert('[[', ']]')
+vars = ac.findAllVariables(sql)
+NameSpace = {v:'${' + v + '}$' for v in vars if v != 'filterstr' }
+filterdic.update(NameSpace)
+sql = ac.convert(sql, filterdic)
+
+debug(f'{sql=}')
+db = DBPools()
+dbname = get_module_dbname('llmage')
+async with db.sqlorContext(dbname) as sor:
+	r = await sor.sqlPaging(sql, ns) 
+	return r
+return {
+	"total":0,
+	"rows":[]
+}
