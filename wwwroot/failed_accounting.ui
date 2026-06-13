@@ -91,8 +91,7 @@
             "id": "failed_table",
             "options": {
                 "url": "{{entire_url('/llmage/api/failed_accounting_list.dspy')}}",
-                "title": "失败记录列表",
-                "pageSize": 20,
+                "page_rows": 20,
                 "fields": [
                     {"name": "id", "title": "ID", "hidden": true},
                     {"name": "llmusageid", "title": "使用记录ID", "width": "120px"},
