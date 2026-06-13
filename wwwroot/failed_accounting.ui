@@ -87,26 +87,44 @@
             ]
         },
         {
-            "widgettype": "DataViewer",
+            "widgettype": "Tabular",
             "id": "failed_table",
             "options": {
-                "url": "{{entire_url('/llmage/api/failed_accounting_list.dspy')}}",
+                "width": "100%",
+                "height": "100%",
+                "css": "card",
+                "data_url": "{{entire_url('/llmage/api/failed_accounting_list.dspy')}}",
+                "data_method": "GET",
                 "page_rows": 20,
-                "fields": [
-                    {"name": "id", "title": "ID", "hidden": true},
-                    {"name": "llmusageid", "title": "使用记录ID", "width": "120px"},
-                    {"name": "llmid", "title": "模型ID", "width": "120px"},
-                    {"name": "userid", "title": "用户ID", "width": "120px"},
-                    {"name": "userorgid", "title": "机构ID", "width": "120px"},
-                    {"name": "use_date", "title": "使用日期", "width": "110px"},
-                    {"name": "use_time", "title": "使用时间", "width": "160px"},
-                    {"name": "amount", "title": "金额", "width": "80px"},
-                    {"name": "cost", "title": "成本", "width": "80px"},
-                    {"name": "failed_reason", "title": "失败原因", "width": "30%"},
-                    {"name": "failed_time", "title": "失败时间", "width": "160px"},
-                    {"name": "retry_count", "title": "重试次数", "width": "80px"},
-                    {"name": "handled", "title": "状态", "width": "80px"}
-                ]
+                "row_options": {
+                    "browserfields": {
+                        "exclouded": ["id"],
+                        "alters": {
+                            "handled": {
+                                "uitype": "code",
+                                "data": [
+                                    {"value": "0", "text": "未处理"},
+                                    {"value": "1", "text": "已处理"}
+                                ]
+                            }
+                        }
+                    },
+                    "fields": [
+                        {"name": "id", "title": "ID", "type": "str", "length": 32, "uitype": "str", "label": "ID"},
+                        {"name": "llmusageid", "title": "使用记录ID", "type": "str", "length": 32, "cwidth": 12, "uitype": "str", "label": "使用记录ID"},
+                        {"name": "llmid", "title": "模型ID", "type": "str", "length": 32, "cwidth": 12, "uitype": "str", "label": "模型ID"},
+                        {"name": "userid", "title": "用户ID", "type": "str", "length": 32, "cwidth": 10, "uitype": "str", "label": "用户ID"},
+                        {"name": "userorgid", "title": "机构ID", "type": "str", "length": 32, "cwidth": 10, "uitype": "str", "label": "机构ID"},
+                        {"name": "use_date", "title": "使用日期", "type": "date", "cwidth": 10, "uitype": "date", "label": "使用日期"},
+                        {"name": "use_time", "title": "使用时间", "type": "timestamp", "cwidth": 14, "uitype": "str", "label": "使用时间"},
+                        {"name": "amount", "title": "金额", "type": "double", "length": 18, "dec": 5, "cwidth": 8, "uitype": "float", "label": "金额"},
+                        {"name": "cost", "title": "成本", "type": "double", "length": 18, "dec": 5, "cwidth": 8, "uitype": "float", "label": "成本"},
+                        {"name": "failed_reason", "title": "失败原因", "type": "text", "cwidth": 20, "uitype": "text", "label": "失败原因"},
+                        {"name": "failed_time", "title": "失败时间", "type": "timestamp", "cwidth": 14, "uitype": "str", "label": "失败时间"},
+                        {"name": "retry_count", "title": "重试", "type": "int", "cwidth": 4, "uitype": "int", "label": "重试"},
+                        {"name": "handled", "title": "状态", "type": "str", "length": 1, "cwidth": 6, "uitype": "code", "label": "状态"}
+                    ]
+                }
             }
         }
     ]
