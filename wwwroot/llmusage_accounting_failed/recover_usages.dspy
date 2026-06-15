@@ -1,6 +1,6 @@
 
 ns = params_kw.copy()
-limit = int(ns.get('limit') or 100)
+limit = int(ns.get('limit') or 200)
 single_id = ns.get('id') or None
 
 from ahserver.filestorage import FileStorage
@@ -9,23 +9,21 @@ import os
 db = DBPools()
 dbname = get_module_dbname('llmage')
 
-details = []
 recovered = 0
 failed = 0
 skipped = 0
+errors = []
 
 try:
 	async with db.sqlorContext(dbname) as sor:
 		if single_id:
-			sql = """select a.id, a.llmid, a.ioinfo, a.status, a.use_date,
-					b.model
+			sql = """select a.id, a.llmid, a.ioinfo, a.status, b.model
 				from llmusage a
 				left join llm b on a.llmid = b.id
 				where a.id = ${id}$"""
 			params = {'id': single_id}
 		else:
-			sql = """select a.id, a.llmid, a.ioinfo, a.status, a.use_date,
-					b.model
+			sql = """select a.id, a.llmid, a.ioinfo, a.status, b.model
 				from llmusage a
 				left join llm b on a.llmid = b.id
 				where a.usages is null
@@ -63,20 +61,28 @@ try:
 				continue
 
 			try:
-				real_path = fs.realPath(ioinfo)
-				if not os.path.isfile(real_path):
-					failed += 1
-					continue
-
-				with open(real_path, 'r', encoding='utf-8') as f:
-					io_data = json.load(f)
+				# ioinfo 可能是 JSON 内容，也可能是文件路径
+				io_data = None
+				if ioinfo.startswith('{') or ioinfo.startswith('"'):
+					# 直接是 JSON 内容
+					io_data = json.loads(ioinfo)
+				else:
+					# 文件路径
+					real_path = fs.realPath(ioinfo)
+					if not os.path.isfile(real_path):
+						errors.append(f'{rid}: 文件不存在')
+						failed += 1
+						continue
+					with open(real_path, 'r', encoding='utf-8') as f:
+						io_data = json.load(f)
 
 				outputs = io_data.get('output', [])
 				if not outputs:
+					errors.append(f'{rid}: output为空')
 					failed += 1
 					continue
 
-				# 从最后一条output中获取usage
+				# 从最后一条output开始倒序找usage
 				usage = None
 				for out in reversed(outputs):
 					if isinstance(out, dict) and out.get('usage'):
@@ -84,6 +90,7 @@ try:
 						break
 
 				if not usage:
+					errors.append(f'{rid}: output中未找到usage')
 					failed += 1
 					continue
 
@@ -96,6 +103,7 @@ try:
 
 			except Exception as e:
 				debug(f'recover_usages error for {rid}: {e}')
+				errors.append(f'{rid}: {e}')
 				failed += 1
 
 except Exception as e:
@@ -113,14 +121,16 @@ except Exception as e:
 
 total = recovered + failed + skipped
 msg = f"处理 {total} 条: 恢复成功 {recovered}, 失败 {failed}, 跳过 {skipped}"
+if errors:
+	msg += f"\n失败详情(前5条): {'; '.join(errors[:5])}"
 
 return {
 	"widgettype": "Message",
 	"options": {
 		"title": "恢复Usages完成",
-		"cwidth": 24,
-		"cheight": 5,
-		"timeout": 6,
+		"cwidth": 30,
+		"cheight": 6,
+		"timeout": 8,
 		"message": msg
 	}
 }
