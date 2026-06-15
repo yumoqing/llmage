@@ -1,0 +1,126 @@
+
+ns = params_kw.copy()
+limit = int(ns.get('limit') or 100)
+single_id = ns.get('id') or None
+
+from ahserver.filestorage import FileStorage
+import os
+
+db = DBPools()
+dbname = get_module_dbname('llmage')
+
+details = []
+recovered = 0
+failed = 0
+skipped = 0
+
+try:
+	async with db.sqlorContext(dbname) as sor:
+		if single_id:
+			sql = """select a.id, a.llmid, a.ioinfo, a.status, a.use_date,
+					b.model
+				from llmusage a
+				left join llm b on a.llmid = b.id
+				where a.id = ${id}$"""
+			params = {'id': single_id}
+		else:
+			sql = """select a.id, a.llmid, a.ioinfo, a.status, a.use_date,
+					b.model
+				from llmusage a
+				left join llm b on a.llmid = b.id
+				where a.usages is null
+				and a.status = 'SUCCEEDED'
+				order by a.use_date desc"""
+			params = {'page': 1, 'rows': limit}
+
+		recs = await sor.sqlExe(sql, params)
+		if isinstance(recs, dict):
+			rows = recs.get('rows', [])
+		else:
+			rows = recs if recs else []
+
+		if not rows:
+			return {
+				"widgettype": "Message",
+				"options": {
+					"title": "恢复Usages",
+					"cwidth": 20,
+					"cheight": 5,
+					"timeout": 5,
+					"message": "没有找到需要恢复的记录"
+				}
+			}
+
+		fs = FileStorage()
+
+		for r in rows:
+			rid = r.id if hasattr(r, 'id') else r.get('id', '')
+			model = r.model if hasattr(r, 'model') else r.get('model', '')
+			ioinfo = r.ioinfo if hasattr(r, 'ioinfo') else r.get('ioinfo', None)
+
+			if not ioinfo:
+				skipped += 1
+				continue
+
+			try:
+				real_path = fs.realPath(ioinfo)
+				if not os.path.isfile(real_path):
+					failed += 1
+					continue
+
+				with open(real_path, 'r', encoding='utf-8') as f:
+					io_data = json.load(f)
+
+				outputs = io_data.get('output', [])
+				if not outputs:
+					failed += 1
+					continue
+
+				# 从最后一条output中获取usage
+				usage = None
+				for out in reversed(outputs):
+					if isinstance(out, dict) and out.get('usage'):
+						usage = out['usage']
+						break
+
+				if not usage:
+					failed += 1
+					continue
+
+				usages_str = json.dumps(usage, ensure_ascii=False)
+				await sor.U('llmusage', {
+					'id': rid,
+					'usages': usages_str
+				})
+				recovered += 1
+
+			except Exception as e:
+				debug(f'recover_usages error for {rid}: {e}')
+				failed += 1
+
+except Exception as e:
+	exception(f'recover_usages error: {e}')
+	return {
+		"widgettype": "Error",
+		"options": {
+			"title": "恢复Usages失败",
+			"cwidth": 20,
+			"cheight": 5,
+			"timeout": 5,
+			"message": str(e)
+		}
+	}
+
+total = recovered + failed + skipped
+msg = f"处理 {total} 条: 恢复成功 {recovered}, 失败 {failed}, 跳过 {skipped}"
+
+return {
+	"widgettype": "Message",
+	"options": {
+		"title": "恢复Usages完成",
+		"cwidth": 24,
+		"cheight": 5,
+		"timeout": 6,
+		"message": msg
+	}
+}

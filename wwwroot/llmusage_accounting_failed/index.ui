@@ -66,6 +66,48 @@
             ]
         },
         {
+            "widgettype": "HBox",
+            "options": {
+                "css": "card", "padding": "4px 8px", "cheight": 3
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "Button",
+                    "id": "btn_recover_usages",
+                    "options": {
+                        "label": "从IO文件恢复Usages",
+                        "css": "primary"
+                    },
+                    "binds": [
+                        {
+                            "wid": "self",
+                            "event": "click",
+                            "actiontype": "urldata",
+                            "target": "msg_area",
+                            "options": {
+                                "url": "{{entire_url('./recover_usages.dspy')}}"
+                            },
+                            "mode": "replace"
+                        },
+                        {
+                            "wid": "self",
+                            "event": "click",
+                            "actiontype": "method",
+                            "target": "llmusage_accounting_failed_tbl",
+                            "method": "render"
+                        }
+                    ]
+                },
+                {
+                    "widgettype": "VBox",
+                    "id": "msg_area",
+                    "options": {
+                        "width": "100%", "css": "filler"
+                    }
+                }
+            ]
+        },
+        {
             "id": "llmusage_accounting_failed_tbl",
             "widgettype": "Tabular",
             "options": {

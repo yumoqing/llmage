@@ -153,6 +153,7 @@ PATHS_LOGINED = [
     f"/{MOD}/llmusage_accounting_failed/add_llmusage_accounting_failed.dspy",
     f"/{MOD}/llmusage_accounting_failed/delete_llmusage_accounting_failed.dspy",
     f"/{MOD}/llmusage_accounting_failed/get_llmusage_accounting_failed.dspy",
+    f"/{MOD}/llmusage_accounting_failed/recover_usages.dspy",
     f"/{MOD}/llmusage_accounting_failed/update_llmusage_accounting_failed.dspy",
 
     # CRUD 子目录 — llmusage_history/

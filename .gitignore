@@ -5,5 +5,6 @@ wwwroot/llm_api_map/
 wwwroot/llmcatelog_list/
 wwwroot/llmusage/
 wwwroot/llmusage_accounting_failed/
+!wwwroot/llmusage_accounting_failed/recover_usages.dspy
 wwwroot/llmusage_history/
 build/
