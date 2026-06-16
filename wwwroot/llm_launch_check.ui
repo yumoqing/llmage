@@ -33,49 +33,49 @@
 				{
 					"widgettype": "urlwidget",
 					"options": {
-						"url": "{{entire_url('../check_model_record.dspy')}}?llmid={{llmid}}"
+						"url": "/llmage/check_model_record.dspy?llmid={{llmid}}"
 					}
 				},
 				{
 					"widgettype": "urlwidget",
 					"options": {
-						"url": "{{entire_url('../check_date_status.dspy')}}?llmid={{llmid}}"
+						"url": "/llmage/check_date_status.dspy?llmid={{llmid}}"
 					}
 				},
 				{
 					"widgettype": "urlwidget",
 					"options": {
-						"url": "{{entire_url('../check_upapp.dspy')}}?llmid={{llmid}}"
+						"url": "/llmage/check_upapp.dspy?llmid={{llmid}}"
 					}
 				},
 				{
 					"widgettype": "urlwidget",
 					"options": {
-						"url": "{{entire_url('../check_uapi.dspy')}}?llmid={{llmid}}"
+						"url": "/llmage/check_uapi.dspy?llmid={{llmid}}"
 					}
 				},
 				{
 					"widgettype": "urlwidget",
 					"options": {
-						"url": "{{entire_url('../check_uapiio.dspy')}}?llmid={{llmid}}"
+						"url": "/llmage/check_uapiio.dspy?llmid={{llmid}}"
 					}
 				},
 				{
 					"widgettype": "urlwidget",
 					"options": {
-						"url": "{{entire_url('../check_llm_api_map.dspy')}}?llmid={{llmid}}"
+						"url": "/llmage/check_llm_api_map.dspy?llmid={{llmid}}"
 					}
 				},
 				{
 					"widgettype": "urlwidget",
 					"options": {
-						"url": "{{entire_url('../check_pricing_program.dspy')}}?llmid={{llmid}}"
+						"url": "/llmage/check_pricing_program.dspy?llmid={{llmid}}"
 					}
 				},
 				{
 					"widgettype": "urlwidget",
 					"options": {
-						"url": "{{entire_url('../check_pricing_data.dspy')}}?llmid={{llmid}}"
+						"url": "/llmage/check_pricing_data.dspy?llmid={{llmid}}"
 					}
 				}
 			]
@@ -120,7 +120,7 @@
 			"actiontype": "urldata",
 			"target": "test_result",
 			"options": {
-				"url": "{{entire_url('../api/llm_launch_check_api.dspy')}}?llmid={{llmid}}&action=inference"
+				"url": "/llmage/api/llm_launch_check_api.dspy?llmid={{llmid}}&action=inference"
 			}
 		},
 		{
@@ -129,7 +129,7 @@
 			"actiontype": "urldata",
 			"target": "charge_result",
 			"options": {
-				"url": "{{entire_url('../api/llm_launch_check_api.dspy')}}?llmid={{llmid}}&action=check_charging&usages={\"prompt_tokens\":1000,\"completion_tokens\":500}"
+				"url": "/llmage/api/llm_launch_check_api.dspy?llmid={{llmid}}&action=check_charging&usages={\"prompt_tokens\":1000,\"completion_tokens\":500}"
 			}
 		}
 	]
