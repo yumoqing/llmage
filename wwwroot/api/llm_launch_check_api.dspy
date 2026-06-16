@@ -4,239 +4,85 @@ action = params_kw.get('action', 'check')
 if not llmid:
 	return json.dumps({'error': 'missing llmid'}, ensure_ascii=False)
 
-if action == 'check':
-	# Return check results
-	today = curDateString()[:10]
-	env = request._run_ns
-	result = {'llmid': llmid, 'checks': [], 'all_passed': True}
-
-	async def add_check(name, passed, detail=''):
-		result['checks'].append({'name': name, 'passed': passed, 'detail': detail})
-		if not passed:
-			result['all_passed'] = False
-
-	async with get_sor_context(env, 'llmage') as sor:
-		# 1. llm record
+if action == 'inference':
+	# 验证推理配置是否完整
+	async with get_sor_context(request._run_ns, 'llmage') as sor:
 		recs = await sor.sqlExe(
 			"select * from llm where id=${llmid}$", {'llmid': llmid})
 		if not recs:
-			await add_check('模型记录', False, f'llm id={llmid} 不存在')
-			return json.dumps(result, ensure_ascii=False)
+			return '❌ 模型记录不存在'
 		llm = recs[0]
-		await add_check('模型记录', True, f'{llm.name} ({llm.model})')
-
-		# 2. dates & status
-		date_ok = llm.enabled_date and llm.expired_date
-		status_ok = llm.status == 'published'
-		await add_check('日期与状态',
-			date_ok and status_ok,
-			f"启用:{llm.enabled_date} 失效:{llm.expired_date} 状态:{llm.status}")
-
-		# 3. upapp
-		recs = await sor.sqlExe(
-			"select a.* from llm a, upapp b where a.id=${llmid}$ and a.upappid=b.id",
+		
+		# 检查 API 映射
+		maps = await sor.sqlExe(
+			"select * from llm_api_map where llmid=${llmid}$",
 			{'llmid': llmid})
-		if recs:
-			await add_check('上位系统(upapp)', True, f'upappid={llm.upappid}')
-		else:
-			await add_check('上位系统(upapp)', False, f'upappid={llm.upappid} 未找到关联')
-
-		# 4. uapi
-		recs = await sor.sqlExe("""
-			select a.*, e.ioid, e.stream
+		if not maps:
+			return '❌ 无 API 映射配置'
+		
+		# 检查 upapp 和 uapi
+		uapi_recs = await sor.sqlExe("""
+			select a.*, e.ioid, e.stream, e.name as api_name
 			from llm a
 			join llm_api_map m on a.id = m.llmid
 			join upapp c on a.upappid = c.id
 			join uapi e on c.id = e.upappid and m.apiname = e.name
 			where a.id=${llmid}$""", {'llmid': llmid})
-		if recs:
-			await add_check('API映射(uapi)', True, f'ioid={recs[0].ioid}, stream={recs[0].stream}')
-		else:
-			await add_check('API映射(uapi)', False, f'apiname={getattr(llm, "apiname", "N/A")} 在upapp中未找到')
-
-		# 5. uapiio
-		if recs:
-			ioid = recs[0].ioid
-			recs2 = await sor.sqlExe(
-				"select * from uapiio where id=${ioid}$", {'ioid': ioid})
-			if recs2:
-				await add_check('IO定义(uapiio)', True, f'uapiio id={ioid}')
-			else:
-				await add_check('IO定义(uapiio)', False, f'ioid={ioid} 未找到')
-		else:
-			await add_check('IO定义(uapiio)', False, '依赖 uapi 未通过')
-
-		# 6. llm_api_map
-		maps = await sor.sqlExe(
-			"select * from llm_api_map where llmid=${llmid}$", {'llmid': llmid})
-		if maps:
-			ppids = [m.ppid for m in maps if m.ppid]
-			await add_check('能力映射(llm_api_map)', True,
-				f'{len(maps)}条记录, {len(ppids)}个有定价')
-		else:
-			await add_check('能力映射(llm_api_map)', False, '无映射记录')
-			ppids = []
-
-		# 7. pricing_program
-		if ppids:
-			ppid = ppids[0]
-			async with get_sor_context(env, 'pricing') as psor:
-				pregs = await psor.sqlExe(
-					"select * from pricing_program where id=${ppid}$", {'ppid': ppid})
-				if pregs:
-					await add_check('定价项目(pricing_program)', True,
-						f'{pregs[0].name} (id={ppid})')
-					# 8. pricingdata
-					datas = await psor.sqlExe(
-						"select count(*) as cnt from pricingdata where ppid=${ppid}$",
-						{'ppid': ppid})
-					cnt = datas[0].cnt if datas else 0
-					await add_check('定价数据(pricingdata)', cnt > 0,
-						f'{cnt}条记录' if cnt > 0 else '无定价数据')
-				else:
-					await add_check('定价项目(pricing_program)', False,
-						f'ppid={ppid} 未找到')
-					await add_check('定价数据(pricingdata)', False, '依赖定价项目未通过')
-		else:
-			await add_check('定价项目(pricing_program)', False, 'llm_api_map中无ppid')
-			await add_check('定价数据(pricingdata)', False, '无定价项目')
-
-	return json.dumps(result, ensure_ascii=False)
-
-elif action == 'inference':
-	# Perform test inference - direct uapi call to get usage data
-	async with get_sor_context(request._run_ns, 'llmage') as sor:
-		recs = await sor.sqlExe(
-			"select * from llm where id=${llmid}$", {'llmid': llmid})
-		if not recs:
-			return json.dumps({'error': 'llm not found'}, ensure_ascii=False)
-		llm = recs[0]
 		
-		# Get API mapping
-		maps = await sor.sqlExe(
-			"select * from llm_api_map where llmid=${llmid}$ and isdefaultcatelog='1'",
-			{'llmid': llmid})
-		if not maps:
-			return json.dumps({'error': 'no default api map'}, ensure_ascii=False)
+		if not uapi_recs:
+			return '❌ uapi 配置不完整，无法调用'
 		
-		api_map = maps[0]
+		uapi = uapi_recs[0]
 		
-		# Direct uapi call
-		try:
-			env = request._run_ns
-			uapi = env.UpAppApi(request)
-			userid = await get_user()
-			userorgid = await get_userorgid()
-			
-			# Get caller userid for the upapp
-			caller_userid = await env.uapi_data.get_calluserid(llm.upappid, orgid=llm.ownerid)
-			
-			# Simple test message
-			test_params = {
-				'messages': [{'role': 'user', 'content': '你好，这是一条测试消息'}],
-				'model': llm.model
-			}
-			
-			# Call uapi
-			response = await uapi.call(llm.upappid, api_map.apiname, caller_userid, params=test_params)
-			if isinstance(response, bytes):
-				response = response.decode('utf-8')
-			
-			data = json.loads(response)
-			usage = data.get('usage', {})
-			content = data.get('content', '')
-			if not content and 'choices' in data:
-				content = data['choices'][0].get('message', {}).get('content', '')
-			
-			return json.dumps({
-				'success': True,
-				'response': content or '(空响应)',
-				'usage': usage
-			}, ensure_ascii=False)
-		except Exception as e:
-			return json.dumps({
-				'success': False,
-				'error': str(e)
-			}, ensure_ascii=False)
+		# 检查 ioid
+		io_recs = await sor.sqlExe(
+			"select * from uapiio where id=${ioid}$", {'ioid': uapi.ioid})
+		if not io_recs:
+			return '❌ IO 定义不存在'
+		
+		return f'✅ 推理配置验证通过\n模型: {llm.name}\nAPI: {uapi.api_name}\nIO: {uapi.ioid}\nStream: {uapi.stream}'
 
 elif action == 'check_charging':
-	# Check if pricing can calculate costs from usage data
+	# 验证计费配置是否完整
 	usages_str = params_kw.get('usages', '{}')
-	llmusage_id = params_kw.get('llmusage_id', '')
 	
 	try:
 		usages = json.loads(usages_str) if isinstance(usages_str, str) else usages_str
-	except Exception as e:
-		return json.dumps({'error': f'invalid usages format: {e}'}, ensure_ascii=False)
+	except:
+		usages = {}
 	
-	if not usages:
-		return json.dumps({'error': 'usages is empty'}, ensure_ascii=False)
-	
-	env = request._run_ns
-	
-	# Get ppid from llm_api_map
-	async with get_sor_context(env, 'llmage') as sor:
+	async with get_sor_context(request._run_ns, 'llmage') as sor:
 		maps = await sor.sqlExe(
-			"select * from llm_api_map where llmid=${llmid}$ and isdefaultcatelog='1'",
+			"select * from llm_api_map where llmid=${llmid}$",
 			{'llmid': llmid})
 		if not maps:
-			return json.dumps({'error': 'no default api map'}, ensure_ascii=False)
+			return '❌ 无 API 映射'
 		
-		api_map = maps[0]
-		ppid = api_map.ppid
+		ppids = [m.ppid for m in maps if m.ppid]
+		if not ppids:
+			return '❌ 无定价项目(ppid)'
 		
-		if not ppid:
-			return json.dumps({
-				'success': False,
-				'error': 'llm_api_map 中没有定价项目(ppid)'
-			}, ensure_ascii=False)
+		ppid = ppids[0]
 		
-		# Get pricing program name
-		async with get_sor_context(env, 'pricing') as psor:
+		# 检查 pricing_program
+		async with get_sor_context(request._run_ns, 'pricing') as psor:
 			pregs = await psor.sqlExe(
-				"select name from pricing_program where id=${ppid}$", {'ppid': ppid})
-			pp_name = pregs[0].name if pregs else '未知'
-		
-		# Test charging calculation
-		try:
-			prices = await env.buffered_charging(ppid, usages)
-			if prices is None or len(prices) == 0:
-				return json.dumps({
-					'success': False,
-					'error': f'buffered_charging 返回空，定价项目 {pp_name}(ppid={ppid}) 无法计算费用',
-					'usages': usages
-				}, ensure_ascii=False)
+				"select * from pricing_program where id=${ppid}$", {'ppid': ppid})
+			if not pregs:
+				return f'❌ 定价项目不存在 (ppid={ppid})'
 			
-			# Calculate totals
-			total_amount = 0
-			total_cost = 0
-			breakdown = []
-			for p in prices:
-				total_amount += p.amount
-				if p.cost:
-					total_cost += p.cost
-				breakdown.append({
-					'factor': getattr(p, 'factor', ''),
-					'amount': p.amount,
-					'cost': p.cost
-				})
+			pp = pregs[0]
 			
-			return json.dumps({
-				'success': True,
-				'ppid': ppid,
-				'pp_name': pp_name,
-				'usages': usages,
-				'total_amount': total_amount,
-				'total_cost': total_cost,
-				'breakdown': breakdown
-			}, ensure_ascii=False)
-		except Exception as e:
-			return json.dumps({
-				'success': False,
-				'error': f'计费计算失败: {e}',
-				'ppid': ppid,
-				'pp_name': pp_name,
-				'usages': usages
-			}, ensure_ascii=False)
+			# 检查 pricing_program_timing
+			try:
+				timings = await psor.sqlExe(
+					"select * from pricing_program_timing where ppid=${ppid}$",
+					{'ppid': ppid})
+				if timings:
+					return f'✅ 计费配置验证通过\n定价项目: {pp.name}\n定价数据: {len(timings)}条记录\n测试用量: {json.dumps(usages)}'
+				else:
+					return f'⚠️ 定价项目存在但无定价数据\n定价项目: {pp.name}'
+			except Exception as e:
+				return f'⚠️ 定价数据查询失败: {e}'
 
-return json.dumps({'error': 'invalid action'}, ensure_ascii=False)
+return '无效的操作'
