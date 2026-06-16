@@ -64,6 +64,15 @@
 				"i18n": false
 			}
 		}
+	],
+	"binds": [
+		{
+			"wid": "self",
+			"event": "load",
+			"actiontype": "script",
+			"target": "self",
+			"script": "var resp = await fetch('{{entire_url('./api/llm_launch_check_api.dspy')}}?llmid={{llmid}}&action=check'); var data = await resp.json(); var statusEl = this.getWidgetByName('check_status'); var listEl = this.getWidgetByName('checks_list'); if(data.error) { statusEl.set_text('错误: ' + data.error); return; } var html = ''; var allOk = true; (data.checks||[]).forEach(function(c){ var icon = c.passed ? '✅' : '❌'; if(!c.passed) allOk = false; html += '<div style=\"padding:4px 0\">' + icon + ' <b>' + c.name + '</b>: ' + (c.detail||'') + '</div>'; }); if(listEl && listEl.dom_element) listEl.dom_element.innerHTML = html; if(allOk) { statusEl.set_text('全部通过 ✅'); var testBtn = this.getWidgetByName('test_btn'); if(testBtn) { testBtn.dom_element.disabled = false; testBtn.dom_element.onclick = async function(){ var r2 = await fetch('{{entire_url('./api/llm_launch_check_api.dspy')}}?llmid={{llmid}}&action=inference'); var d2 = await r2.json(); var tr = this.getWidgetByName('test_result'); if(d2.success) tr.set_text('回复: ' + d2.response); else tr.set_text('失败: ' + d2.error); }.bind(this); } } else { statusEl.set_text('存在问题 ❌ 请检查下方详情'); }"
+		}
 	]
 }
 {% else %}
