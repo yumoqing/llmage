@@ -3,7 +3,7 @@ llmid = params_kw.get('llmid', '')
 if not llmid:
     return json.dumps({
         "widgettype": "Text",
-        "options": {"text": "❌ 日期与状态: 缺少llmid参数", "i18n": false}
+        "options": {"text": "❌ 日期与状态: 缺少llmid参数", "i18n": False}
     }, ensure_ascii=False)
 
 async with get_sor_context(request._run_ns, 'llmage') as sor:
@@ -13,7 +13,7 @@ async with get_sor_context(request._run_ns, 'llmage') as sor:
 if not recs:
     return json.dumps({
         "widgettype": "Text",
-        "options": {"text": "❌ 日期与状态: 模型不存在", "i18n": false}
+        "options": {"text": "❌ 日期与状态: 模型不存在", "i18n": False}
     }, ensure_ascii=False)
 
 llm = recs[0]
@@ -27,5 +27,5 @@ else:
 
 return json.dumps({
     "widgettype": "Text",
-    "options": {"text": text, "i18n": false}
+    "options": {"text": text, "i18n": False}
 }, ensure_ascii=False)

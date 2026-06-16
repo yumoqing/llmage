@@ -3,7 +3,7 @@ llmid = params_kw.get('llmid', '')
 if not llmid:
     return json.dumps({
         "widgettype": "Text",
-        "options": {"text": "❌ 能力映射(llm_api_map): 缺少llmid参数", "i18n": false}
+        "options": {"text": "❌ 能力映射(llm_api_map): 缺少llmid参数", "i18n": False}
     }, ensure_ascii=False)
 
 async with get_sor_context(request._run_ns, 'llmage') as sor:
@@ -18,5 +18,5 @@ else:
 
 return json.dumps({
     "widgettype": "Text",
-    "options": {"text": text, "i18n": false}
+    "options": {"text": text, "i18n": False}
 }, ensure_ascii=False)

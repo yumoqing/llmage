@@ -3,7 +3,7 @@ llmid = params_kw.get('llmid', '')
 if not llmid:
     return json.dumps({
         "widgettype": "Text",
-        "options": {"text": "❌ 定价数据(pricingdata): 缺少llmid参数", "i18n": false}
+        "options": {"text": "❌ 定价数据: 缺少llmid参数", "i18n": False}
     }, ensure_ascii=False)
 
 async with get_sor_context(request._run_ns, 'llmage') as sor:
@@ -12,25 +12,31 @@ async with get_sor_context(request._run_ns, 'llmage') as sor:
     ppids = [m.ppid for m in maps if m.ppid] if maps else []
 
 if not ppids:
-    text = "❌ 定价数据(pricingdata): 无定价项目"
+    text = "❌ 定价数据: 无定价项目"
 else:
     ppid = ppids[0]
-    async with get_sor_context(request._run_ns, 'pricing') as psor:
-        # First check if pricing_program exists
-        pregs = await psor.sqlExe(
-            "select * from pricing_program where id=${ppid}$", {'ppid': ppid})
-        if not pregs:
-            text = "❌ 定价数据(pricingdata): 依赖定价项目未通过"
-        else:
-            datas = await psor.sqlExe(
-                "select count(*) as cnt from pricingdata where ppid=${ppid}$", {'ppid': ppid})
-            cnt = datas[0].cnt if datas else 0
-            if cnt > 0:
-                text = f"✅ 定价数据(pricingdata): {cnt}条记录"
+    try:
+        async with get_sor_context(request._run_ns, 'pricing') as psor:
+            pregs = await psor.sqlExe(
+                "select * from pricing_program where id=${ppid}$", {'ppid': ppid})
+            if not pregs:
+                text = "❌ 定价数据: 依赖定价项目未通过"
             else:
-                text = "❌ 定价数据(pricingdata): 无定价数据"
+                # 检查 pricing_program_timing 表
+                try:
+                    timings = await psor.sqlExe(
+                        "select count(*) as cnt from pricing_program_timing where ppid=${ppid}$", {'ppid': ppid})
+                    cnt = timings[0].cnt if timings else 0
+                    if cnt > 0:
+                        text = f"✅ 定价数据(pricing_program_timing): {cnt}条记录"
+                    else:
+                        text = "❌ 定价数据: pricing_program_timing 无记录"
+                except Exception as e:
+                    text = f"❌ 定价数据: {e}"
+    except Exception as e:
+        text = f"❌ 定价数据: {e}"
 
 return json.dumps({
     "widgettype": "Text",
-    "options": {"text": text, "i18n": false}
+    "options": {"text": text, "i18n": False}
 }, ensure_ascii=False)
