@@ -1,0 +1,31 @@
+llmid = params_kw.get('llmid', '')
+
+if not llmid:
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "❌ 日期与状态: 缺少llmid参数", "i18n": false}
+    }, ensure_ascii=False)
+
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+    recs = await sor.sqlExe(
+        "select * from llm where id=${llmid}$", {'llmid': llmid})
+
+if not recs:
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "❌ 日期与状态: 模型不存在", "i18n": false}
+    }, ensure_ascii=False)
+
+llm = recs[0]
+date_ok = bool(llm.enabled_date and llm.expired_date)
+status_ok = llm.status == 'published'
+
+if date_ok and status_ok:
+    text = f"✅ 日期与状态: 启用:{llm.enabled_date} 失效:{llm.expired_date} 状态:{llm.status}"
+else:
+    text = f"❌ 日期与状态: 启用:{llm.enabled_date} 失效:{llm.expired_date} 状态:{llm.status}"
+
+return json.dumps({
+    "widgettype": "Text",
+    "options": {"text": text, "i18n": false}
+}, ensure_ascii=False)

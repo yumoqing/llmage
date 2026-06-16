@@ -1,0 +1,27 @@
+llmid = params_kw.get('llmid', '')
+
+if not llmid:
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "❌ 上位系统(upapp): 缺少llmid参数", "i18n": false}
+    }, ensure_ascii=False)
+
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+    recs = await sor.sqlExe(
+        "select a.* from llm a, upapp b where a.id=${llmid}$ and a.upappid=b.id",
+        {'llmid': llmid})
+    
+    if recs:
+        llm = recs[0]
+        text = f"✅ 上位系统(upapp): upappid={llm.upappid}"
+    else:
+        # Get llm info to show upappid
+        llm_recs = await sor.sqlExe(
+            "select upappid from llm where id=${llmid}$", {'llmid': llmid})
+        upappid = llm_recs[0].upappid if llm_recs else '未知'
+        text = f"❌ 上位系统(upapp): upappid={upappid} 未找到关联"
+
+return json.dumps({
+    "widgettype": "Text",
+    "options": {"text": text, "i18n": false}
+}, ensure_ascii=False)

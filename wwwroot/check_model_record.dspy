@@ -1,0 +1,22 @@
+llmid = params_kw.get('llmid', '')
+
+if not llmid:
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "❌ 模型记录: 缺少llmid参数", "i18n": false}
+    }, ensure_ascii=False)
+
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+    recs = await sor.sqlExe(
+        "select * from llm where id=${llmid}$", {'llmid': llmid})
+
+if recs:
+    llm = recs[0]
+    text = f"✅ 模型记录: {llm.name} ({llm.model})"
+else:
+    text = f"❌ 模型记录: llm id={llmid} 不存在"
+
+return json.dumps({
+    "widgettype": "Text",
+    "options": {"text": text, "i18n": false}
+}, ensure_ascii=False)

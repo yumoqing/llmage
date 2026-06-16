@@ -1,0 +1,33 @@
+llmid = params_kw.get('llmid', '')
+
+if not llmid:
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "❌ IO定义(uapiio): 缺少llmid参数", "i18n": false}
+    }, ensure_ascii=False)
+
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+    # First get ioid from uapi
+    recs = await sor.sqlExe("""
+        select e.ioid
+        from llm a
+        join llm_api_map m on a.id = m.llmid
+        join upapp c on a.upappid = c.id
+        join uapi e on c.id = e.upappid and m.apiname = e.name
+        where a.id=${llmid}$""", {'llmid': llmid})
+    
+    if not recs:
+        text = "❌ IO定义(uapiio): 依赖 uapi 未通过"
+    else:
+        ioid = recs[0].ioid
+        recs2 = await sor.sqlExe(
+            "select * from uapiio where id=${ioid}$", {'ioid': ioid})
+        if recs2:
+            text = f"✅ IO定义(uapiio): uapiio id={ioid}"
+        else:
+            text = f"❌ IO定义(uapiio): ioid={ioid} 未找到"
+
+return json.dumps({
+    "widgettype": "Text",
+    "options": {"text": text, "i18n": false}
+}, ensure_ascii=False)

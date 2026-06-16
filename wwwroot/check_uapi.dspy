@@ -1,0 +1,30 @@
+llmid = params_kw.get('llmid', '')
+
+if not llmid:
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "❌ API映射(uapi): 缺少llmid参数", "i18n": false}
+    }, ensure_ascii=False)
+
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+    recs = await sor.sqlExe("""
+        select a.*, e.ioid, e.stream
+        from llm a
+        join llm_api_map m on a.id = m.llmid
+        join upapp c on a.upappid = c.id
+        join uapi e on c.id = e.upappid and m.apiname = e.name
+        where a.id=${llmid}$""", {'llmid': llmid})
+
+if recs:
+    text = f"✅ API映射(uapi): ioid={recs[0].ioid}, stream={recs[0].stream}"
+else:
+    # Get apiname from llm
+    async with get_sor_context(request._run_ns, 'llmage') as sor:
+        llm_recs = await sor.sqlExe("select apiname from llm where id=${llmid}$", {'llmid': llmid})
+        apiname = llm_recs[0].apiname if llm_recs else 'N/A'
+    text = f"❌ API映射(uapi): apiname={apiname} 在upapp中未找到"
+
+return json.dumps({
+    "widgettype": "Text",
+    "options": {"text": text, "i18n": false}
+}, ensure_ascii=False)

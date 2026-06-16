@@ -1,0 +1,22 @@
+llmid = params_kw.get('llmid', '')
+
+if not llmid:
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "❌ 能力映射(llm_api_map): 缺少llmid参数", "i18n": false}
+    }, ensure_ascii=False)
+
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+    maps = await sor.sqlExe(
+        "select * from llm_api_map where llmid=${llmid}$", {'llmid': llmid})
+
+if maps:
+    ppids = [m.ppid for m in maps if m.ppid]
+    text = f"✅ 能力映射(llm_api_map): {len(maps)}条记录, {len(ppids)}个有定价"
+else:
+    text = "❌ 能力映射(llm_api_map): 无映射记录"
+
+return json.dumps({
+    "widgettype": "Text",
+    "options": {"text": text, "i18n": false}
+}, ensure_ascii=False)

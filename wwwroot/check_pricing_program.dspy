@@ -1,0 +1,29 @@
+llmid = params_kw.get('llmid', '')
+
+if not llmid:
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "❌ 定价项目(pricing_program): 缺少llmid参数", "i18n": false}
+    }, ensure_ascii=False)
+
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+    maps = await sor.sqlExe(
+        "select * from llm_api_map where llmid=${llmid}$", {'llmid': llmid})
+    ppids = [m.ppid for m in maps if m.ppid] if maps else []
+
+if not ppids:
+    text = "❌ 定价项目(pricing_program): llm_api_map中无ppid"
+else:
+    ppid = ppids[0]
+    async with get_sor_context(request._run_ns, 'pricing') as psor:
+        pregs = await psor.sqlExe(
+            "select * from pricing_program where id=${ppid}$", {'ppid': ppid})
+        if pregs:
+            text = f"✅ 定价项目(pricing_program): {pregs[0].name} (id={ppid})"
+        else:
+            text = f"❌ 定价项目(pricing_program): ppid={ppid} 未找到"
+
+return json.dumps({
+    "widgettype": "Text",
+    "options": {"text": text, "i18n": false}
+}, ensure_ascii=False)
