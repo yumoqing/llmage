@@ -57,6 +57,7 @@ PATHS_LOGINED = [
     f"/{MOD}/api_doc.md",
     f"/{MOD}/llm_dialog.ui",
     f"/{MOD}/llm_launch_check.ui",
+    f"/{MOD}/llm_launch_check_page.dspy",
     f"/{MOD}/show_same_catelog_llm.ui",
     f"/{MOD}/show_llms.ui",
     f"/{MOD}/show_llms_by_providers.ui",

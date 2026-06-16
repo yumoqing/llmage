@@ -1,0 +1,161 @@
+# llm_launch_check_page.dspy
+# 服务端渲染模型上线检查页面，输出bricks widget JSON
+# 所有检查在服务端async执行，结果直接嵌入widget
+
+import html as html_mod
+
+llmid = params_kw.get('id', '')
+
+if not llmid:
+	return json.dumps({
+		"widgettype": "VBox",
+		"options": {"width": "100%", "height": "100%", "spacing": 10},
+		"subwidgets": [
+			{"widgettype": "Title", "options": {"text": "模型上线检查", "level": 2}},
+			{"widgettype": "Text", "options": {"text": "缺少模型ID参数", "i18n": False}}
+		]
+	}, ensure_ascii=False)
+
+# --- 服务端执行所有检查 ---
+checks = []
+all_passed = True
+llm_name = ''
+llm_model = ''
+
+async def add_check(name, passed, detail=''):
+	global all_passed
+	checks.append({'name': name, 'passed': passed, 'detail': detail})
+	if not passed:
+		all_passed = False
+
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+	recs = await sor.sqlExe(
+		"select * from llm where id=${llmid}$", {'llmid': llmid})
+	if not recs:
+		await add_check('模型记录', False, f'llm id={llmid} 不存在')
+	else:
+		llm = recs[0]
+		llm_name = llm.name or ''
+		llm_model = llm.model or ''
+		await add_check('模型记录', True, f'{llm_name} ({llm_model})')
+
+		date_ok = bool(llm.enabled_date and llm.expired_date)
+		status_ok = llm.status == 'published'
+		await add_check('日期与状态', date_ok and status_ok,
+			f"启用:{llm.enabled_date} 失效:{llm.expired_date} 状态:{llm.status}")
+
+		recs2 = await sor.sqlExe(
+			"select a.* from llm a, upapp b where a.id=${llmid}$ and a.upappid=b.id",
+			{'llmid': llmid})
+		await add_check('上位系统(upapp)', bool(recs2),
+			f'upappid={llm.upappid}' + ('' if recs2 else ' 未找到关联'))
+
+		recs3 = await sor.sqlExe("""
+			select a.*, e.ioid, e.stream
+			from llm a
+			join llm_api_map m on a.id = m.llmid
+			join upapp c on a.upappid = c.id
+			join uapi e on c.id = e.upappid and m.apiname = e.name
+			where a.id=${llmid}$""", {'llmid': llmid})
+		if recs3:
+			await add_check('API映射(uapi)', True, f'ioid={recs3[0].ioid}, stream={recs3[0].stream}')
+			ioid = recs3[0].ioid
+			recs4 = await sor.sqlExe(
+				"select * from uapiio where id=${ioid}$", {'ioid': ioid})
+			await add_check('IO定义(uapiio)', bool(recs4),
+				f'uapiio id={ioid}' if recs4 else f'ioid={ioid} 未找到')
+		else:
+			await add_check('API映射(uapi)', False, f'apiname={getattr(llm, "apiname", "N/A")} 在upapp中未找到')
+			await add_check('IO定义(uapiio)', False, '依赖 uapi 未通过')
+
+		maps = await sor.sqlExe(
+			"select * from llm_api_map where llmid=${llmid}$", {'llmid': llmid})
+		ppids = []
+		if maps:
+			ppids = [m.ppid for m in maps if m.ppid]
+			await add_check('能力映射(llm_api_map)', True, f'{len(maps)}条记录, {len(ppids)}个有定价')
+		else:
+			await add_check('能力映射(llm_api_map)', False, '无映射记录')
+
+		if ppids:
+			ppid = ppids[0]
+			async with get_sor_context(request._run_ns, 'pricing') as psor:
+				pregs = await psor.sqlExe(
+					"select * from pricing_program where id=${ppid}$", {'ppid': ppid})
+				if pregs:
+					await add_check('定价项目(pricing_program)', True, f'{pregs[0].name} (id={ppid})')
+					datas = await psor.sqlExe(
+						"select count(*) as cnt from pricingdata where ppid=${ppid}$", {'ppid': ppid})
+					cnt = datas[0].cnt if datas else 0
+					await add_check('定价数据(pricingdata)', cnt > 0,
+						f'{cnt}条记录' if cnt > 0 else '无定价数据')
+				else:
+					await add_check('定价项目(pricing_program)', False, f'ppid={ppid} 未找到')
+					await add_check('定价数据(pricingdata)', False, '依赖定价项目未通过')
+		else:
+			await add_check('定价项目(pricing_program)', False, 'llm_api_map中无ppid')
+			await add_check('定价数据(pricingdata)', False, '无定价项目')
+
+# --- 构建widget JSON ---
+api_url = entire_url('./api/llm_launch_check_api.dspy')
+status_text = '全部通过 ✅' if all_passed else '存在问题 ❌ 请检查下方详情'
+
+# 检查项列表：每项一行Text widget
+check_widgets = []
+for c in checks:
+	icon = '✅' if c['passed'] else '❌'
+	text = f"{icon} {c['name']}: {c['detail']}"
+	check_widgets.append({
+		"widgettype": "Text",
+		"options": {"text": text, "i18n": False}
+	})
+
+# 按钮和结果显示区
+subwidgets = [
+	{"widgettype": "Title", "options": {"text": f"模型上线检查 — {llm_name}", "level": 2}},
+	{"widgettype": "Text", "options": {"text": status_text, "i18n": False}},
+] + check_widgets
+
+if all_passed:
+	subwidgets.append({
+		"widgettype": "Button",
+		"options": {"name": "test_btn", "label": "体验一次", "i18n": False},
+		"binds": [{
+			"wid": "self",
+			"event": "click",
+			"actiontype": "urldata",
+			"target": "test_result",
+			"options": {
+				"url": f"{api_url}?llmid={llmid}&action=inference"
+			}
+		}]
+	})
+	subwidgets.append({
+		"widgettype": "Text",
+		"options": {"name": "test_result", "text": "", "i18n": False}
+	})
+	subwidgets.append({
+		"widgettype": "Button",
+		"options": {"name": "charge_btn", "label": "检查计费", "i18n": False},
+		"binds": [{
+			"wid": "self",
+			"event": "click",
+			"actiontype": "urldata",
+			"target": "charge_result",
+			"options": {
+				"url": f"{api_url}?llmid={llmid}&action=check_charging&usages=" + json.dumps({"prompt_tokens": 1000, "completion_tokens": 500})
+			}
+		}]
+	})
+	subwidgets.append({
+		"widgettype": "Text",
+		"options": {"name": "charge_result", "text": "", "i18n": False}
+	})
+
+widget = {
+	"widgettype": "VBox",
+	"options": {"width": "100%", "height": "100%", "spacing": 10},
+	"subwidgets": subwidgets
+}
+
+return json.dumps(widget, ensure_ascii=False)
