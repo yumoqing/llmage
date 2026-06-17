@@ -16,6 +16,12 @@
                     "dataurl": "{{entire_url('../api/get_search_apiname.dspy?allow_empty=1')}}?llmid={{params_kw.llmid}}",
                     "valueField": "apiname",
                     "textField": "apiname_text"
+                },
+                "isdefaultcatelog": {
+                    "uitype": "code",
+                    "dataurl": "{{entire_url('/appbase/get_appcodes_kv.dspy')}}?parentid=isdefaultcatelog_flg",
+                    "valueField": "k",
+                    "textField": "v"
                 }
             }
         },

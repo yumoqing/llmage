@@ -1,0 +1,47 @@
+{
+    "appcodes": [
+        {
+            "id": "llm_status",
+            "name": "模型上架状态",
+            "hierarchy_flg": "0"
+        },
+        {
+            "id": "llmusage_status",
+            "name": "调用状态",
+            "hierarchy_flg": "0"
+        },
+        {
+            "id": "accounting_status",
+            "name": "记账状态",
+            "hierarchy_flg": "0"
+        },
+        {
+            "id": "handled_flg",
+            "name": "是否已处理",
+            "hierarchy_flg": "0"
+        },
+        {
+            "id": "isdefaultcatelog_flg",
+            "name": "是否缺省分类",
+            "hierarchy_flg": "0"
+        }
+    ],
+    "appcodes_kv": [
+        {"id": "llm_status_published", "parentid": "llm_status", "k": "published", "v": "已上架"},
+        {"id": "llm_status_unpublished", "parentid": "llm_status", "k": "unpublished", "v": "已下架"},
+
+        {"id": "llmusage_status_succeeded", "parentid": "llmusage_status", "k": "SUCCEEDED", "v": "成功"},
+        {"id": "llmusage_status_failed", "parentid": "llmusage_status", "k": "FAILED", "v": "失败"},
+        {"id": "llmusage_status_unknown", "parentid": "llmusage_status", "k": "UNKNOWN", "v": "未知"},
+
+        {"id": "accounting_status_created", "parentid": "accounting_status", "k": "created", "v": "待记账"},
+        {"id": "accounting_status_accounted", "parentid": "accounting_status", "k": "accounted", "v": "已记账"},
+        {"id": "accounting_status_failed", "parentid": "accounting_status", "k": "failed", "v": "记账失败"},
+
+        {"id": "handled_flg_0", "parentid": "handled_flg", "k": "0", "v": "未处理"},
+        {"id": "handled_flg_1", "parentid": "handled_flg", "k": "1", "v": "已处理"},
+
+        {"id": "isdefaultcatelog_flg_0", "parentid": "isdefaultcatelog_flg", "k": "0", "v": "否"},
+        {"id": "isdefaultcatelog_flg_1", "parentid": "isdefaultcatelog_flg", "k": "1", "v": "是"}
+    ]
+}
