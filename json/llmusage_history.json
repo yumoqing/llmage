@@ -5,20 +5,7 @@
         "sortby": "use_time desc",
         "browserfields": {
             "exclouded": ["id"],
-            "alters": {
-                "status": {
-                    "uitype": "code",
-                    "dataurl": "{{entire_url('/appbase/get_appcodes_kv.dspy')}}?parentid=llmusage_status",
-                    "valueField": "k",
-                    "textField": "v"
-                },
-                "accounting_status": {
-                    "uitype": "code",
-                    "dataurl": "{{entire_url('/appbase/get_appcodes_kv.dspy')}}?parentid=accounting_status",
-                    "valueField": "k",
-                    "textField": "v"
-                }
-            }
+            "alters": {}
         },
         "editexclouded": ["id"],
         "editable": {

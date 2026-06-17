@@ -23,12 +23,6 @@
         "browserfields": {
             "exclouded": ["id", "ownerid"],
             "alters": {
-                "status": {
-                    "uitype": "code",
-                    "dataurl": "{{entire_url('/appbase/get_appcodes_kv.dspy')}}?parentid=llm_status",
-                    "valueField": "k",
-                    "textField": "v"
-                },
                 "ppid":{
                     "dataurl":"{{entire_url('/pricing/get_all_pricing_programs.dspy')}}",
                     "textField": "name",

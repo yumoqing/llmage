@@ -5,14 +5,7 @@
         "sortby": "failed_time desc",
         "browserfields": {
             "exclouded": ["id"],
-            "alters": {
-                "handled": {
-                    "uitype": "code",
-                    "dataurl": "{{entire_url('/appbase/get_appcodes_kv.dspy')}}?parentid=handled_flg",
-                    "valueField": "k",
-                    "textField": "v"
-                }
-            }
+            "alters": {}
         },
         "editexclouded": ["id", "llmusageid", "failed_time"],
         "editable": {

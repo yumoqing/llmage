@@ -16,13 +16,6 @@
                     "dataurl": "{{entire_url('../api/get_search_apiname.dspy')}}?allow_empty=1&llmid={{params_kw.llmid}}",
                     "valueField": "apiname",
                     "textField": "apiname_text"
-                },
-                "isdefaultcatelog": {
-                    "uitype": "code",
-                    "data": [
-                        {"value": "0", "text": "否"},
-                        {"value": "1", "text": "是"}
-                    ]
                 }
             }
         },

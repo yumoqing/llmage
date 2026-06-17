@@ -108,6 +108,13 @@
             "table": "organization",
             "valuefield": "id",
             "textfield": "orgname"
+        },
+        {
+            "field": "status",
+            "table": "appcodes_kv",
+            "valuefield": "k",
+            "textfield": "v",
+            "cond": "parentid='llm_status'"
         }
     ]
 }

@@ -144,5 +144,21 @@
                 "use_time"
             ]
         }
+    ],
+    "codes": [
+        {
+            "field": "status",
+            "table": "appcodes_kv",
+            "valuefield": "k",
+            "textfield": "v",
+            "cond": "parentid='llmusage_status'"
+        },
+        {
+            "field": "accounting_status",
+            "table": "appcodes_kv",
+            "valuefield": "k",
+            "textfield": "v",
+            "cond": "parentid='accounting_status'"
+        }
     ]
 }

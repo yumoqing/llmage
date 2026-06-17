@@ -121,5 +121,14 @@
             "idxtype": "index",
             "idxfields": ["failed_time"]
         }
+    ],
+    "codes": [
+        {
+            "field": "handled",
+            "table": "appcodes_kv",
+            "valuefield": "k",
+            "textfield": "v",
+            "cond": "parentid='handled_flg'"
+        }
     ]
 }

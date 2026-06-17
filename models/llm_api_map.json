@@ -118,6 +118,13 @@
             "table": "pricing_program",
             "valuefield": "id",
             "textfield": "name"
+        },
+        {
+            "field": "isdefaultcatelog",
+            "table": "appcodes_kv",
+            "valuefield": "k",
+            "textfield": "v",
+            "cond": "parentid='isdefaultcatelog_flg'"
         }
     ]
 }
