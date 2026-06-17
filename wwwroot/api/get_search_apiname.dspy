@@ -3,7 +3,7 @@ allow_empty = params_kw.get('allow_empty', '')
 
 result = []
 if allow_empty:
-	result = [{'apiname': '', 'apiname_text': '不指定'}]
+	result = [{'apiname': '', 'apiname_text': '不指定', 'value': '', 'text': '不指定'}]
 
 try:
 	if not llmid:
@@ -26,6 +26,10 @@ try:
 			"select name as apiname, name as apiname_text from uapi where upappid = ${upappid}$ order by name",
 			{'upappid': upappid}
 		)
+		# Add value/text keys for form dropdown compatibility
+		for a in apis:
+			a['value'] = a['apiname']
+			a['text'] = a['apiname_text']
 		return json.dumps(result + list(apis), ensure_ascii=False)
 except Exception as e:
 	debug(f'get_search_apiname error: {e}')
