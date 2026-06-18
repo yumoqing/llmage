@@ -8,73 +8,46 @@
     },
     "subwidgets": [
         {
-            "widgettype": "HBox",
+            "widgettype": "InlineForm",
+            "id": "filter_form",
             "options": {
-                "width": "100%",
-                "gap": "8px",
-                "alignItems": "flex-end"
-            },
-            "subwidgets": [
-                {
-                    "widgettype": "InlineForm",
-                    "id": "filter_form",
-                    "options": {
-                        "css": "card",
-                        "padding": "8px",
-                        "submit_label": "查询",
-                        "submit_css": "primary",
-                        "fields": [
-                            {
-                                "name": "start_date",
-                                "label": "开始日期",
-                                "uitype": "date",
-                                "cwidth": 10
-                            },
-                            {
-                                "name": "end_date",
-                                "label": "结束日期",
-                                "uitype": "date",
-                                "cwidth": 10
-                            },
-                            {
-                                "name": "handled",
-                                "label": "处理状态",
-                                "uitype": "code",
-                                "cwidth": 8,
-                                "data": [
-                                    {"value": "", "text": "全部"},
-                                    {"value": "0", "text": "未处理"},
-                                    {"value": "1", "text": "已处理"}
-                                ]
-                            }
+                "css": "card",
+                "padding": "8px",
+                "submit_label": "查询",
+                "submit_css": "primary",
+                "fields": [
+                    {
+                        "name": "start_date",
+                        "label": "开始日期",
+                        "uitype": "date",
+                        "cwidth": 10
+                    },
+                    {
+                        "name": "end_date",
+                        "label": "结束日期",
+                        "uitype": "date",
+                        "cwidth": 10
+                    },
+                    {
+                        "name": "handled",
+                        "label": "处理状态",
+                        "uitype": "code",
+                        "cwidth": 8,
+                        "data": [
+                            {"value": "", "text": "全部"},
+                            {"value": "0", "text": "未处理"},
+                            {"value": "1", "text": "已处理"}
                         ]
-                    },
-                    "binds": [
-                        {
-                            "wid": "self",
-                            "event": "submit",
-                            "actiontype": "script",
-                            "target": "failed_table",
-                            "script": "var tbl = bricks.getWidgetById('failed_table', bricks.app.root); if(tbl) await tbl.render(params);"
-                        }
-                    ]
-                },
+                    }
+                ]
+            },
+            "binds": [
                 {
-                    "widgettype": "Button",
-                    "id": "retry_btn",
-                    "options": {
-                        "label": "重试记账",
-                        "bgcolor": "#4caf50",
-                        "color": "#ffffff",
-                        "cwidth": 6
-                    },
-                    "binds": [{
-                        "wid": "self",
-                        "event": "click",
-                        "actiontype": "script",
-                        "target": "self",
-                        "script": "var dv = bricks.getWidgetById('failed_table', bricks.app.root); if(!dv || !dv.select_row || !dv.select_row.user_data) { alert('请先选中一条记录'); return; } var row = dv.select_row.user_data; if(!row.llmusageid) { alert('记录缺少llmusageid'); return; } var resp = await fetch('{{entire_url('/llmage/api/retry_accounting.dspy')}}?id=' + row.llmusageid); var d = await resp.json(); if(d.success) { alert(d.message); await dv.render({}); } else { alert('失败: ' + d.message); }"
-                    }]
+                    "wid": "self",
+                    "event": "submit",
+                    "actiontype": "script",
+                    "target": "failed_table",
+                    "script": "var tbl = bricks.getWidgetById('failed_table', bricks.app.root); if(tbl) await tbl.render(params);"
                 }
             ]
         },
@@ -90,6 +63,11 @@
                         {
                             "name": "show_reason",
                             "label": "原因",
+                            "selected_row": true
+                        },
+                        {
+                            "name": "retry_accounting",
+                            "label": "重试记账",
                             "selected_row": true
                         }
                     ]
@@ -180,6 +158,13 @@
                     "options": {
                         "url": "{{entire_url('/llmage/api/show_failed_reason.dspy')}}?id=${id}$"
                     }
+                },
+                {
+                    "wid": "self",
+                    "event": "retry_accounting",
+                    "actiontype": "script",
+                    "target": "self",
+                    "script": "var dv = bricks.getWidgetById('failed_table', bricks.app.root); if(!dv || !dv.select_row || !dv.select_row.user_data) { alert('请先选中一条记录'); return; } var row = dv.select_row.user_data; if(!row.llmusageid) { alert('记录缺少llmusageid'); return; } var resp = await fetch('{{entire_url('/llmage/api/retry_accounting.dspy')}}?id=' + row.llmusageid); var d = await resp.json(); if(d.success) { alert(d.message); await dv.render({}); } else { alert('失败: ' + d.message); }"
                 }
             ]
         }
