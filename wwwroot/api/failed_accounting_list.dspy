@@ -44,10 +44,10 @@ try:
 			conditions.append("f.use_date<=${end_date}$")
 			ns['end_date'] = filters['end_date']
 		if filters.get('filter_userid'):
-			conditions.append("f.userid LIKE ${filter_userid}$")
+			conditions.append("(u.username LIKE ${filter_userid}$ OR u.name LIKE ${filter_userid}$)")
 			ns['filter_userid'] = '%' + filters['filter_userid'] + '%'
 		if filters.get('filter_llmid'):
-			conditions.append("(f.llmid LIKE ${filter_llmid}$ OR f.llmid_text LIKE ${filter_llmid}$)")
+			conditions.append("(f.llmid LIKE ${filter_llmid}$ OR l.name LIKE ${filter_llmid}$)")
 			ns['filter_llmid'] = '%' + filters['filter_llmid'] + '%'
 
 		where = ""
@@ -61,7 +61,7 @@ SELECT f.*,
 	o.orgname as userorgid_text,
 	l.name as llmid_text
 FROM llmusage_accounting_failed f
-LEFT JOIN {sage_db}.users u ON f.userid = u.userid
+LEFT JOIN {sage_db}.users u ON f.userid = u.id
 LEFT JOIN {sage_db}.organization o ON f.userorgid = o.id
 LEFT JOIN {llmage_db}.llm l ON f.llmid = l.id
 {where}
@@ -71,7 +71,7 @@ ORDER BY f.failed_time DESC
 		count_sql = f"""
 SELECT count(*) as cnt
 FROM llmusage_accounting_failed f
-LEFT JOIN {sage_db}.users u ON f.userid = u.userid
+LEFT JOIN {sage_db}.users u ON f.userid = u.id
 LEFT JOIN {sage_db}.organization o ON f.userorgid = o.id
 LEFT JOIN {llmage_db}.llm l ON f.llmid = l.id
 {where}
