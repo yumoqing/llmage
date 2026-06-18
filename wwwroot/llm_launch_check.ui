@@ -17,23 +17,16 @@
 		},
 		{
 			"widgettype": "VScrollPanel",
+			"id": "check_scroll",
 			"options": {
 				"css": "filler",
 				"width": "100%"
 			},
 			"subwidgets": [
 				{
-					"widgettype": "Text",
-					"options": {
-						"name": "check_status",
-						"text": "检查中...",
-						"i18n": false
-					}
-				},
-				{
 					"widgettype": "VBox",
+					"id": "checks_list",
 					"options": {
-						"name": "checks_list",
 						"spacing": 5
 					},
 					"subwidgets": [
@@ -89,16 +82,16 @@
 				},
 				{
 					"widgettype": "Text",
+					"id": "test_result",
 					"options": {
-						"name": "test_result",
 						"text": "",
 						"i18n": false
 					}
 				},
 				{
 					"widgettype": "Text",
+					"id": "charge_result",
 					"options": {
-						"name": "charge_result",
 						"text": "",
 						"i18n": false
 					}
@@ -114,16 +107,16 @@
 			"subwidgets": [
 				{
 					"widgettype": "Button",
+					"id": "test_btn",
 					"options": {
-						"name": "test_btn",
 						"label": "体验一次",
 						"i18n": false
 					}
 				},
 				{
 					"widgettype": "Button",
+					"id": "charge_btn",
 					"options": {
-						"name": "charge_btn",
 						"label": "检查计费",
 						"i18n": false
 					}
