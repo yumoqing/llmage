@@ -24,8 +24,7 @@
                     "cheight": 20
                 },
                 "options": {
-                    "url": "{{entire_url('../api/show_failed_reason.dspy')}}",
-                    "params": {"id": "${id}$"}
+                    "url": "{{entire_url('../api/show_failed_reason.dspy')}}?id=${id}$"
                 }
             }
         ],
