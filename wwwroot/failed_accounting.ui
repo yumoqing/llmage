@@ -93,12 +93,21 @@
                 "width": "100%",
                 "height": "100%",
                 "css": "card",
+                "toolbar": {
+                    "tools": [
+                        {
+                            "name": "show_reason",
+                            "label": "原因",
+                            "selected_row": true
+                        }
+                    ]
+                },
                 "data_url": "{{entire_url('/llmage/api/failed_accounting_list.dspy')}}",
                 "data_method": "GET",
                 "page_rows": 20,
                 "row_options": {
                     "browserfields": {
-                        "exclouded": ["id"],
+                        "exclouded": ["id", "failed_reason"],
                         "alters": {
                             "handled": {
                                 "uitype": "code",
@@ -125,7 +134,23 @@
                         {"name": "handled", "title": "状态", "type": "str", "length": 1, "cwidth": 6, "uitype": "code", "label": "状态"}
                     ]
                 }
-            }
+            },
+            "binds": [
+                {
+                    "wid": "self",
+                    "event": "show_reason",
+                    "actiontype": "urlwidget",
+                    "target": "PopupWindow",
+                    "popup_options": {
+                        "title": "失败原因",
+                        "cwidth": 30,
+                        "cheight": 20
+                    },
+                    "options": {
+                        "url": "{{entire_url('/llmage/api/show_failed_reason.dspy')}}?id=${id}$"
+                    }
+                }
+            ]
         }
     ]
 }
