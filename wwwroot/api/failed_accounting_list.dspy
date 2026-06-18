@@ -1,72 +1,101 @@
 result = {'success': False, 'rows': [], 'total': 0, 'page': 1, 'page_size': 50}
 
 try:
-    dbname = get_module_dbname('llmage')
+	llmage_db = get_module_dbname('llmage')
+	sage_db = get_module_dbname('sage')
+	db = DBPools()
 
-    filters = {}
-    if params_kw.get('userorgid'):
-        filters['userorgid'] = params_kw.get('userorgid')
-    if params_kw.get('llmid'):
-        filters['llmid'] = params_kw.get('llmid')
-    if params_kw.get('handled') is not None and params_kw.get('handled') != '':
-        filters['handled'] = params_kw.get('handled')
-    if params_kw.get('start_date'):
-        filters['start_date'] = params_kw.get('start_date')
-    if params_kw.get('end_date'):
-        filters['end_date'] = params_kw.get('end_date')
+	filters = {}
+	if params_kw.get('userorgid'):
+		filters['userorgid'] = params_kw.get('userorgid')
+	if params_kw.get('llmid'):
+		filters['llmid'] = params_kw.get('llmid')
+	if params_kw.get('handled') is not None and params_kw.get('handled') != '':
+		filters['handled'] = params_kw.get('handled')
+	if params_kw.get('start_date'):
+		filters['start_date'] = params_kw.get('start_date')
+	if params_kw.get('end_date'):
+		filters['end_date'] = params_kw.get('end_date')
+	if params_kw.get('filter_userid'):
+		filters['filter_userid'] = params_kw.get('filter_userid')
+	if params_kw.get('filter_llmid'):
+		filters['filter_llmid'] = params_kw.get('filter_llmid')
 
-    page = int(params_kw.get('page', 1))
-    page_size = int(params_kw.get('page_size', 50))
+	page = int(params_kw.get('page', 1))
+	page_size = int(params_kw.get('page_size', 50))
 
-    async with DBPools().sqlorContext(dbname) as sor:
-        conditions = []
-        ns = {}
+	async with db.sqlorContext(llmage_db) as sor:
+		conditions = []
+		ns = {}
 
-        if 'handled' not in filters:
-            conditions.append("handled='0'")
+		if filters.get('userorgid'):
+			conditions.append("f.userorgid=${userorgid}$")
+			ns['userorgid'] = filters['userorgid']
+		if filters.get('llmid'):
+			conditions.append("f.llmid=${llmid}$")
+			ns['llmid'] = filters['llmid']
+		if filters.get('handled') is not None:
+			conditions.append("f.handled=${handled}$")
+			ns['handled'] = filters['handled']
+		if filters.get('start_date'):
+			conditions.append("f.use_date>=${start_date}$")
+			ns['start_date'] = filters['start_date']
+		if filters.get('end_date'):
+			conditions.append("f.use_date<=${end_date}$")
+			ns['end_date'] = filters['end_date']
+		if filters.get('filter_userid'):
+			conditions.append("f.userid LIKE ${filter_userid}$")
+			ns['filter_userid'] = '%' + filters['filter_userid'] + '%'
+		if filters.get('filter_llmid'):
+			conditions.append("(f.llmid LIKE ${filter_llmid}$ OR f.llmid_text LIKE ${filter_llmid}$)")
+			ns['filter_llmid'] = '%' + filters['filter_llmid'] + '%'
 
-        if filters.get('userorgid'):
-            conditions.append("userorgid=${userorgid}$")
-            ns['userorgid'] = filters['userorgid']
-        if filters.get('llmid'):
-            conditions.append("llmid=${llmid}$")
-            ns['llmid'] = filters['llmid']
-        if filters.get('handled') is not None:
-            conditions.append("handled=${handled}$")
-            ns['handled'] = filters['handled']
-        if filters.get('start_date'):
-            conditions.append("use_date>=${start_date}$")
-            ns['start_date'] = filters['start_date']
-        if filters.get('end_date'):
-            conditions.append("use_date<=${end_date}$")
-            ns['end_date'] = filters['end_date']
+		where = ""
+		if conditions:
+			where = "WHERE " + " AND ".join(conditions)
 
-        where = ""
-        if conditions:
-            where = "where " + " and ".join(conditions)
+		# 跨库JOIN获取名称
+		sql = f"""
+SELECT f.*,
+	u.username as userid_text,
+	o.orgname as userorgid_text,
+	l.name as llmid_text
+FROM llmusage_accounting_failed f
+LEFT JOIN {sage_db}.users u ON f.userid = u.userid
+LEFT JOIN {sage_db}.organization o ON f.userorgid = o.id
+LEFT JOIN {llmage_db}.llm l ON f.llmid = l.id
+{where}
+ORDER BY f.failed_time DESC
+"""
 
-        count_sql = f"select count(*) as cnt from llmusage_accounting_failed {where}"
-        count_recs = await sor.sqlExe(count_sql, ns)
-        total = count_recs[0].cnt if count_recs else 0
+		count_sql = f"""
+SELECT count(*) as cnt
+FROM llmusage_accounting_failed f
+LEFT JOIN {sage_db}.users u ON f.userid = u.userid
+LEFT JOIN {sage_db}.organization o ON f.userorgid = o.id
+LEFT JOIN {llmage_db}.llm l ON f.llmid = l.id
+{where}
+"""
+		count_recs = await sor.sqlExe(count_sql, ns)
+		total = count_recs[0].cnt if count_recs else 0
 
-        offset = (page - 1) * page_size
-        query_sql = f"""select * from llmusage_accounting_failed {where}
-order by failed_time desc limit {page_size} offset {offset}"""
-        recs = await sor.sqlExe(query_sql, ns)
+		offset = (page - 1) * page_size
+		query_sql = sql + f" LIMIT {page_size} OFFSET {offset}"
+		recs = await sor.sqlExe(query_sql, ns)
 
-        rows = []
-        for r in (recs or []):
-            d = dict(r)
-            d['handled'] = '已处理' if d.get('handled') == '1' else '未处理'
-            rows.append(d)
+		rows = []
+		for r in (recs or []):
+			d = dict(r)
+			rows.append(d)
 
-        result['rows'] = rows
-        result['total'] = total
-        result['page'] = page
-        result['page_size'] = page_size
-        result['success'] = True
+		result['rows'] = rows
+		result['total'] = total
+		result['page'] = page
+		result['page_size'] = page_size
+		result['success'] = True
 
 except Exception as e:
-    result['error'] = str(e)
+	result['error'] = str(e)
+	debug(f'failed_accounting_list error: {format_exc()}')
 
 return json.dumps(result, ensure_ascii=False, default=str)
