@@ -19,7 +19,11 @@ else:
         pregs = await psor.sqlExe(
             "select * from pricing_program where id=${ppid}$", {'ppid': ppid})
         if pregs:
-            text = f"✅ 定价项目(pricing_program): {pregs[0].name} (id={ppid})"
+            p = pregs[0]
+            display_name = getattr(p, 'display_text', '') or getattr(p, 'name', '')
+            text = f"✅ 定价项目(pricing_program): {display_name}"
+            if hasattr(p, 'id'):
+                text += f" (id={p.id})"
         else:
             text = f"❌ 定价项目(pricing_program): ppid={ppid} 未找到"
 

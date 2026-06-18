@@ -16,101 +16,119 @@
 			}
 		},
 		{
-			"widgettype": "Text",
+			"widgettype": "VScrollPanel",
 			"options": {
-				"name": "check_status",
-				"text": "检查中...",
-				"i18n": false
-			}
-		},
-		{
-			"widgettype": "VBox",
-			"options": {
-				"name": "checks_list",
-				"spacing": 5
+				"css": "filler",
+				"width": "100%"
 			},
 			"subwidgets": [
 				{
-					"widgettype": "urlwidget",
+					"widgettype": "Text",
 					"options": {
-						"url": "/llmage/check_model_record.dspy?llmid={{llmid}}"
+						"name": "check_status",
+						"text": "检查中...",
+						"i18n": false
 					}
 				},
 				{
-					"widgettype": "urlwidget",
+					"widgettype": "VBox",
 					"options": {
-						"url": "/llmage/check_date_status.dspy?llmid={{llmid}}"
+						"name": "checks_list",
+						"spacing": 5
+					},
+					"subwidgets": [
+						{
+							"widgettype": "urlwidget",
+							"options": {
+								"url": "/llmage/check_model_record.dspy?llmid={{llmid}}"
+							}
+						},
+						{
+							"widgettype": "urlwidget",
+							"options": {
+								"url": "/llmage/check_date_status.dspy?llmid={{llmid}}"
+							}
+						},
+						{
+							"widgettype": "urlwidget",
+							"options": {
+								"url": "/llmage/check_upapp.dspy?llmid={{llmid}}"
+							}
+						},
+						{
+							"widgettype": "urlwidget",
+							"options": {
+								"url": "/llmage/check_uapi.dspy?llmid={{llmid}}"
+							}
+						},
+						{
+							"widgettype": "urlwidget",
+							"options": {
+								"url": "/llmage/check_uapiio.dspy?llmid={{llmid}}"
+							}
+						},
+						{
+							"widgettype": "urlwidget",
+							"options": {
+								"url": "/llmage/check_llm_api_map.dspy?llmid={{llmid}}"
+							}
+						},
+						{
+							"widgettype": "urlwidget",
+							"options": {
+								"url": "/llmage/check_pricing_program.dspy?llmid={{llmid}}"
+							}
+						},
+						{
+							"widgettype": "urlwidget",
+							"options": {
+								"url": "/llmage/check_pricing_data.dspy?llmid={{llmid}}"
+							}
+						}
+					]
+				},
+				{
+					"widgettype": "Text",
+					"options": {
+						"name": "test_result",
+						"text": "",
+						"i18n": false
 					}
 				},
 				{
-					"widgettype": "urlwidget",
+					"widgettype": "Text",
 					"options": {
-						"url": "/llmage/check_upapp.dspy?llmid={{llmid}}"
-					}
-				},
-				{
-					"widgettype": "urlwidget",
-					"options": {
-						"url": "/llmage/check_uapi.dspy?llmid={{llmid}}"
-					}
-				},
-				{
-					"widgettype": "urlwidget",
-					"options": {
-						"url": "/llmage/check_uapiio.dspy?llmid={{llmid}}"
-					}
-				},
-				{
-					"widgettype": "urlwidget",
-					"options": {
-						"url": "/llmage/check_llm_api_map.dspy?llmid={{llmid}}"
-					}
-				},
-				{
-					"widgettype": "urlwidget",
-					"options": {
-						"url": "/llmage/check_pricing_program.dspy?llmid={{llmid}}"
-					}
-				},
-				{
-					"widgettype": "urlwidget",
-					"options": {
-						"url": "/llmage/check_pricing_data.dspy?llmid={{llmid}}"
+						"name": "charge_result",
+						"text": "",
+						"i18n": false
 					}
 				}
 			]
 		},
 		{
-			"widgettype": "Button",
+			"widgettype": "HBox",
 			"options": {
-				"name": "test_btn",
-				"label": "体验一次",
-				"i18n": false
-			}
-		},
-		{
-			"widgettype": "Text",
-			"options": {
-				"name": "test_result",
-				"text": "",
-				"i18n": false
-			}
-		},
-		{
-			"widgettype": "Button",
-			"options": {
-				"name": "charge_btn",
-				"label": "检查计费",
-				"i18n": false
-			}
-		},
-		{
-			"widgettype": "Text",
-			"options": {
-				"name": "charge_result",
-				"text": "",
-				"i18n": false
-			}
+				"spacing": 10,
+				"alignItems": "center"
+			},
+			"subwidgets": [
+				{
+					"widgettype": "Button",
+					"options": {
+						"name": "test_btn",
+						"label": "体验一次",
+						"i18n": false
+					}
+				},
+				{
+					"widgettype": "Button",
+					"options": {
+						"name": "charge_btn",
+						"label": "检查计费",
+						"i18n": false
+					}
+				}
+			]
 		}
 	],
 	"binds": [
