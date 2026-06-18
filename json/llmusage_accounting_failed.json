@@ -3,8 +3,34 @@
     "title": "记账失败记录",
     "params": {
         "sortby": "failed_time desc",
+        "toolbar": {
+            "tools": [
+                {
+                    "name": "show_reason",
+                    "label": "原因",
+                    "selected_row": true
+                }
+            ]
+        },
+        "binds": [
+            {
+                "wid": "self",
+                "event": "show_reason",
+                "actiontype": "urlwidget",
+                "target": "PopupWindow",
+                "popup_options": {
+                    "title": "失败原因",
+                    "cwidth": 30,
+                    "cheight": 20
+                },
+                "options": {
+                    "url": "{{entire_url('../api/show_failed_reason.dspy')}}",
+                    "params": {"id": "${id}$"}
+                }
+            }
+        ],
         "browserfields": {
-            "exclouded": ["id"],
+            "exclouded": ["id", "failed_reason"],
             "alters": {}
         },
         "editexclouded": ["id", "llmusageid", "failed_time"],

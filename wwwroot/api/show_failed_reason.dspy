@@ -1,0 +1,28 @@
+record_id = params_kw.get('id', '')
+
+reason = '未找到记录'
+if record_id:
+    dbname = get_module_dbname('llmage')
+    async with DBPools().sqlorContext(dbname) as sor:
+        rows = await sor.R('llmusage_accounting_failed', {'id': record_id})
+        if rows:
+            reason = rows[0].get('failed_reason', '') or '（空）'
+
+return {
+    "widgettype": "VScrollPanel",
+    "options": {
+        "width": "100%",
+        "height": "100%",
+        "css": "card",
+        "padding": "12px"
+    },
+    "subwidgets": [
+        {
+            "widgettype": "Text",
+            "options": {
+                "text": reason,
+                "i18n": False
+            }
+        }
+    ]
+}
