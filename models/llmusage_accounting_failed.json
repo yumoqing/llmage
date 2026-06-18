@@ -129,6 +129,24 @@
             "valuefield": "k",
             "textfield": "v",
             "cond": "parentid='handled_flg'"
+        },
+        {
+            "field": "userid",
+            "table": "users",
+            "valuefield": "userid",
+            "textfield": "username"
+        },
+        {
+            "field": "userorgid",
+            "table": "organization",
+            "valuefield": "id",
+            "textfield": "orgname"
+        },
+        {
+            "field": "llmid",
+            "table": "llm",
+            "valuefield": "id",
+            "textfield": "name"
         }
     ]
 }

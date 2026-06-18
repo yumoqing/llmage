@@ -1,8 +1,10 @@
 {
     "widgettype": "VBox",
     "options": {
-        "css": "filler", "height": "100%",
-        "width": "100%"
+        "height": "100%",
+        "width": "100%",
+        "padding": "8px",
+        "gap": "8px"
     },
     "subwidgets": [
         {
@@ -11,7 +13,6 @@
             "options": {
                 "css": "card",
                 "padding": "8px",
-                "show_label": true,
                 "submit_label": "查询",
                 "submit_css": "primary",
                 "fields": [
@@ -38,12 +39,6 @@
                         "label": "用户",
                         "uitype": "str",
                         "placeholder": "用户ID",
-                        "cwidth": 12
-                    },
-                    {
-                        "name": "use_date",
-                        "label": "使用日期",
-                        "uitype": "date",
                         "cwidth": 12
                     },
                     {
@@ -160,42 +155,66 @@
                         },
                         {
                             "name": "llmid",
-                            "title": "模型id",
+                            "title": "模型",
                             "type": "str",
                             "length": 32,
                             "cwidth": 18,
-                            "uitype": "str",
+                            "uitype": "code",
+                            "valueField": "llmid",
+                            "textField": "llmid_text",
+                            "params": {
+                                "dbname": "llmage",
+                                "table": "llm",
+                                "tblvalue": "id",
+                                "tbltext": "name",
+                                "valueField": "llmid",
+                                "textField": "llmid_text"
+                            },
+                            "dataurl": "{{entire_url('/appbase/get_code.dspy')}}",
                             "datatype": "str",
-                            "label": "模型id"
+                            "label": "模型"
                         },
                         {
                             "name": "userid",
-                            "title": "用户id",
+                            "title": "用户",
                             "type": "str",
                             "length": 32,
                             "cwidth": 18,
-                            "uitype": "str",
+                            "uitype": "code",
+                            "valueField": "userid",
+                            "textField": "userid_text",
+                            "params": {
+                                "dbname": "sage",
+                                "table": "users",
+                                "tblvalue": "userid",
+                                "tbltext": "username",
+                                "valueField": "userid",
+                                "textField": "userid_text"
+                            },
+                            "dataurl": "{{entire_url('/appbase/get_code.dspy')}}",
                             "datatype": "str",
-                            "label": "用户id"
+                            "label": "用户"
                         },
                         {
                             "name": "userorgid",
-                            "title": "用户机构id",
+                            "title": "机构",
                             "type": "str",
                             "length": 32,
                             "cwidth": 18,
-                            "uitype": "str",
+                            "uitype": "code",
+                            "valueField": "userorgid",
+                            "textField": "userorgid_text",
+                            "params": {
+                                "dbname": "sage",
+                                "table": "organization",
+                                "tblvalue": "id",
+                                "tbltext": "orgname",
+                                "valueField": "userorgid",
+                                "textField": "userorgid_text"
+                            },
+                            "dataurl": "{{entire_url('/appbase/get_code.dspy')}}",
                             "datatype": "str",
-                            "label": "用户机构id"
-                        },
-                        {
-                            "name": "use_date",
-                            "title": "使用日期",
-                            "type": "date",
-                            "length": 0,
-                            "uitype": "date",
-                            "datatype": "date",
-                            "label": "使用日期"
+                            "label": "机构"
                         },
                         {
                             "name": "use_time",
@@ -216,17 +235,6 @@
                             "uitype": "float",
                             "datatype": "double",
                             "label": "交易金额"
-                        },
-                        {
-                            "name": "cost",
-                            "title": "交易成本",
-                            "type": "double",
-                            "length": 18,
-                            "dec": 5,
-                            "cwidth": 18,
-                            "uitype": "float",
-                            "datatype": "double",
-                            "label": "交易成本"
                         },
                         {
                             "name": "failed_reason",
