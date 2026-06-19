@@ -1,0 +1,127 @@
+模型管理: Model Management
+模型名称: Model Name
+模型编码: Model Code
+模型类型: Model Type
+模型提供商: Model Provider
+模型版本: Model Version
+模型状态: Model Status
+API接口: API Interface
+API密钥: API Key
+API地址: API Endpoint
+最大Token: Max Tokens
+输入价格: Input Price
+输出价格: Output Price
+折扣: Discount
+启用: Enable
+停用: Disable
+已启用: Enabled
+已停用: Disabled
+新增模型: Add Model
+编辑模型: Edit Model
+删除模型: Delete Model
+测试模型: Test Model
+模型分组: Model Group
+分组名称: Group Name
+分组描述: Group Description
+新增分组: Add Group
+编辑分组: Edit Group
+删除分组: Delete Group
+使用统计: Usage Statistics
+调用次数: Call Count
+成功次数: Success Count
+失败次数: Failure Count
+Token用量: Token Usage
+输入Token: Input Tokens
+输出Token: Output Tokens
+总Token: Total Tokens
+费用统计: Cost Statistics
+总费用: Total Cost
+本月费用: Monthly Cost
+今日费用: Daily Cost
+按模型统计: By Model
+按用户统计: By User
+按日期统计: By Date
+趋势图: Trend Chart
+日: Day
+周: Week
+月: Month
+年: Year
+用户管理: User Management
+用户名称: User Name
+用户Token配额: User Token Quota
+已使用: Used
+剩余配额: Remaining Quota
+配额重置: Quota Reset
+模型映射: Model Mapping
+映射名称: Mapping Name
+源模型: Source Model
+目标模型: Target Model
+映射状态: Mapping Status
+新增映射: Add Mapping
+编辑映射: Edit Mapping
+删除映射: Delete Mapping
+密钥管理: Key Management
+密钥名称: Key Name
+密钥值: Key Value
+密钥状态: Key Status
+新增密钥: Add Key
+编辑密钥: Edit Key
+删除密钥: Delete Key
+日志: Log
+请求日志: Request Log
+错误日志: Error Log
+请求时间: Request Time
+响应时间: Response Time
+耗时: Duration
+状态码: Status Code
+错误信息: Error Message
+请求参数: Request Parameters
+响应内容: Response Content
+供应商: Vendor
+所属机构: Organization
+定价项目: Pricing Item
+定价属于: Pricing Belongs To
+供应商折扣: Vendor Discount
+描述: Description
+规格明细: Specification Details
+项目名称: Item Name
+模型: Model
+API: API
+定价: Pricing
+时序: Timeline
+开始日期: Start Date
+结束日期: End Date
+生效日期: Effective Date
+失效日期: Expiration Date
+定价数据: Pricing Data
+定价项目时序: Pricing Item Timeline
+测试: Test
+定价测试: Pricing Test
+新增: Add
+保存: Save
+取消: Cancel
+确认: Confirm
+删除: Delete
+编辑: Edit
+查看: View
+导出: Export
+打印: Print
+刷新: Refresh
+返回: Back
+提交: Submit
+重置: Reset
+Conform: Confirm
+Discard: Discard
+Submit: Submit
+Reset: Reset
+Cancel: Cancel
+搜索: Search
+操作: Action
+类型: Type
+状态: Status
+名称: Name
+编码: Code
+备注: Remark
+创建时间: Created Time
+更新时间: Updated Time
+全部: All

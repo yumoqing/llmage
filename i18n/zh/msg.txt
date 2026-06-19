@@ -1,0 +1,140 @@
+API接口: API接口
+Add Error: Add Error
+Add Success: Add Success
+Authorization Error: Authorization Error
+Cancel: Cancel
+Conform: Conform
+Delete Error: Delete Error
+Delete Success: Delete Success
+Discard: Discard
+Error: Error
+ID: ID
+Invalid: Invalid
+Messages array cannot be empty: Messages array cannot be empty
+Missing required parameter\x3A model: Missing required parameter\x3A model
+Not enrogh balance to use llm: Not enrogh balance to use llm
+Please login: Please login
+Record no exist or with wrong ownership: Record no exist or with wrong ownership
+Reset: Reset
+Submit: Submit
+Success: Success
+Update Error: Update Error
+Update Success: Update Success
+You need login to use llm: You need login to use llm
+failed: failed
+id: id
+model parameter required: model parameter required
+need a config_data: need a config_data
+need a llmid: need a llmid
+ok: ok
+server error: server error
+上位系统id: 上位系统id
+上架: 上架
+上架状态: 上架状态
+上线检查: 上线检查
+下架: 下架
+主键ID: 主键ID
+交互内容: 交互内容
+交易号: 交易号
+交易成本: 交易成本
+交易金额: 交易金额
+从IO文件恢复Usages: 从IO文件恢复Usages
+任务号: 任务号
+任务查询间隔（秒）: 任务查询间隔（秒）
+任务结果查询接口名称: 任务结果查询接口名称
+体验一次: 体验一次
+使用信息: 使用信息
+使用日期: 使用日期
+使用时间: 使用时间
+使用记录ID: 使用记录ID
+使用记录id: 使用记录id
+供应商id: 供应商id
+供应商模型列表: 供应商模型列表
+全部: 全部
+分类: 分类
+删除成功: 删除成功
+历史数据为只读，不可修改: 历史数据为只读，不可修改
+历史数据为只读，不可删除: 历史数据为只读，不可删除
+历史数据为只读，不可新增: 历史数据为只读，不可新增
+原因: 原因
+名称: 名称
+启用日期: 启用日期
+响应时间: 响应时间
+图标id: 图标id
+处理备注: 处理备注
+处理时间: 处理时间
+处理状态: 处理状态
+备份时间: 备份时间
+大语言模型: 大语言模型
+失效日期: 失效日期
+失败原因: 失败原因
+失败时间: 失败时间
+定价ID: 定价ID
+开始日期: 开始日期
+恢复Usages: 恢复Usages
+恢复Usages失败: 恢复Usages失败
+恢复Usages完成: 恢复Usages完成
+成功: 成功
+所属机构id: 所属机构id
+按供应商: 按供应商
+按分类: 按分类
+探索和使用各类AI模型: 探索和使用各类AI模型
+接口名称: 接口名称
+提示: 提示
+操作: 操作
+无效的参数，未找到模型ID: 无效的参数，未找到模型ID
+无权删除该映射: 无权删除该映射
+无权操作该模型: 无权操作该模型
+是否已处理: 是否已处理
+最低余额: 最低余额
+机构: 机构
+查询API: 查询API
+查询间隔(秒): 查询间隔(秒)
+检查计费: 检查计费
+模型: 模型
+模型API映射表: 模型API映射表
+模型ID: 模型ID
+模型id: 模型id
+模型、分类和API接口为必填项: 模型、分类和API接口为必填项
+模型使用: 模型使用
+模型使用历史记录: 模型使用历史记录
+模型分类ID: 模型分类ID
+模型列表: 模型列表
+模型名称: 模型名称
+模型广场: 模型广场
+模型机构id: 模型机构id
+模型用量: 模型用量
+模型类型: 模型类型
+模型类型管理: 模型类型管理
+模型类目: 模型类目
+没找到模型: 没找到模型
+没有找到需要恢复的记录: 没有找到需要恢复的记录
+添加成功: 添加成功
+添加映射: 添加映射
+状态: 状态
+用户: 用户
+用户id: 用户id
+用户机构id: 用户机构id
+类型名: 类型名
+类型名不能为空: 类型名不能为空
+类型说明: 类型说明
+结束日期: 结束日期
+结束时间: 结束时间
+缺少ID参数: 缺少ID参数
+缺省分类: 缺省分类
+能力映射: 能力映射
+计费项目: 计费项目
+记录ID不能为空: 记录ID不能为空
+记账失败记录: 记账失败记录
+记账状态: 记账状态
+识别名: 识别名
+该模型的此API映射已存在: 该模型的此API映射已存在
+说明: 说明
+账户余额不够: 账户余额不够
+选择分类: 选择分类
+重试: 重试
+重试次数: 重试次数
+重试记账: 重试记账
+金额: 金额
+错误: 错误
+间隔(秒): 间隔(秒)
