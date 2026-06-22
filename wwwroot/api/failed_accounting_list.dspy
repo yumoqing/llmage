@@ -21,8 +21,13 @@ try:
 	if params_kw.get('filter_llmid'):
 		filters['filter_llmid'] = params_kw.get('filter_llmid')
 
-	page = int(params_kw.get('page', 1))
-	page_size = int(params_kw.get('page_size', 50))
+	try:
+		page = int(params_kw.get('page', 1))
+	except (ValueError, TypeError):
+		page = 1
+	if page < 1:
+		page = 1
+	page_size = int(params_kw.get('rows', params_kw.get('page_size', 20)))
 
 	async with db.sqlorContext(llmage_db) as sor:
 		conditions = []

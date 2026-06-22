@@ -89,44 +89,17 @@
                             "userid": {
                                 "uitype": "code",
                                 "valueField": "userid",
-                                "textField": "userid_text",
-                                "params": {
-                                    "dbname": "sage",
-                                    "table": "users",
-                                    "tblvalue": "userid",
-                                    "tbltext": "username",
-                                    "valueField": "userid",
-                                    "textField": "userid_text"
-                                },
-                                "dataurl": "{{entire_url('/appbase/get_code.dspy')}}"
+                                "textField": "userid_text"
                             },
                             "userorgid": {
                                 "uitype": "code",
                                 "valueField": "userorgid",
-                                "textField": "userorgid_text",
-                                "params": {
-                                    "dbname": "sage",
-                                    "table": "organization",
-                                    "tblvalue": "id",
-                                    "tbltext": "orgname",
-                                    "valueField": "userorgid",
-                                    "textField": "userorgid_text"
-                                },
-                                "dataurl": "{{entire_url('/appbase/get_code.dspy')}}"
+                                "textField": "userorgid_text"
                             },
                             "llmid": {
                                 "uitype": "code",
                                 "valueField": "llmid",
-                                "textField": "llmid_text",
-                                "params": {
-                                    "dbname": "llmage",
-                                    "table": "llm",
-                                    "tblvalue": "id",
-                                    "tbltext": "name",
-                                    "valueField": "llmid",
-                                    "textField": "llmid_text"
-                                },
-                                "dataurl": "{{entire_url('/appbase/get_code.dspy')}}"
+                                "textField": "llmid_text"
                             }
                         }
                     },

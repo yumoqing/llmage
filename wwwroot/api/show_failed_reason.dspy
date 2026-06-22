@@ -1,14 +1,75 @@
 record_id = params_kw.get('id', '')
 
+llm_info = {}
 reason = '未找到记录'
 if record_id:
     dbname = get_module_dbname('llmage')
+    sage_db = get_module_dbname('sage')
     async with DBPools().sqlorContext(dbname) as sor:
-        rows = await sor.R('llmusage_accounting_failed', {'id': record_id})
+        # 查询失败记录 + JOIN llm表获取模型详情
+        sql = f"""
+SELECT f.*, l.name as llm_name, l.model as llm_model, l.upappid as llm_ppid,
+    u.username as userid_text, o.orgname as userorgid_text
+FROM llmusage_accounting_failed f
+LEFT JOIN llm l ON f.llmid = l.id
+LEFT JOIN {sage_db}.users u ON f.userid = u.id
+LEFT JOIN {sage_db}.organization o ON f.userorgid = o.id
+WHERE f.id = ${{record_id}}$
+"""
+        rows = await sor.sqlExe(sql, {'record_id': record_id})
         if rows:
-            reason = rows[0].get('failed_reason', '') or '（空）'
+            rec = dict(rows[0])
+            llm_info = {
+                'llmid': rec.get('llmid', ''),
+                'llm_name': rec.get('llm_name', ''),
+                'llm_model': rec.get('llm_model', ''),
+                'llm_ppid': rec.get('llm_ppid', ''),
+                'userid': rec.get('userid', ''),
+                'username': rec.get('userid_text', ''),
+                'orgid': rec.get('userorgid', ''),
+                'orgname': rec.get('userorgid_text', ''),
+                'use_time': str(rec.get('use_time', '')),
+                'amount': str(rec.get('amount', '')),
+                'failed_time': str(rec.get('failed_time', '')),
+                'retry_count': str(rec.get('retry_count', '')),
+            }
+            reason = rec.get('failed_reason', '') or '（空）'
 
-return {
+fields = [
+    {'label': '模型ID (llmID)', 'value': llm_info.get('llmid', '')},
+    {'label': '模型名称', 'value': llm_info.get('llm_name', '')},
+    {'label': '模型标识 (model)', 'value': llm_info.get('llm_model', '')},
+    {'label': '上位系统 (ppid)', 'value': llm_info.get('llm_ppid', '')},
+    {'label': '用户', 'value': f"{llm_info.get('username', '')} ({llm_info.get('userid', '')})"},
+    {'label': '机构', 'value': f"{llm_info.get('orgname', '')} ({llm_info.get('orgid', '')})"},
+    {'label': '使用时间', 'value': llm_info.get('use_time', '')},
+    {'label': '金额', 'value': llm_info.get('amount', '')},
+    {'label': '失败时间', 'value': llm_info.get('failed_time', '')},
+    {'label': '重试次数', 'value': llm_info.get('retry_count', '')},
+]
+
+field_widgets = []
+for f in fields:
+    if f['value']:
+        field_widgets.append({
+            "widgettype": "HBox",
+            "options": {"padding": "4px 0"},
+            "subwidgets": [
+                {"widgettype": "Text", "options": {"text": f['label'] + "：", "cwidth": 12, "i18n": False, "css": "field-label"}},
+                {"widgettype": "Text", "options": {"text": f['value'], "cwidth": 18, "i18n": False}}
+            ]
+        })
+
+field_widgets.append({
+    "widgettype": "Text",
+    "options": {"text": "───── 失败原因 ─────", "cwidth": 30, "i18n": False, "padding": "12px 0 4px 0"}
+})
+field_widgets.append({
+    "widgettype": "Text",
+    "options": {"text": reason, "i18n": False}
+})
+
+return json.dumps({
     "widgettype": "VScrollPanel",
     "options": {
         "width": "100%",
@@ -16,13 +77,5 @@ return {
         "css": "card",
         "padding": "12px"
     },
-    "subwidgets": [
-        {
-            "widgettype": "Text",
-            "options": {
-                "text": reason,
-                "i18n": False
-            }
-        }
-    ]
-}
+    "subwidgets": field_widgets
+}, ensure_ascii=False)
