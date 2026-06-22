@@ -1,145 +1,121 @@
 {
-    "widgettype": "VBox",
+    "widgettype": "Tabular",
+    "id": "failed_table",
     "options": {
         "width": "100%",
         "height": "100%",
-        "padding": "8px",
-        "gap": "8px"
-    },
-    "subwidgets": [
-        {
-            "widgettype": "InlineForm",
-            "id": "filter_form",
-            "options": {
-                "css": "card",
-                "padding": "8px",
-                "submit_label": "查询",
-                "submit_css": "primary",
-                "fields": [
-                    {
-                        "name": "start_date",
-                        "label": "开始日期",
-                        "uitype": "date",
-                        "cwidth": 10
-                    },
-                    {
-                        "name": "end_date",
-                        "label": "结束日期",
-                        "uitype": "date",
-                        "cwidth": 10
-                    },
-                    {
-                        "name": "handled",
-                        "label": "处理状态",
-                        "uitype": "code",
-                        "cwidth": 8,
-                        "data": [
-                            {"value": "", "text": "全部"},
-                            {"value": "0", "text": "未处理"},
-                            {"value": "1", "text": "已处理"}
-                        ]
-                    }
-                ]
-            },
-            "binds": [
+        "css": "card",
+        "toolbar": {
+            "tools": [
                 {
-                    "wid": "self",
-                    "event": "submit",
-                    "actiontype": "script",
-                    "target": "app.failed_table",
-                    "script": "var tbl = bricks.getWidgetById('app.failed_table'); if(tbl) await tbl.render(params);"
+                    "name": "filter",
+                    "label": "搜索"
+                },
+                {
+                    "name": "show_reason",
+                    "label": "原因",
+                    "selected_row": true
+                },
+                {
+                    "name": "retry_accounting",
+                    "label": "重试记账",
+                    "selected_row": true
                 }
             ]
         },
-        {
-            "widgettype": "Tabular",
-            "id": "failed_table",
-            "options": {
-                "width": "100%",
-                "height": "100%",
-                "css": "card",
-                "toolbar": {
-                    "tools": [
-                        {
-                            "name": "show_reason",
-                            "label": "原因",
-                            "selected_row": true
-                        },
-                        {
-                            "name": "retry_accounting",
-                            "label": "重试记账",
-                            "selected_row": true
-                        }
-                    ]
-                },
-                "data_url": "{{entire_url('/llmage/api/failed_accounting_list.dspy')}}",
-                "data_method": "GET",
-                "page_rows": 20,
-                "row_options": {
-                    "browserfields": {
-                        "exclouded": ["id", "failed_reason"],
-                        "alters": {
-                            "handled": {
-                                "uitype": "code",
-                                "data": [
-                                    {"value": "0", "text": "未处理"},
-                                    {"value": "1", "text": "已处理"}
-                                ]
-                            },
-                            "userid": {
-                                "uitype": "code",
-                                "valueField": "userid",
-                                "textField": "userid_text"
-                            },
-                            "userorgid": {
-                                "uitype": "code",
-                                "valueField": "userorgid",
-                                "textField": "userorgid_text"
-                            },
-                            "llmid": {
-                                "uitype": "code",
-                                "valueField": "llmid",
-                                "textField": "llmid_text"
-                            }
-                        }
-                    },
-                    "fields": [
-                        {"name": "llmusageid", "title": "使用记录ID", "type": "str", "length": 32, "cwidth": 12, "uitype": "str", "label": "使用记录ID"},
-                        {"name": "llmid", "title": "模型", "type": "str", "length": 32, "cwidth": 12, "uitype": "str", "label": "模型"},
-                        {"name": "userid", "title": "用户", "type": "str", "length": 32, "cwidth": 10, "uitype": "str", "label": "用户"},
-                        {"name": "userorgid", "title": "机构", "type": "str", "length": 32, "cwidth": 10, "uitype": "str", "label": "机构"},
-                        {"name": "use_time", "title": "使用时间", "type": "timestamp", "cwidth": 14, "uitype": "str", "label": "使用时间"},
-                        {"name": "amount", "title": "金额", "type": "double", "length": 18, "dec": 5, "cwidth": 8, "uitype": "float", "label": "金额"},
-                        {"name": "failed_reason", "title": "失败原因", "type": "text", "cwidth": 20, "uitype": "text", "label": "失败原因"},
-                        {"name": "failed_time", "title": "失败时间", "type": "timestamp", "cwidth": 14, "uitype": "str", "label": "失败时间"},
-                        {"name": "retry_count", "title": "重试", "type": "int", "cwidth": 4, "uitype": "int", "label": "重试"},
-                        {"name": "handled", "title": "状态", "type": "str", "length": 1, "cwidth": 6, "uitype": "code", "label": "状态"}
-                    ]
-                }
-            },
-            "binds": [
+        "search_form": {
+            "fields": [
                 {
-                    "wid": "self",
-                    "event": "show_reason",
-                    "actiontype": "urlwidget",
-                    "target": "PopupWindow",
-                    "popup_options": {
-                        "title": "失败原因",
-                        "cwidth": 30,
-                        "cheight": 20
-                    },
-                    "options": {
-                        "url": "{{entire_url('/llmage/api/show_failed_reason.dspy')}}?id=${id}$"
-                    }
+                    "name": "start_date",
+                    "label": "开始日期",
+                    "uitype": "date",
+                    "cwidth": 10
                 },
                 {
-                    "wid": "self",
-                    "event": "retry_accounting",
-                    "actiontype": "script",
-                    "target": "self",
-                    "script": "var dv = bricks.getWidgetById('failed_table', bricks.app.root); if(!dv || !dv.select_row || !dv.select_row.user_data) { alert('请先选中一条记录'); return; } var row = dv.select_row.user_data; if(!row.llmusageid) { alert('记录缺少llmusageid'); return; } var resp = await fetch('{{entire_url('/llmage/api/retry_accounting.dspy')}}?id=' + row.llmusageid); var d = await resp.json(); if(d.success) { alert(d.message); await dv.render({}); } else { alert('失败: ' + d.message); }"
+                    "name": "end_date",
+                    "label": "结束日期",
+                    "uitype": "date",
+                    "cwidth": 10
+                },
+                {
+                    "name": "handled",
+                    "label": "处理状态",
+                    "uitype": "code",
+                    "cwidth": 8,
+                    "data": [
+                        {"value": "", "text": "全部"},
+                        {"value": "0", "text": "未处理"},
+                        {"value": "1", "text": "已处理"}
+                    ]
                 }
             ]
+        },
+        "data_url": "{{entire_url('/llmage/api/failed_accounting_list.dspy')}}",
+        "data_method": "GET",
+        "page_rows": 20,
+        "row_options": {
+            "browserfields": {
+                "exclouded": ["id", "failed_reason"],
+                "alters": {
+                    "handled": {
+                        "uitype": "code",
+                        "data": [
+                            {"value": "0", "text": "未处理"},
+                            {"value": "1", "text": "已处理"}
+                        ]
+                    },
+                    "userid": {
+                        "uitype": "code",
+                        "valueField": "userid",
+                        "textField": "userid_text"
+                    },
+                    "userorgid": {
+                        "uitype": "code",
+                        "valueField": "userorgid",
+                        "textField": "userorgid_text"
+                    },
+                    "llmid": {
+                        "uitype": "code",
+                        "valueField": "llmid",
+                        "textField": "llmid_text"
+                    }
+                }
+            },
+            "fields": [
+                {"name": "llmusageid", "title": "使用记录ID", "type": "str", "length": 32, "cwidth": 12, "uitype": "str", "label": "使用记录ID"},
+                {"name": "llmid", "title": "模型", "type": "str", "length": 32, "cwidth": 12, "uitype": "str", "label": "模型"},
+                {"name": "userid", "title": "用户", "type": "str", "length": 32, "cwidth": 10, "uitype": "str", "label": "用户"},
+                {"name": "userorgid", "title": "机构", "type": "str", "length": 32, "cwidth": 10, "uitype": "str", "label": "机构"},
+                {"name": "use_time", "title": "使用时间", "type": "timestamp", "cwidth": 14, "uitype": "str", "label": "使用时间"},
+                {"name": "amount", "title": "金额", "type": "double", "length": 18, "dec": 5, "cwidth": 8, "uitype": "float", "label": "金额"},
+                {"name": "failed_reason", "title": "失败原因", "type": "text", "cwidth": 20, "uitype": "text", "label": "失败原因"},
+                {"name": "failed_time", "title": "失败时间", "type": "timestamp", "cwidth": 14, "uitype": "str", "label": "失败时间"},
+                {"name": "retry_count", "title": "重试", "type": "int", "cwidth": 4, "uitype": "int", "label": "重试"},
+                {"name": "handled", "title": "状态", "type": "str", "length": 1, "cwidth": 6, "uitype": "code", "label": "状态"}
+            ]
+        }
+    },
+    "binds": [
+        {
+            "wid": "self",
+            "event": "show_reason",
+            "actiontype": "urlwidget",
+            "target": "PopupWindow",
+            "popup_options": {
+                "title": "失败原因",
+                "cwidth": 30,
+                "cheight": 20
+            },
+            "options": {
+                "url": "{{entire_url('/llmage/api/show_failed_reason.dspy')}}?id=${id}$"
+            }
+        },
+        {
+            "wid": "self",
+            "event": "retry_accounting",
+            "actiontype": "script",
+            "target": "self",
+            "script": "var dv = bricks.getWidgetById('failed_table', bricks.app.root); if(!dv || !dv.select_row || !dv.select_row.user_data) { alert('请先选中一条记录'); return; } var row = dv.select_row.user_data; if(!row.llmusageid) { alert('记录缺少llmusageid'); return; } var resp = await fetch('{{entire_url('/llmage/api/retry_accounting.dspy')}}?id=' + row.llmusageid); var d = await resp.json(); if(d.success) { alert(d.message); await dv.render({}); } else { alert('失败: ' + d.message); }"
         }
     ]
 }
