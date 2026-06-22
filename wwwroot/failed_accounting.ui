@@ -46,8 +46,8 @@
                     "wid": "self",
                     "event": "submit",
                     "actiontype": "script",
-                    "target": "failed_table",
-                    "script": "var tbl = bricks.getWidgetById('failed_table', bricks.app.root); if(tbl) await tbl.render(params);"
+                    "target": "app.failed_table",
+                    "script": "var tbl = bricks.getWidgetById('app.failed_table'); if(tbl) await tbl.render(params);"
                 }
             ]
         },
