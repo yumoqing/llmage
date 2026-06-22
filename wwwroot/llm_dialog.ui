@@ -50,7 +50,7 @@
 				"height":"100%",
 				"title":"{{llm.name}}",
 {% if len(kdbs) > 0 %}
-				"enabled_kdb": true,
+				"enabled_kdb": false,
 				"kdb_setting":{},
 				"get_kdb_url": "{{entire_url('/rag/get_my_kdbs.dspy')}}",
 {% endif %}
@@ -86,7 +86,7 @@
 		"height":"100%",
 		"title":"{{llm.name}}",
 {% if len(kdbs) > 0 %}
-		"enabled_kdb": true,
+		"enabled_kdb": false,
 		"kdb_setting":{},
 		"get_kdb_url": "{{entire_url('/rag/get_my_kdbs.dspy')}}",
 {% endif %}
