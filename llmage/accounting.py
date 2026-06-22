@@ -336,6 +336,15 @@ async def backend_accounting():
 				else:
 					debug(f'{lu.id=},{lu.userid=}, {tpac=}, go local')
 					await llm_accounting(lu)
+				# 记账成功，清理对应的失败记录
+				try:
+					async with get_sor_context(env, 'llmage') as sor:
+						await sor.execute(
+							"DELETE FROM llmusage_accounting_failed WHERE llmusageid=${luid}$",
+							{'luid': lu.id}
+						)
+				except Exception as e2:
+					debug(f'清理失败记录异常(不影响记账): {e2}')
 			except Exception as e:
 				exception(f'{e}, {lu.id=}')
 				await llm_accoung_failed(lu.id, reason=str(e))
