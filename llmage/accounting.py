@@ -57,8 +57,16 @@ async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
 	bal = 0 if balance is None else balance
 	if llm.min_balance is None:
 		llm.min_balance = 0.00
-	ret = llm.ppid and llm.min_balance < bal
-	debug(f'{llm.ppid=}, {llm.min_balance=}, {bal=}')
+	if not llm.ppid:
+		debug(f'{llm.ppid=} is empty, model unavailable')
+		return False
+	try:
+		await env.get_ppid_pricing(llm.ppid)
+	except Exception as e:
+		debug(f'{llm.ppid=} has no pricing data for today: {e}')
+		return False
+	ret = llm.min_balance < bal
+	debug(f'{llm.ppid=}, {llm.min_balance=}, {bal=}, pricing OK')
 	return ret
 
 async def llm_accounting(llmusage):
