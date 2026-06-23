@@ -2,7 +2,8 @@
 llmage Product Module Interface Implementation
 
 Implements the standard resource module interface for product_management.
-Each function maps product_code (= llm.model) to llmage internals.
+All functions take resource_ref_id (= llm.id) as the primary identifier.
+The product module stores this mapping in product.resource_ref_id.
 """
 import json
 import time
@@ -23,33 +24,26 @@ from .utils import (
 from .accounting import llm_charging
 
 
-async def _resolve_llm(product_code):
-    """Resolve product_code (llm.model) to llm record with full info.
+async def _resolve_llm(resource_ref_id):
+    """Resolve resource_ref_id (llm.id) to llm record with full info.
     Returns (llm_record, error_message).
     """
-    env = ServerEnv()
-    async with get_sor_context(env, 'llmage') as sor:
-        recs = await sor.R('llm', {'model': product_code})
-        if not recs:
-            return None, f'模型 {product_code} 不存在'
-        llmid = recs[0].id
-
-    llm = await get_llmage_llm(llmid)
+    llm = await get_llmage_llm(resource_ref_id)
     if not llm:
-        return None, f'模型 {product_code} 配置不完整(llm_api_map缺失)'
+        return None, f'模型 {resource_ref_id} 不存在或配置不完整'
     return llm, None
 
 
-async def get_product_display(product_code):
+async def get_product_display(resource_ref_id):
     """获取产品定价展示信息。
 
     Args:
-        product_code: 产品编码（= llm.model）
+        resource_ref_id: 资源模块内部ID（= llm.id）
 
     Returns:
         {'success': True, 'pricing_text': str, 'pricing_detail': dict, 'extra_info': dict}
     """
-    llm, err = await _resolve_llm(product_code)
+    llm, err = await _resolve_llm(resource_ref_id)
     if err:
         return {'success': False, 'message': err}
 
@@ -78,7 +72,8 @@ async def get_product_display(product_code):
     extra_info = {
         'provider': provider_name,
         'llmid': llm.id,
-        'catelog': llm.catelogname if hasattr(llm, 'catelogname') else '',
+        'model': llm.model,
+        'catelog': getattr(llm, 'catelogname', ''),
         'ownerid': llm.ownerid,
     }
 
@@ -90,17 +85,17 @@ async def get_product_display(product_code):
     }
 
 
-async def check_product_availability(product_code, user_org_id=None):
+async def check_product_availability(resource_ref_id, user_org_id=None):
     """检查产品是否可用（定价方案是否有效）。
 
     Args:
-        product_code: 产品编码（= llm.model）
+        resource_ref_id: 资源模块内部ID（= llm.id）
         user_org_id: 用户组织ID（自有模型免检）
 
     Returns:
         {'available': bool, 'reason': str}
     """
-    llm, err = await _resolve_llm(product_code)
+    llm, err = await _resolve_llm(resource_ref_id)
     if err:
         return {'available': False, 'reason': err}
 
@@ -122,23 +117,23 @@ async def check_product_availability(product_code, user_org_id=None):
         await env.get_ppid_pricing(llm.ppid)
     except Exception as e:
         debug(f'check_product_availability: ppid={llm.ppid} no pricing: {e}')
-        return {'available': False, 'reason': f'今日无有效定价数据'}
+        return {'available': False, 'reason': '今日无有效定价数据'}
 
     return {'available': True, 'reason': ''}
 
 
-async def check_product_consumable(product_code, user_id, user_org_id):
+async def check_product_consumable(resource_ref_id, user_id, user_org_id):
     """消费前综合预检：可用性 + 余额 + 定价。
 
     Args:
-        product_code: 产品编码（= llm.model）
+        resource_ref_id: 资源模块内部ID（= llm.id）
         user_id: 用户ID
         user_org_id: 用户组织ID
 
     Returns:
         {'consumable': bool, 'reason': str, 'min_balance': float, 'pricing_available': bool}
     """
-    llm, err = await _resolve_llm(product_code)
+    llm, err = await _resolve_llm(resource_ref_id)
     if err:
         return {'consumable': False, 'reason': err,
                 'min_balance': 0, 'pricing_available': False}
@@ -190,11 +185,11 @@ async def check_product_consumable(product_code, user_id, user_org_id):
             'pricing_available': pricing_available}
 
 
-async def execute_product_service(product_code, user_id, user_org_id, request_data):
+async def execute_product_service(resource_ref_id, user_id, user_org_id, request_data):
     """执行大模型API调用（非流式）。
 
     Args:
-        product_code: 产品编码（= llm.model）
+        resource_ref_id: 资源模块内部ID（= llm.id）
         user_id: 用户ID
         user_org_id: 用户组织ID
         request_data: dict, 请求参数（messages, temperature, max_tokens 等）
@@ -204,7 +199,7 @@ async def execute_product_service(product_code, user_id, user_org_id, request_da
          'resource_ref_id': str, 'task_id': str, 'status': 'SUCCEEDED'}
     """
     env = ServerEnv()
-    llm, err = await _resolve_llm(product_code)
+    llm, err = await _resolve_llm(resource_ref_id)
     if err:
         return {'success': False, 'message': err, 'status': 'FAILED'}
 
@@ -214,7 +209,6 @@ async def execute_product_service(product_code, user_id, user_org_id, request_da
         return {'success': False, 'message': '模型API配置不完整', 'status': 'FAILED'}
 
     from uapi.appapi import UAPI
-    uapi = UAPI(full_llm.upappid, full_llm.apiname)
 
     # Get API user
     userid = await env.uapi_data.get_calluserid(full_llm.upappid, orgid=full_llm.ownerid)
@@ -227,23 +221,18 @@ async def execute_product_service(product_code, user_id, user_org_id, request_da
         params_kw.transno = luid
 
     try:
-        start_timestamp = time.time()
-
         if full_llm.stream == 'async':
-            # Async task mode
             from .asyncinference import async_uapi_request_product
             result = await async_uapi_request_product(
                 full_llm, userid, user_id, user_org_id, params_kw, luid)
             return result
 
         elif not full_llm.stream:
-            # Sync mode
             from .syncinference import sync_uapi_request_product
             result = await sync_uapi_request_product(
                 full_llm, userid, user_id, user_org_id, params_kw, luid)
             return result
         else:
-            # Stream mode: collect all chunks into single result
             result = await _collect_stream(full_llm, userid, user_id,
                                            user_org_id, params_kw, luid)
             return result
@@ -330,13 +319,13 @@ async def _collect_stream(llm, api_userid, user_id, user_org_id, params_kw, luid
                 'task_id': luid, 'status': 'FAILED'}
 
 
-async def execute_product_service_stream(product_code, user_id, user_org_id, request_data):
+async def execute_product_service_stream(resource_ref_id, user_id, user_org_id, request_data):
     """执行大模型API调用（流式），返回异步生成器。
 
     Yields: {'chunk': dict, 'usage_data': dict|None, 'done': bool}
     Final chunk has done=True with complete usage_data.
     """
-    llm, err = await _resolve_llm(product_code)
+    llm, err = await _resolve_llm(resource_ref_id)
     if err:
         yield {'chunk': None, 'usage_data': None, 'done': True,
                'error': err}
@@ -432,11 +421,11 @@ async def execute_product_service_stream(product_code, user_id, user_org_id, req
                'error': str(e), 'task_id': luid, 'status': 'FAILED'}
 
 
-async def calculate_product_cost(product_code, usage_data, user_org_id=None):
+async def calculate_product_cost(resource_ref_id, usage_data, user_org_id=None):
     """计算本次消费的费用。
 
     Args:
-        product_code: 产品编码（= llm.model）
+        resource_ref_id: 资源模块内部ID（= llm.id）
         usage_data: dict, 用量数据 (prompt_tokens, completion_tokens 等)
         user_org_id: 用户组织ID（用于折扣）
 
@@ -444,7 +433,7 @@ async def calculate_product_cost(product_code, usage_data, user_org_id=None):
         {'success': True, 'amount': float, 'original_amount': float,
          'cost': float, 'discount': float, 'pricing_program_id': str}
     """
-    llm, err = await _resolve_llm(product_code)
+    llm, err = await _resolve_llm(resource_ref_id)
     if err:
         return {'success': False, 'message': err}
 
@@ -486,7 +475,3 @@ async def calculate_product_cost(product_code, usage_data, user_org_id=None):
     except Exception as e:
         exception(f'calculate_product_cost error: {e}')
         return {'success': False, 'message': f'定价计算失败: {e}'}
-
-
-# Note: load_product_category_product stays in init.py
-# and is registered in the product_interface dict from there.

@@ -153,6 +153,7 @@ order by lc.sort_order, lc.name, a.name"""
 				'id': prod_id,
 				'category_id': target_cat_id,
 				'product_code': llm.model,
+				'resource_ref_id': llm.id,
 				'product_name': llm.name,
 				'product_type': 'llm_model',
 				'brief_intro': getattr(llm, 'description', '') or '',
