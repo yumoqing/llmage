@@ -56,18 +56,22 @@ from .product_interface import (
 
 
 async def load_product_category_product(parent_category_id):
-	"""Load llmage catalogs and published models as product sub-categories and products.
+	"""Return llmage catalogs and published models as standardized import data.
 
-	Called by product_management.import_categories_and_products() when resource_module='llmage'.
-	Responsible for reading source data AND writing to product_management tables.
+	Called by product_management.import_categories_and_products().
+	Only reads source data and returns it in the standard format.
+	Does NOT write to product_management tables — that's product_management's job.
+
+	Returns:
+		{
+			'success': True,
+			'categories': [{'source_id', 'name', 'description', 'product_type', 'product_type_title', 'sort_order'}, ...],
+			'products': [{'source_category_id', 'resource_ref_id', 'product_code', 'product_name', 'product_type', 'brief_intro', 'sort_order'}, ...]
+		}
 	"""
-	import time
-	from appPublic.uniqueID import getID
-
 	env = ServerEnv()
-	pm_dbname = env.get_module_dbname('product_management')
 
-	# Step 1: Read source data from llmage
+	# Read source data from llmage
 	async with get_sor_context(env, 'llmage') as sor:
 		catelogs = await sor.R('llmcatelog', {})
 		if not catelogs:
@@ -82,97 +86,35 @@ where m.isdefaultcatelog = '1' and a.status = 'published'
 order by lc.sort_order, lc.name, a.name"""
 		llms = await sor.sqlExe(llm_sql, {})
 
-	# Step 2: Get parent category's org_id from product_management
-	now = time.strftime('%Y-%m-%d %H:%M:%S')
-	async with DBPools().sqlorContext(pm_dbname) as sor:
-		parent_rows = await sor.sqlExe(
-			"SELECT org_id FROM product_category WHERE id = ${id}$",
-			{'id': parent_category_id}
-		)
-		if not parent_rows:
-			return {'success': False, 'error': f'父类别 {parent_category_id} 不存在'}
-		org_id = parent_rows[0].org_id
+	# Build standardized categories
+	categories = []
+	for c in catelogs:
+		categories.append({
+			'source_id': c.id,
+			'name': c.name,
+			'description': getattr(c, 'description', '') or '',
+			'product_type': 'llm_model',
+			'product_type_title': '大模型按量',
+			'sort_order': int(getattr(c, 'sort_order', 0) or 0),
+		})
 
-	# Step 3: Write sub-categories and products
-	source_to_id = {}
-	created_cats = 0
-	skipped_cats = 0
-	created_prods = 0
-	skipped_prods = 0
-
-	async with DBPools().sqlorContext(pm_dbname) as sor:
-		for c in catelogs:
-			existing = await sor.sqlExe(
-				"""SELECT id FROM product_category
-				   WHERE name = ${name}$ AND parent_id = ${parent_id}$ AND org_id = ${org_id}$""",
-				{'name': c.name, 'parent_id': parent_category_id, 'org_id': org_id}
-			)
-			if existing:
-				source_to_id[c.id] = existing[0].id
-				skipped_cats += 1
-				continue
-
-			new_id = getID()
-			source_to_id[c.id] = new_id
-			cat_data = {
-				'id': new_id,
-				'parent_id': parent_category_id,
-				'name': c.name,
-				'description': getattr(c, 'description', '') or '',
-				'has_product': '1',
-				'product_type': 'llm_model',
-				'product_type_title': '大模型按量',
-				'sort_order': str(getattr(c, 'sort_order', 0) or 0),
-				'icon': '',
-				'status': '1',
-				'resource_module': 'llmage',
-				'org_id': org_id,
-				'created_at': now,
-				'updated_at': now
-			}
-			await sor.C('product_category', cat_data)
-			created_cats += 1
-
-		for llm in (llms or []):
-			target_cat_id = source_to_id.get(llm.llmcatelogid)
-			if not target_cat_id:
-				skipped_prods += 1
-				continue
-
-			existing_prod = await sor.sqlExe(
-				"""SELECT id FROM product
-				   WHERE product_code = ${code}$ AND org_id = ${org_id}$""",
-				{'code': llm.model, 'org_id': org_id}
-			)
-			if existing_prod:
-				skipped_prods += 1
-				continue
-
-			prod_id = getID()
-			prod_data = {
-				'id': prod_id,
-				'category_id': target_cat_id,
-				'product_code': llm.model,
-				'resource_ref_id': llm.id,
-				'product_name': llm.name,
-				'product_type': 'llm_model',
-				'brief_intro': getattr(llm, 'description', '') or '',
-				'status': '1',
-				'price_type': '1',
-				'price': '0',
-				'currency': 'CNY',
-				'sort_order': '0',
-				'org_id': org_id,
-				'created_at': now,
-				'updated_at': now
-			}
-			await sor.C('product', prod_data)
-			created_prods += 1
+	# Build standardized products
+	products = []
+	for llm in (llms or []):
+		products.append({
+			'source_category_id': llm.llmcatelogid,
+			'resource_ref_id': llm.id,
+			'product_code': llm.model,
+			'product_name': llm.name,
+			'product_type': 'llm_model',
+			'brief_intro': getattr(llm, 'description', '') or '',
+			'sort_order': 0,
+		})
 
 	return {
 		'success': True,
-		'message': f'llmage导入完成: 新增 {created_cats} 个子类别, {created_prods} 个产品; '
-				   f'跳过 {skipped_cats} 个已存在类别, {skipped_prods} 个已存在产品'
+		'categories': categories,
+		'products': products,
 	}
 
 
