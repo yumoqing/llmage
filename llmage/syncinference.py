@@ -96,3 +96,64 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 		outlines.append(ed)
 		yield f'{s}\n'
 
+
+async def sync_uapi_request_product(llm, api_userid, user_id, user_org_id, params_kw, luid):
+	"""Product interface version: no HTTP request dependency. Returns dict."""
+	env = ServerEnv()
+	from uapi.appapi import UAPI
+	uapi = UAPI(llm.upappid, llm.apiname)
+	b = None
+	d = None
+	try:
+		start_timestamp = time.time()
+		b = await uapi.call(llm.upappid, llm.apiname, api_userid, params=params_kw)
+		if isinstance(b, bytes):
+			b = b.decode('utf-8')
+		d = json.loads(b)
+		status = d.get('status')
+		usage = d.get('usage')
+		if status and status != 'SUCCEEDED':
+			raise Exception(d.get('error', 'Unknown error'))
+
+		responsed_seconds = time.time() - start_timestamp
+		finish_seconds = responsed_seconds
+
+		llmusage = DictObject()
+		llmusage.id = luid
+		llmusage.llmid = llm.id
+		llmusage.use_date = curDateString()
+		llmusage.use_time = timestampstr()
+		llmusage.userid = user_id
+		llmusage.usages = json.dumps(usage, ensure_ascii=False) if usage else '{}'
+		ioinfo = {"input": dict(params_kw), "output": [d]}
+		webpath = await write_llmio(luid, ioinfo)
+		llmusage.ioinfo = webpath
+		llmusage.transno = params_kw.get('transno', luid)
+		llmusage.responsed_seconds = responsed_seconds
+		llmusage.finish_seconds = finish_seconds
+		llmusage.status = 'SUCCEEDED'
+		llmusage.amount = llmusage.cost = 0.00
+		llmusage.userorgid = user_org_id
+		llmusage.ownerid = llm.ownerid
+		llmusage.accounting_status = 'created'
+		await write_llmusage(llmusage)
+
+		return {
+			'success': True,
+			'result': d,
+			'usage_data': usage or {},
+			'resource_ref_id': llm.id,
+			'task_id': luid,
+			'status': 'SUCCEEDED',
+		}
+
+	except Exception as e:
+		exception(f'sync_uapi_request_product error: {e}')
+		estr = erase_apikey(e)
+		return {
+			'success': False,
+			'message': str(estr),
+			'task_id': luid,
+			'status': 'FAILED',
+		}
+

@@ -45,6 +45,15 @@ from .asyncinference import (
 	get_today_asynctask_list
 )
 
+from .product_interface import (
+	get_product_display,
+	check_product_availability,
+	check_product_consumable,
+	execute_product_service,
+	execute_product_service_stream,
+	calculate_product_cost,
+)
+
 
 async def load_product_category_product(parent_category_id):
 	"""Load llmage catalogs and published models as product sub-categories and products.
@@ -203,6 +212,17 @@ def load_llmage():
 	env.backup_accounted_llmusage = backup_accounted_llmusage
 	env.get_failed_accounting_records = get_failed_accounting_records
 	env.get_llmage_stats = get_llmage_stats
+	# Product module standard interface
+	env.product_interface = {
+		'module_name': 'llmage',
+		'get_product_display': get_product_display,
+		'check_product_availability': check_product_availability,
+		'check_product_consumable': check_product_consumable,
+		'execute_product_service': execute_product_service,
+		'execute_product_service_stream': execute_product_service_stream,
+		'calculate_product_cost': calculate_product_cost,
+		'load_product_category_product': load_product_category_product,
+	}
 	# Bind hot_reload event — module-level function, ref safe (module keeps it alive)
 	if hasattr(env, 'event_dispatcher'):
 		env.event_dispatcher.bind('hot_reload', _on_hot_reload)

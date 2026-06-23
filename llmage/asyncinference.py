@@ -207,4 +207,72 @@ async def query_task_status(request, luid, onetime=False):
 				return
 			await asyncio.sleep(llm.query_period or 30)
 			critical(f'{llm.query_period=} seconds will retry, {new_output["status"]=}')
-					
+
+
+async def async_uapi_request_product(llm, api_userid, user_id, user_org_id, params_kw, luid):
+	"""Product interface version of async task submission. Returns dict with task info."""
+	env = ServerEnv()
+	from uapi.appapi import UAPI
+	uapi = UAPI(llm.upappid, llm.apiname)
+	b = None
+	try:
+		start_timestamp = time.time()
+		if llm.callbackurl:
+			params_kw.callbackurl = llm.callbackurl
+
+		b = await uapi.call(llm.upappid, llm.apiname, api_userid, params=params_kw)
+		if isinstance(b, bytes):
+			b = b.decode('utf-8')
+		debug(f'async task submitted: {b}')
+		d = DictObject(**json.loads(b))
+
+		responsed_seconds = time.time() - start_timestamp
+		finish_seconds = responsed_seconds
+
+		llmusage = DictObject()
+		llmusage.id = luid
+		llmusage.llmid = llm.id
+		llmusage.use_date = curDateString()
+		llmusage.use_time = timestampstr()
+		llmusage.userid = user_id
+		ioinfo = {"input": dict(params_kw), "output": [d]}
+		webpath = await write_llmio(luid, ioinfo)
+		llmusage.ioinfo = webpath
+		llmusage.taskid = d.taskid
+		llmusage.transno = params_kw.get('transno', luid)
+		llmusage.responsed_seconds = responsed_seconds
+		llmusage.finish_seconds = finish_seconds
+		llmusage.status = d.status
+		llmusage.userorgid = user_org_id
+		llmusage.ownerid = llm.ownerid
+		llmusage.accounting_status = 'created'
+		await write_llmusage(llmusage)
+
+		if d.status == 'FAILED':
+			return {
+				'success': False,
+				'message': f'Task submission failed: {d}',
+				'task_id': luid,
+				'status': 'FAILED',
+			}
+
+		# Task submitted successfully — return task info
+		# Background polling is handled by existing query_task_status or callback
+		return {
+			'success': True,
+			'result': {'taskid': d.taskid, 'status': d.status},
+			'usage_data': {},
+			'resource_ref_id': llm.id,
+			'task_id': luid,
+			'external_task_id': d.taskid,
+			'status': d.status,
+		}
+
+	except Exception as e:
+		exception(f'async_uapi_request_product error: {e}')
+		return {
+			'success': False,
+			'message': str(e),
+			'task_id': luid,
+			'status': 'FAILED',
+		}		
