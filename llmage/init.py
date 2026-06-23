@@ -83,7 +83,7 @@ from llm a
 join llm_api_map m on a.id = m.llmid
 join llmcatelog lc on m.llmcatelogid = lc.id
 where m.isdefaultcatelog = '1' and a.status = 'published'
-order by lc.sort_order, lc.name, a.name"""
+order by lc.name, a.name"""
 		llms = await sor.sqlExe(llm_sql, {})
 
 	# Build standardized categories
@@ -95,7 +95,7 @@ order by lc.sort_order, lc.name, a.name"""
 			'description': getattr(c, 'description', '') or '',
 			'product_type': 'llm_model',
 			'product_type_title': '大模型按量',
-			'sort_order': int(getattr(c, 'sort_order', 0) or 0),
+			'sort_order': 0,
 		})
 
 	# Build standardized products
