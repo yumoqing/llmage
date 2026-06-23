@@ -1,6 +1,6 @@
 import asyncio
 from appPublic.registerfunction import RegisterFunction
-from sqlor.dbpools import DBPools
+from sqlor.dbpools import DBPools, get_sor_context
 from ahserver.serverenv import ServerEnv
 from appPublic.log import debug
 from .keling import keling_token
@@ -46,6 +46,76 @@ from .asyncinference import (
 )
 
 
+async def import_products_from_llmage(org_id=None, parent_category_id=None, user_id=None):
+	"""Import llmage categories (llmcatelog) and models (llm) as product categories and products.
+
+	Registered on ServerEnv as env.import_products_from_llmage.
+	Called by product_management when resource_module='llmage'.
+	"""
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		# Get all catalogs
+		catelogs = await sor.R('llmcatelog', {})
+		if not catelogs:
+			return {'success': False, 'error': 'llmage中没有产品类别数据'}
+
+		# Get all published LLMs with catalog info
+		llm_sql = """select a.id, a.name, a.model, a.description, a.status,
+m.llmcatelogid, lc.name as catelogname
+from llm a
+join llm_api_map m on a.id = m.llmid
+join llmcatelog lc on m.llmcatelogid = lc.id
+where m.isdefaultcatelog = '1' and a.status = 'published'
+order by lc.sort_order, lc.name, a.name"""
+		llms = await sor.sqlExe(llm_sql, {})
+
+	# Build import_data
+	categories = []
+	cat_ids_seen = set()
+	for c in catelogs:
+		if c.id in cat_ids_seen:
+			continue
+		cat_ids_seen.add(c.id)
+		categories.append({
+			'name': c.name,
+			'source_id': c.id,
+			'parent_source_id': None,
+			'sort_order': getattr(c, 'sort_order', 0) or 0,
+			'description': getattr(c, 'description', '') or '',
+			'has_product': '1',
+			'product_type': 'llm_model',
+			'product_type_title': '大模型按量',
+			'resource_module': 'llmage'
+		})
+
+	products = []
+	for llm in (llms or []):
+		products.append({
+			'product_code': llm.model,
+			'product_name': llm.name,
+			'category_source_id': llm.llmcatelogid,
+			'product_type': 'llm_model',
+			'brief_intro': getattr(llm, 'description', '') or '',
+			'price': 0,
+			'currency': 'CNY',
+			'sort_order': 0,
+			'status': '1'
+		})
+
+	import_data = {
+		'categories': categories,
+		'products': products
+	}
+
+	# Call the generic import engine
+	return await env.import_categories_and_products(
+		org_id=org_id,
+		parent_category_id=parent_category_id,
+		user_id=user_id,
+		import_data=import_data
+	)
+
+
 def _on_hot_reload(data=None):
 	"""Event handler for hot_reload — wraps invalidate_uapi_cache to accept dispatcher's data arg."""
 	from appPublic.log import debug
@@ -83,6 +153,7 @@ def load_llmage():
 	env.backup_accounted_llmusage = backup_accounted_llmusage
 	env.get_failed_accounting_records = get_failed_accounting_records
 	env.get_llmage_stats = get_llmage_stats
+	env.import_products_from_llmage = import_products_from_llmage
 	# Bind hot_reload event — module-level function, ref safe (module keeps it alive)
 	if hasattr(env, 'event_dispatcher'):
 		env.event_dispatcher.bind('hot_reload', _on_hot_reload)
