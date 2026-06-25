@@ -18,7 +18,7 @@
         },
         {
             "name": "llmid",
-            "title": "模型id",
+            "title": "model",
             "type": "str",
             "length": 32
         },
@@ -34,7 +34,7 @@
         },
         {
             "name": "userid",
-            "title": "用户id",
+            "title": "username",
             "type": "str",
             "length": 32
         },
@@ -96,13 +96,13 @@
         },
         {
             "name": "userorgid",
-            "title": "用户机构id",
+            "title": "orgname",
             "type": "str",
             "length": 32
         },
         {
             "name": "ownerid",
-            "title": "模型机构id",
+            "title": "orgname",
             "type": "str",
             "length": 32
         },
