@@ -84,9 +84,9 @@
             },
             "fields": [
                 {"name": "llmusageid", "title": "使用记录ID", "type": "str", "length": 32, "cwidth": 12, "uitype": "str", "label": "使用记录ID"},
-                {"name": "llmid", "title": "模型", "type": "str", "length": 32, "cwidth": 12, "uitype": "code", "label": "模型"},
-                {"name": "userid", "title": "用户", "type": "str", "length": 32, "cwidth": 10, "uitype": "code", "label": "用户"},
-                {"name": "userorgid", "title": "机构", "type": "str", "length": 32, "cwidth": 10, "uitype": "code", "label": "机构"},
+                {"name": "llmid_text", "title": "模型", "type": "str", "cwidth": 12, "uitype": "str", "label": "模型"},
+                {"name": "userid_text", "title": "用户", "type": "str", "cwidth": 10, "uitype": "str", "label": "用户"},
+                {"name": "userorgid_text", "title": "机构", "type": "str", "cwidth": 10, "uitype": "str", "label": "机构"},
                 {"name": "use_time", "title": "使用时间", "type": "timestamp", "cwidth": 14, "uitype": "str", "label": "使用时间"},
                 {"name": "amount", "title": "金额", "type": "double", "length": 18, "dec": 5, "cwidth": 8, "uitype": "float", "label": "金额"},
                 {"name": "failed_reason", "title": "失败原因", "type": "text", "cwidth": 20, "uitype": "text", "label": "失败原因"},
