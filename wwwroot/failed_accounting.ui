@@ -65,20 +65,17 @@
                             {"value": "1", "text": "已处理"}
                         ]
                     },
+                    "llmid": {
+                        "valueField": "llmid",
+                        "textField": "llmid_text"
+                    },
                     "userid": {
-                        "uitype": "code",
                         "valueField": "userid",
                         "textField": "userid_text"
                     },
                     "userorgid": {
-                        "uitype": "code",
                         "valueField": "userorgid",
                         "textField": "userorgid_text"
-                    },
-                    "llmid": {
-                        "uitype": "code",
-                        "valueField": "llmid",
-                        "textField": "llmid_text"
                     }
                 }
             },
