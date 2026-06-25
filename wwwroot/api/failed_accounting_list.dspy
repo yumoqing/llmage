@@ -61,7 +61,8 @@ try:
 
 		# 跨库JOIN获取名称
 		sql = f"""
-SELECT f.*,
+SELECT f.id, f.llmusageid, f.llmid, f.userid, f.userorgid, f.use_date, f.use_time,
+	f.amount, f.cost, f.failed_reason, f.failed_time, f.retry_count, f.handled,
 	u.username as userid_text,
 	o.orgname as userorgid_text,
 	l.name as llmid_text
