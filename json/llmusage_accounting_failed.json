@@ -30,7 +30,20 @@
         ],
         "browserfields": {
             "exclouded": ["id", "failed_reason"],
-            "alters": {}
+            "alters": {
+                "llmid": {
+                    "valueField": "llmid",
+                    "textField": "llmid_text"
+                },
+                "userid": {
+                    "valueField": "userid",
+                    "textField": "userid_text"
+                },
+                "userorgid": {
+                    "valueField": "userorgid",
+                    "textField": "userorgid_text"
+                }
+            }
         },
         "editexclouded": ["id", "llmusageid", "failed_time"],
         "editable": {
