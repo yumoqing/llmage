@@ -83,11 +83,6 @@
                             }
                         ]
                     },
-                    "llmid": {
-                        "valueField": "llmid",
-                        "textField": "llmid_text",
-                        "uitype": "code"
-                    },
                     "userid": {
                         "valueField": "userid",
                         "textField": "userid_text",
@@ -117,6 +112,8 @@
                     "length": 32,
                     "cwidth": 12,
                     "uitype": "code",
+					"textField": "llmid_text",
+					"valueField": "llmid",
                     "label": "模型"
                 },
                 {
