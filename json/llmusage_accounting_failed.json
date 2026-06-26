@@ -29,23 +29,33 @@
             }
         ],
         "browserfields": {
-            "exclouded": ["id", "failed_reason"],
+            "exclouded": [
+                "id",
+                "failed_reason"
+            ],
             "alters": {
                 "llmid": {
                     "valueField": "llmid",
-                    "textField": "llmid_text"
+                    "textField": "llmid_text",
+                    "uitype": "code"
                 },
                 "userid": {
                     "valueField": "userid",
-                    "textField": "userid_text"
+                    "textField": "userid_text",
+                    "uitype": "code"
                 },
                 "userorgid": {
                     "valueField": "userorgid",
-                    "textField": "userorgid_text"
+                    "textField": "userorgid_text",
+                    "uitype": "code"
                 }
             }
         },
-        "editexclouded": ["id", "llmusageid", "failed_time"],
+        "editexclouded": [
+            "id",
+            "llmusageid",
+            "failed_time"
+        ],
         "editable": {
             "new_data_url": "{{entire_url('../api/llmusage_accounting_failed_create.dspy')}}",
             "update_data_url": "{{entire_url('../api/llmusage_accounting_failed_update.dspy')}}",

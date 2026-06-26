@@ -44,9 +44,18 @@
                     "uitype": "code",
                     "cwidth": 8,
                     "data": [
-                        {"value": "", "text": "全部"},
-                        {"value": "0", "text": "未处理"},
-                        {"value": "1", "text": "已处理"}
+                        {
+                            "value": "",
+                            "text": "全部"
+                        },
+                        {
+                            "value": "0",
+                            "text": "未处理"
+                        },
+                        {
+                            "value": "1",
+                            "text": "已处理"
+                        }
                     ]
                 }
             ]
@@ -56,40 +65,129 @@
         "page_rows": 20,
         "row_options": {
             "browserfields": {
-                "exclouded": ["id", "failed_reason"],
+                "exclouded": [
+                    "id",
+                    "failed_reason"
+                ],
                 "alters": {
                     "handled": {
                         "uitype": "code",
                         "data": [
-                            {"value": "0", "text": "未处理"},
-                            {"value": "1", "text": "已处理"}
+                            {
+                                "value": "0",
+                                "text": "未处理"
+                            },
+                            {
+                                "value": "1",
+                                "text": "已处理"
+                            }
                         ]
                     },
                     "llmid": {
                         "valueField": "llmid",
-                        "textField": "llmid_text"
+                        "textField": "llmid_text",
+                        "uitype": "code"
                     },
                     "userid": {
                         "valueField": "userid",
-                        "textField": "userid_text"
+                        "textField": "userid_text",
+                        "uitype": "code"
                     },
                     "userorgid": {
                         "valueField": "userorgid",
-                        "textField": "userorgid_text"
+                        "textField": "userorgid_text",
+                        "uitype": "code"
                     }
                 }
             },
             "fields": [
-                {"name": "llmusageid", "title": "使用记录ID", "type": "str", "length": 32, "cwidth": 12, "uitype": "str", "label": "使用记录ID"},
-                {"name": "llmid", "title": "模型", "type": "str", "length": 32, "cwidth": 12, "uitype": "code", "label": "模型"},
-                {"name": "userid", "title": "用户", "type": "str", "length": 32, "cwidth": 10, "uitype": "code", "label": "用户"},
-                {"name": "userorgid", "title": "机构", "type": "str", "length": 32, "cwidth": 10, "uitype": "code", "label": "机构"},
-                {"name": "use_time", "title": "使用时间", "type": "timestamp", "cwidth": 14, "uitype": "str", "label": "使用时间"},
-                {"name": "amount", "title": "金额", "type": "double", "length": 18, "dec": 5, "cwidth": 8, "uitype": "float", "label": "金额"},
-                {"name": "failed_reason", "title": "失败原因", "type": "text", "cwidth": 20, "uitype": "text", "label": "失败原因"},
-                {"name": "failed_time", "title": "失败时间", "type": "timestamp", "cwidth": 14, "uitype": "str", "label": "失败时间"},
-                {"name": "retry_count", "title": "重试", "type": "int", "cwidth": 4, "uitype": "int", "label": "重试"},
-                {"name": "handled", "title": "状态", "type": "str", "length": 1, "cwidth": 6, "uitype": "code", "label": "状态"}
+                {
+                    "name": "llmusageid",
+                    "title": "使用记录ID",
+                    "type": "str",
+                    "length": 32,
+                    "cwidth": 12,
+                    "uitype": "str",
+                    "label": "使用记录ID"
+                },
+                {
+                    "name": "llmid",
+                    "title": "模型",
+                    "type": "str",
+                    "length": 32,
+                    "cwidth": 12,
+                    "uitype": "code",
+                    "label": "模型"
+                },
+                {
+                    "name": "userid",
+                    "title": "用户",
+                    "type": "str",
+                    "length": 32,
+                    "cwidth": 10,
+                    "uitype": "code",
+                    "label": "用户"
+                },
+                {
+                    "name": "userorgid",
+                    "title": "机构",
+                    "type": "str",
+                    "length": 32,
+                    "cwidth": 10,
+                    "uitype": "code",
+                    "label": "机构"
+                },
+                {
+                    "name": "use_time",
+                    "title": "使用时间",
+                    "type": "timestamp",
+                    "cwidth": 14,
+                    "uitype": "str",
+                    "label": "使用时间"
+                },
+                {
+                    "name": "amount",
+                    "title": "金额",
+                    "type": "double",
+                    "length": 18,
+                    "dec": 5,
+                    "cwidth": 8,
+                    "uitype": "float",
+                    "label": "金额"
+                },
+                {
+                    "name": "failed_reason",
+                    "title": "失败原因",
+                    "type": "text",
+                    "cwidth": 20,
+                    "uitype": "text",
+                    "label": "失败原因"
+                },
+                {
+                    "name": "failed_time",
+                    "title": "失败时间",
+                    "type": "timestamp",
+                    "cwidth": 14,
+                    "uitype": "str",
+                    "label": "失败时间"
+                },
+                {
+                    "name": "retry_count",
+                    "title": "重试",
+                    "type": "int",
+                    "cwidth": 4,
+                    "uitype": "int",
+                    "label": "重试"
+                },
+                {
+                    "name": "handled",
+                    "title": "状态",
+                    "type": "str",
+                    "length": 1,
+                    "cwidth": 6,
+                    "uitype": "code",
+                    "label": "状态"
+                }
             ]
         }
     },
