@@ -1,0 +1,35 @@
+{% set sor = db.sqlorContext() %}
+{% set row = sor.execute_sql('select llmid, ioinfo from llmusage where id = ${id}$').first() %}
+{% set ioinfo = row.ioinfo if row and row.ioinfo else '' %}
+{% set model_id = row.llmid if row else '' %}
+{
+    "widgettype": "VScrollPanel",
+    "options": {
+        "width": "100%",
+        "height": "100%"
+    },
+    "subwidgets": [
+        {
+            "widgettype": "VBox",
+            "options": {
+                "width": "100%",
+                "padding": "16px",
+                "spacing": 12
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "Title4",
+                    "options": {
+                        "text": "Model: {{ model_id }}"
+                    }
+                },
+                {
+                    "widgettype": "Text",
+                    "options": {
+                        "text": {{ ioinfo | tojson }}
+                    }
+                }
+            ]
+        }
+    ]
+}

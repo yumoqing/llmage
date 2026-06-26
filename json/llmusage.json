@@ -3,13 +3,59 @@
     "title": "模型使用",
     "params": {
         "sortby": "use_time desc",
+        "toolbar": {
+            "tools": [
+                {
+                    "name": "show_usages",
+                    "label": "使用信息",
+                    "selected_row": true,
+                    "icon": "{{entire_url('/bricks/imgs/database.svg')}}"
+                },
+                {
+                    "name": "show_ioinfo",
+                    "label": "交互内容",
+                    "selected_row": true,
+                    "icon": "{{entire_url('/bricks/imgs/chat-user.svg')}}"
+                }
+            ]
+        },
+        "binds": [
+            {
+                "wid": "self",
+                "event": "show_usages",
+                "actiontype": "urlwidget",
+                "target": "PopupWindow",
+                "popup_options": {
+                    "title": "使用信息",
+                    "width": "70%",
+                    "height": "70%"
+                },
+                "options": {
+                    "url": "{{entire_url('../llmusage_usages_display.ui')}}?id=${id}$"
+                }
+            },
+            {
+                "wid": "self",
+                "event": "show_ioinfo",
+                "actiontype": "urlwidget",
+                "target": "PopupWindow",
+                "popup_options": {
+                    "title": "交互内容",
+                    "width": "70%",
+                    "height": "70%"
+                },
+                "options": {
+                    "url": "{{entire_url('../llmusage_ioinfo_display.ui')}}?id=${id}$"
+                }
+            }
+        ],
         "browserfields": {
-            "exclouded": ["id"],
+            "exclouded": ["id", "usages", "ioinfo"],
             "alters": {}
         },
-        "editexclouded": ["id"],
+        "editexclouded": ["id", "usages", "ioinfo"],
         "editable": {
-			"get_data_url": "{{entire_url(‘get_llmusage.dspy')}}?pagerows=50",
+            "get_data_url": "{{entire_url('get_llmusage.dspy')}}?pagerows=50",
             "new_data_url": "{{entire_url('../api/llmusage_create.dspy')}}",
             "update_data_url": "{{entire_url('../api/llmusage_update.dspy')}}",
             "delete_data_url": "{{entire_url('../api/llmusage_delete.dspy')}}"
