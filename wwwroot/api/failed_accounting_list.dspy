@@ -16,10 +16,6 @@ try:
 		filters['start_date'] = params_kw.get('start_date')
 	if params_kw.get('end_date'):
 		filters['end_date'] = params_kw.get('end_date')
-	if params_kw.get('filter_userid'):
-		filters['filter_userid'] = params_kw.get('filter_userid')
-	if params_kw.get('filter_llmid'):
-		filters['filter_llmid'] = params_kw.get('filter_llmid')
 
 	try:
 		page = int(params_kw.get('page', 1))
@@ -34,52 +30,37 @@ try:
 		ns = {}
 
 		if filters.get('userorgid'):
-			conditions.append("f.userorgid=${userorgid}$")
+			conditions.append("userorgid=${userorgid}$")
 			ns['userorgid'] = filters['userorgid']
 		if filters.get('llmid'):
-			conditions.append("f.llmid=${llmid}$")
+			conditions.append("llmid=${llmid}$")
 			ns['llmid'] = filters['llmid']
 		if filters.get('handled') is not None:
-			conditions.append("f.handled=${handled}$")
+			conditions.append("handled=${handled}$")
 			ns['handled'] = filters['handled']
 		if filters.get('start_date'):
-			conditions.append("f.use_date>=${start_date}$")
+			conditions.append("use_date>=${start_date}$")
 			ns['start_date'] = filters['start_date']
 		if filters.get('end_date'):
-			conditions.append("f.use_date<=${end_date}$")
+			conditions.append("use_date<=${end_date}$")
 			ns['end_date'] = filters['end_date']
-		if filters.get('filter_userid'):
-			conditions.append("(u.username LIKE ${filter_userid}$ OR u.name LIKE ${filter_userid}$)")
-			ns['filter_userid'] = '%' + filters['filter_userid'] + '%'
-		if filters.get('filter_llmid'):
-			conditions.append("(f.llmid LIKE ${filter_llmid}$ OR l.name LIKE ${filter_llmid}$)")
-			ns['filter_llmid'] = '%' + filters['filter_llmid'] + '%'
 
 		where = ""
 		if conditions:
 			where = "WHERE " + " AND ".join(conditions)
 
-		# 跨库JOIN获取名称
+		# 不查 failed_reason（大 TEXT），只查列表需要的字段
 		sql = f"""
-SELECT f.id, f.llmusageid, f.llmid, f.userid, f.userorgid, f.use_date, f.use_time,
-	f.amount, f.cost, f.failed_reason, f.failed_time, f.retry_count, f.handled,
-	u.username as userid_text,
-	o.orgname as userorgid_text,
-	l.name as llmid_text
-FROM llmusage_accounting_failed f
-LEFT JOIN {sage_db}.users u ON f.userid = u.id
-LEFT JOIN {sage_db}.organization o ON f.userorgid = o.id
-LEFT JOIN {llmage_db}.llm l ON f.llmid = l.id
+SELECT id, llmusageid, llmid, userid, userorgid, use_date, use_time,
+	amount, cost, failed_time, retry_count, handled
+FROM llmusage_accounting_failed
 {where}
-ORDER BY f.failed_time DESC
+ORDER BY failed_time DESC
 """
 
 		count_sql = f"""
 SELECT count(*) as cnt
-FROM llmusage_accounting_failed f
-LEFT JOIN {sage_db}.users u ON f.userid = u.id
-LEFT JOIN {sage_db}.organization o ON f.userorgid = o.id
-LEFT JOIN {llmage_db}.llm l ON f.llmid = l.id
+FROM llmusage_accounting_failed
 {where}
 """
 		count_recs = await sor.sqlExe(count_sql, ns)
@@ -89,16 +70,60 @@ LEFT JOIN {llmage_db}.llm l ON f.llmid = l.id
 		query_sql = sql + f" LIMIT {page_size} OFFSET {offset}"
 		recs = await sor.sqlExe(query_sql, ns)
 
-		rows = []
-		for r in (recs or []):
-			d = dict(r)
-			rows.append(d)
+		if recs:
+			# 收集所有需要转换的 ID
+			llm_ids = list(set(r.llmid for r in recs if r.llmid))
+			user_ids = list(set(r.userid for r in recs if r.userid))
+			org_ids = list(set(r.userorgid for r in recs if r.userorgid))
 
-		result['rows'] = rows
-		result['total'] = total
-		result['page'] = page
-		result['page_size'] = page_size
-		result['success'] = True
+			# 批量查询映射（内存中完成）
+			llm_map = {}
+			if llm_ids:
+				llm_recs = await sor.sqlExe(
+					"SELECT id, name FROM llm WHERE id IN ${ids}$",
+					{'ids': tuple(llm_ids)}
+				)
+				if llm_recs:
+					llm_map = {r.id: r.name for r in llm_recs}
+
+			user_map = {}
+			if user_ids:
+				async with db.sqlorContext(sage_db) as sage_sor:
+					user_recs = await sage_sor.sqlExe(
+						"SELECT id, username FROM users WHERE id IN ${ids}$",
+						{'ids': tuple(user_ids)}
+					)
+					if user_recs:
+						user_map = {r.id: r.username for r in user_recs}
+
+			org_map = {}
+			if org_ids:
+				async with db.sqlorContext(sage_db) as sage_sor:
+					org_recs = await sage_sor.sqlExe(
+						"SELECT id, orgname FROM organization WHERE id IN ${ids}$",
+						{'ids': tuple(org_ids)}
+					)
+					if org_recs:
+						org_map = {r.id: r.orgname for r in org_recs}
+
+			# 转换
+			handled_map = {'0': '未处理', '1': '已处理'}
+			rows = []
+			for r in recs:
+				d = dict(r)
+				d['llmid_text'] = llm_map.get(r.llmid, r.llmid)
+				d['userid_text'] = user_map.get(r.userid, r.userid)
+				d['userorgid_text'] = org_map.get(r.userorgid, r.userorgid)
+				d['handled_text'] = handled_map.get(r.handled, r.handled)
+				rows.append(d)
+
+			result['rows'] = rows
+			result['total'] = total
+			result['page'] = page
+			result['page_size'] = page_size
+			result['success'] = True
+		else:
+			result['success'] = True
 
 except Exception as e:
 	result['error'] = str(e)

@@ -69,8 +69,7 @@
                     "id",
                     "failed_reason"
                 ],
-                "alters": {
-                }
+                "alters": {}
             },
             "fields": [
                 {
@@ -83,36 +82,30 @@
                     "label": "使用记录ID"
                 },
                 {
-                    "name": "llmid",
+                    "name": "llmid_text",
                     "title": "模型",
                     "type": "str",
                     "length": 32,
                     "cwidth": 12,
-                    "uitype": "code",
-					"textField": "llmid_text",
-					"valueField": "llmid",
+                    "uitype": "str",
                     "label": "模型"
                 },
                 {
-                    "name": "userid",
+                    "name": "userid_text",
                     "title": "用户",
                     "type": "str",
                     "length": 32,
                     "cwidth": 10,
-                    "uitype": "code",
-					"valueField": "userid",
-					"textField": "userid_text",
+                    "uitype": "str",
                     "label": "用户"
                 },
                 {
-                    "name": "userorgid",
+                    "name": "userorgid_text",
                     "title": "机构",
                     "type": "str",
                     "length": 32,
                     "cwidth": 10,
-                    "uitype": "code",
-					"valueField": "userorgid",
-					"textField": "userorgid_text",
+                    "uitype": "str",
                     "label": "机构"
                 },
                 {
@@ -158,22 +151,12 @@
                     "label": "重试"
                 },
                 {
-                    "name": "handled",
+                    "name": "handled_text",
                     "title": "状态",
                     "type": "str",
                     "length": 1,
                     "cwidth": 6,
-                    "uitype": "code",
-					"data": [
-						{
-							"value": "0",
-							"text": "未处理"
-						},
-						{
-							"value": "1",
-							"text": "已处理"
-						}
-					],
+                    "uitype": "str",
                     "label": "状态"
                 }
             ]
