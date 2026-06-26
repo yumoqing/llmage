@@ -70,29 +70,6 @@
                     "failed_reason"
                 ],
                 "alters": {
-                    "handled": {
-                        "uitype": "code",
-                        "data": [
-                            {
-                                "value": "0",
-                                "text": "未处理"
-                            },
-                            {
-                                "value": "1",
-                                "text": "已处理"
-                            }
-                        ]
-                    },
-                    "userid": {
-                        "valueField": "userid",
-                        "textField": "userid_text",
-                        "uitype": "code"
-                    },
-                    "userorgid": {
-                        "valueField": "userorgid",
-                        "textField": "userorgid_text",
-                        "uitype": "code"
-                    }
                 }
             },
             "fields": [
@@ -123,6 +100,8 @@
                     "length": 32,
                     "cwidth": 10,
                     "uitype": "code",
+					"valueField": "userid",
+					"textField": "userid_text",
                     "label": "用户"
                 },
                 {
@@ -132,6 +111,8 @@
                     "length": 32,
                     "cwidth": 10,
                     "uitype": "code",
+					"valueField": "userorgid",
+					"textField": "userorgid_text",
                     "label": "机构"
                 },
                 {
@@ -183,6 +164,16 @@
                     "length": 1,
                     "cwidth": 6,
                     "uitype": "code",
+					"data": [
+						{
+							"value": "0",
+							"text": "未处理"
+						},
+						{
+							"value": "1",
+							"text": "已处理"
+						}
+					],
                     "label": "状态"
                 }
             ]
