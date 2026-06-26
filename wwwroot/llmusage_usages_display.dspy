@@ -43,7 +43,8 @@ return {
                 {
                     "widgettype": "Text",
                     "options": {
-                        "text": usages_text
+                        "text": usages_text,
+                        "css": "padding: 0 5px; white-space: pre-wrap; word-break: break-all;"
                     }
                 }
             ]

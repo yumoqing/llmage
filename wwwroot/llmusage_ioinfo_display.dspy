@@ -39,7 +39,8 @@ return {
                 {
                     "widgettype": "Text",
                     "options": {
-                        "text": ioinfo_text
+                        "text": ioinfo_text,
+                        "css": "padding: 0 5px; white-space: pre-wrap; word-break: break-all;"
                     }
                 }
             ]
