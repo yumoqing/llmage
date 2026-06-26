@@ -50,12 +50,20 @@
             }
         ],
         "browserfields": {
-            "exclouded": ["id", "usages", "ioinfo"],
+            "exclouded": [
+                "id",
+                "usages",
+                "ioinfo"
+            ],
             "alters": {}
         },
-        "editexclouded": ["id", "usages", "ioinfo"],
+        "editexclouded": [
+            "id",
+            "usages",
+            "ioinfo"
+        ],
         "editable": {
-            "get_data_url": "{{entire_url('get_llmusage.dspy')}}?pagerows=50",
+            "get_data_url": "{{entire_url('../api/llmusage_list.dspy')}}?pagerows=50",
             "new_data_url": "{{entire_url('../api/llmusage_create.dspy')}}",
             "update_data_url": "{{entire_url('../api/llmusage_update.dspy')}}",
             "delete_data_url": "{{entire_url('../api/llmusage_delete.dspy')}}"
