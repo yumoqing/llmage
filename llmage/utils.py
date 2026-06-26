@@ -149,6 +149,32 @@ async def write_llmio(luid, io_dic):
 	webpath = await fs.save(name, s, userid='llmio')
 	return webpath
 
+async def get_llmusage_by_id(usage_id):
+	"""从数据库获取 llmusage 记录"""
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		sql = "select id, llmid, ioinfo, usages from llmusage where id = ${id}$"
+		recs = await sor.sqlExe(sql, {'id': usage_id})
+		if recs and len(recs) > 0:
+			return dict(recs[0])
+		return None
+
+
+async def read_ioinfo_content(ioinfo_webpath):
+	"""从 FileStorage 读取交互信息文件内容"""
+	if not ioinfo_webpath:
+		return None
+	try:
+		fs = FileStorage()
+		real_path = fs.realPath(ioinfo_webpath)
+		async with aiofiles.open(real_path, 'rb') as f:
+			bin_data = await f.read()
+			return json.loads(bin_data.decode('utf-8'))
+	except Exception as e:
+		debug(f'read_ioinfo_content error: {e}')
+		return None
+
+
 async def llm_query_orders(userorgid, page, pagerows=80):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:

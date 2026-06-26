@@ -1,0 +1,52 @@
+import json
+from llmage.utils import get_llmusage_by_id
+
+usage_id = params_kw.get('id')
+if not usage_id:
+    return {"widgettype": "Message", "options": {"message": "缺少 id 参数", "type": "error"}}
+
+record = await get_llmusage_by_id(usage_id)
+if not record:
+    return {"widgettype": "Message", "options": {"message": "未找到记录", "type": "error"}}
+
+llmid = record.get('llmid', '')
+usages_raw = record.get('usages', '')
+
+try:
+    usages_obj = json.loads(usages_raw) if isinstance(usages_raw, str) else usages_raw
+except (json.JSONDecodeError, TypeError):
+    usages_obj = usages_raw
+
+usages_text = json.dumps(usages_obj, ensure_ascii=False, indent=2) if usages_obj else "无使用信息"
+
+return {
+    "widgettype": "VScrollPanel",
+    "options": {
+        "width": "100%",
+        "height": "100%"
+    },
+    "subwidgets": [
+        {
+            "widgettype": "VBox",
+            "options": {
+                "width": "100%",
+                "padding": "16px",
+                "spacing": 12
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "Title4",
+                    "options": {
+                        "text": f"Model: {llmid}"
+                    }
+                },
+                {
+                    "widgettype": "Text",
+                    "options": {
+                        "text": usages_text
+                    }
+                }
+            ]
+        }
+    ]
+}

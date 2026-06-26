@@ -1,0 +1,48 @@
+import json
+from llmage.utils import get_llmusage_by_id, read_ioinfo_content
+
+usage_id = params_kw.get('id')
+if not usage_id:
+    return {"widgettype": "Message", "options": {"message": "缺少 id 参数", "type": "error"}}
+
+record = await get_llmusage_by_id(usage_id)
+if not record:
+    return {"widgettype": "Message", "options": {"message": "未找到记录", "type": "error"}}
+
+llmid = record.get('llmid', '')
+ioinfo_webpath = record.get('ioinfo', '')
+
+ioinfo_content = await read_ioinfo_content(ioinfo_webpath) if ioinfo_webpath else None
+ioinfo_text = json.dumps(ioinfo_content, ensure_ascii=False, indent=2) if ioinfo_content else "无交互内容"
+
+return {
+    "widgettype": "VScrollPanel",
+    "options": {
+        "width": "100%",
+        "height": "100%"
+    },
+    "subwidgets": [
+        {
+            "widgettype": "VBox",
+            "options": {
+                "width": "100%",
+                "padding": "16px",
+                "spacing": 12
+            },
+            "subwidgets": [
+                {
+                    "widgettype": "Title4",
+                    "options": {
+                        "text": f"Model: {llmid}"
+                    }
+                },
+                {
+                    "widgettype": "Text",
+                    "options": {
+                        "text": ioinfo_text
+                    }
+                }
+            ]
+        }
+    ]
+}

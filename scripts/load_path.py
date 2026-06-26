@@ -155,8 +155,8 @@ PATHS_LOGINED = [
     f"/{MOD}/llmusage/delete_llmusage.dspy",
     f"/{MOD}/llmusage/get_llmusage.dspy",
     f"/{MOD}/llmusage/update_llmusage.dspy",
-    f"/{MOD}/llmusage_usages_display.ui",
-    f"/{MOD}/llmusage_ioinfo_display.ui",
+    f"/{MOD}/llmusage_usages_display.dspy",
+    f"/{MOD}/llmusage_ioinfo_display.dspy",
 
     # CRUD 子目录 — llmusage_accounting_failed/
     f"/{MOD}/llmusage_accounting_failed/index.ui",

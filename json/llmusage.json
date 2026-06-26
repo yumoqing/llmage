@@ -31,7 +31,7 @@
                     "height": "70%"
                 },
                 "options": {
-                    "url": "{{entire_url('../llmusage_usages_display.ui')}}?id=${id}$"
+                    "url": "{{entire_url('../llmusage_usages_display.dspy')}}?id=${id}$"
                 }
             },
             {
@@ -45,7 +45,7 @@
                     "height": "70%"
                 },
                 "options": {
-                    "url": "{{entire_url('../llmusage_ioinfo_display.ui')}}?id=${id}$"
+                    "url": "{{entire_url('../llmusage_ioinfo_display.dspy')}}?id=${id}$"
                 }
             }
         ],

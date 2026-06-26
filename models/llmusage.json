@@ -151,6 +151,13 @@
                 "userorgid",
                 "use_time"
             ]
+        },
+        {
+            "name": "idx_llmusage_usetime",
+            "idxtype": "index",
+            "idxfields": [
+                "use_time"
+            ]
         }
     ],
     "codes": [
