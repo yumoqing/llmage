@@ -96,13 +96,13 @@
         },
         {
             "name": "userorgid",
-            "title": "orgname",
+            "title": "user_orgname",
             "type": "str",
             "length": 32
         },
         {
             "name": "ownerid",
-            "title": "orgname",
+            "title": "owner_orgname",
             "type": "str",
             "length": 32
         },
@@ -154,6 +154,30 @@
         }
     ],
     "codes": [
+        {
+            "field": "userid",
+            "table": "users",
+            "valuefield": "id",
+            "textfield": "username"
+        },
+        {
+            "field": "ownerid",
+            "table": "organization",
+            "valuefield": "id",
+            "textfield": "orgname"
+        },
+        {
+            "field": "userorgid",
+            "table": "organization",
+            "valuefield": "id",
+            "textfield": "orgname"
+        },
+        {
+            "field": "llmid",
+            "table": "llm",
+            "valuefield": "id",
+            "textfield": "model"
+        },
         {
             "field": "status",
             "table": "appcodes_kv",
