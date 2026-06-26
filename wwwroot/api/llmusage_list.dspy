@@ -1,87 +1,74 @@
 result = {'success': False, 'rows': [], 'total': 0, 'page': 1, 'page_size': 50}
 
 try:
-	ns = params_kw.copy()
+	# 参数解析
+	try:
+		page = int(params_kw.get('page', 1))
+	except (ValueError, TypeError):
+		page = 1
+	if page < 1:
+		page = 1
+	rows_per_page = int(params_kw.get('rows', params_kw.get('pagerows', 50)))
+	offset = (page - 1) * rows_per_page
+	sort_field = params_kw.get('sort', 'use_time desc')
 
-	if not ns.get('page'):
-		ns['page'] = 1
-	if not ns.get('sort'):
-		ns['sort'] = 'use_time desc'
+	# 构建 WHERE 条件（只支持常用筛选字段，手动拼接避免框架开销）
+	conditions = ['1=1']
+	ns = {}
 
-	filterjson = params_kw.get('data_filter')
-	if filterjson and isinstance(filterjson, str):
-		try:
-			filterjson = json.loads(filterjson)
-		except (json.JSONDecodeError, TypeError):
-			filterjson = None
+	llmid = params_kw.get('llmid')
+	if llmid:
+		conditions.append('llmid=${llmid}$')
+		ns['llmid'] = llmid
 
-	fields_str=r'''[
-		{"name": "id", "title": "id", "type": "str", "length": 32},
-		{"name": "llmid", "title": "模型id", "type": "str", "length": 32},
-		{"name": "use_date", "title": "使用日期", "type": "date"},
-		{"name": "use_time", "title": "使用时间", "type": "timestamp"},
-		{"name": "userid", "title": "用户id", "type": "str", "length": 32},
-		{"name": "usages", "title": "使用信息", "type": "text"},
-		{"name": "ioinfo", "title": "交互内容", "type": "text"},
-		{"name": "transno", "title": "交易号", "type": "str", "length": 32},
-		{"name": "responsed_seconds", "title": "响应时间", "type": "float", "length": 18, "dec": 2},
-		{"name": "finish_seconds", "title": "结束时间", "type": "float", "length": 18, "dec": 2},
-		{"name": "status", "title": "状态", "type": "str", "length": 32},
-		{"name": "taskid", "title": "任务号", "type": "str", "length": 256},
-		{"name": "amount", "title": "交易金额", "type": "float", "length": 18, "dec": 2},
-		{"name": "cost", "title": "交易成本", "type": "float", "length": 18, "dec": 2},
-		{"name": "userorgid", "title": "用户机构id", "type": "str", "length": 32},
-		{"name": "ownerid", "title": "模型机构id", "type": "str", "length": 32},
-		{"name": "accounting_status", "title": "记账状态", "type": "str", "length": 32}
-	]'''
-	ori_fields = json.loads(fields_str)
+	status = params_kw.get('status')
+	if status:
+		conditions.append('status=${status}$')
+		ns['status'] = status
 
-	filterdic = ns.copy()
-	filterdic['filterstr'] = ''
-	filterdic['userorgid'] = '${userorgid}$'
-	filterdic['userid'] = '${userid}$'
+	accounting_status = params_kw.get('accounting_status')
+	if accounting_status:
+		conditions.append('accounting_status=${accounting_status}$')
+		ns['accounting_status'] = accounting_status
 
-	if not filterjson:
-		# 排除大 TEXT 字段，避免生成 LIKE 过滤导致全表扫描
-		filter_fields = [f['name'] for f in ori_fields if f['name'] not in ('usages', 'ioinfo')]
-		filterjson = default_filterjson(filter_fields, ns)
+	userid = params_kw.get('userid')
+	if userid:
+		conditions.append('userid=${userid}$')
+		ns['userid'] = userid
 
-	if filterjson:
-		dbf = DBFilter(filterjson)
-		conds = dbf.gen(ns)
-		if conds:
-			ns.update(dbf.consts)
-			conds = f' and {conds}'
-			filterdic['filterstr'] = conds
+	userorgid = params_kw.get('userorgid')
+	if userorgid:
+		conditions.append('userorgid=${userorgid}$')
+		ns['userorgid'] = userorgid
 
-	ac = ArgsConvert('[[', ']]')
-	sql_template = 'select id, llmid, use_date, use_time, userid, transno, responsed_seconds, finish_seconds, status, taskid, amount, cost, userorgid, ownerid, accounting_status from llmusage where 1=1 [[filterstr]]'
-	vars = ac.findAllVariables(sql_template)
-	NameSpace = {v: '${' + v + '}$' for v in vars if v != 'filterstr'}
-	filterdic.update(NameSpace)
-	where_sql = ac.convert(sql_template, filterdic)
+	start_date = params_kw.get('start_date')
+	if start_date:
+		conditions.append('use_date>=${start_date}$')
+		ns['start_date'] = start_date
 
-	# 提取 WHERE 条件，避免 sqlPaging 子查询包装
-	idx = where_sql.lower().find('where')
-	where_clause = where_sql[idx:] if idx >= 0 else 'where 1=1'
+	end_date = params_kw.get('end_date')
+	if end_date:
+		conditions.append('use_date<=${end_date}$')
+		ns['end_date'] = end_date
 
-	sort_field = ns.get('sort', 'use_time desc')
+	where = 'WHERE ' + ' AND '.join(conditions)
+
+	# 列表字段（不含 usages/ioinfo 大 TEXT）
+	select_fields = 'id, llmid, use_date, use_time, userid, transno, responsed_seconds, finish_seconds, status, taskid, amount, cost, userorgid, ownerid, accounting_status'
 
 	db = DBPools()
 	dbname = get_module_dbname('llmage')
 
 	async with db.sqlorContext(dbname) as sor:
-		# 分离 count 和 data 查询，避免子查询包装
-		count_sql = f'select count(*) as rcnt from llmusage {where_clause}'
-		count_recs = await sor.sqlExe(count_sql, ns)
-		total = count_recs[0].rcnt if count_recs else 0
+		# count
+		count_recs = await sor.sqlExe(f'SELECT count(*) as cnt FROM llmusage {where}', ns)
+		total = count_recs[0].cnt if count_recs else 0
 
-		page = int(ns.get('page', 1))
-		rows_per_page = int(ns.get('rows', ns.get('pagerows', 50)))
-		offset = (page - 1) * rows_per_page
-
-		data_sql = f'select id, llmid, use_date, use_time, userid, transno, responsed_seconds, finish_seconds, status, taskid, amount, cost, userorgid, ownerid, accounting_status from llmusage {where_clause} order by {sort_field} limit {rows_per_page} offset {offset}'
-		rows = await sor.sqlExe(data_sql, ns)
+		# data
+		rows = await sor.sqlExe(
+			f'SELECT {select_fields} FROM llmusage {where} ORDER BY {sort_field} LIMIT {rows_per_page} OFFSET {offset}',
+			ns
+		)
 
 	result['success'] = True
 	result['total'] = total
@@ -90,7 +77,7 @@ try:
 	result['page_size'] = rows_per_page
 
 except Exception as e:
-	debug(f'error: {traceback.format_exc()}')
+	debug(f'llmusage_list error: {format_exc()}')
 	result['error'] = str(e)
 
-return result
+return json.dumps(result, ensure_ascii=False, default=str)
