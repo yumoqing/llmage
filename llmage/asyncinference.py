@@ -15,6 +15,9 @@ from ahserver.filestorage import FileStorage
 from .accounting import llm_accounting, llm_charging
 from .utils import *
 
+# Global set to keep references to background tasks
+_background_tasks = set()
+
 async def get_today_asynctask_list(userid):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
@@ -39,7 +42,9 @@ async def get_asynctask_status(request, taskid):
 			t = timestampAdd(r.use_time, 600)
 			now = time.time()
 			if r.status not in ['UNKNOWN', 'FAILED', 'SUCCEEDED'] and now > t:
-				asyncio.create_task(query_task_status(request, r.id))
+				task = asyncio.create_task(query_task_status(request, r.id))
+				_background_tasks.add(task)
+				task.add_done_callback(_background_tasks.discard)
 			return output
 		return {
 			'taskid': taskid,
@@ -112,7 +117,9 @@ async def async_uapi_request(request, llm,
 		if d.status == 'FAILED':
 			e = Exception(f'resp={d} FFAILED')
 			return
-		asyncio.create_task(query_task_status(request,  luid))
+		task = asyncio.create_task(query_task_status(request, luid))
+		_background_tasks.add(task)
+		task.add_done_callback(_background_tasks.discard)
 
 	except Exception as e:
 		ed = {"error": f"ERROR:{e}", "status": "FAILED"}
@@ -165,48 +172,55 @@ async def query_task_status(request, luid, onetime=False):
 	upappid = llm.upappid
 	apinames = llm.query_apiname.split(',')
 
-	for apiname in apinames:
-		while True:
-			lastoutout = await get_lastoutput(llmusage.ioinfo)
-			if lastoutout['status'] in ['UNKNOWN', 'FAILED', 'SUCCEEDED']:
-				critical(f"{lastoutout['status']=}")
-				return
-			ns = {'taskid': taskid}
-			new_output = b = d = None
-			try:
-				b = await uapi.call(upappid, apiname, userid, params=ns)
-				if isinstance(b, bytes):
-					b = b.decode('utf-8')
-				new_output = json.loads(b)
-			except Exception as e:
-				exception(f'{e}, {b=}')
-				new_output = {
-					'status': 'FAILED', 
-					'error': f'{b},{e}'
-				}
-			if not new_output.get('status'):
-				e = Exception(f"{new_output=} {upappid=}, {apiname=} has not status field")
-				critical(f'{e}')
-				raise e
-			if lastoutout['status'] != new_output.get('status'):
-				llmusage.status = new_output['status']
-				ns = {
-					'id': llmusage.id,
-					'status': llmusage.status
-				}
-				if 'usage' in new_output.keys():
-					ns['usages'] = json.dumps(new_output['usage'])
-				await append_new_llmoutput(llmusage.ioinfo, new_output)
-				await modify_llmusage(ns)
-			if  llmusage.status in ['UNKNOWN', 'FAILED', 'SUCCEEDED']:
-				critical(f'finished .. {llmusage.status=}')
-				return
+	try:
+		for apiname in apinames:
+			while True:
+				lastoutout = await get_lastoutput(llmusage.ioinfo)
+				if lastoutout['status'] in ['UNKNOWN', 'FAILED', 'SUCCEEDED']:
+					critical(f"{lastoutout['status']=}")
+					return
+				ns = {'taskid': taskid}
+				new_output = b = d = None
+				try:
+					b = await uapi.call(upappid, apiname, userid, params=ns)
+					if isinstance(b, bytes):
+						b = b.decode('utf-8')
+					new_output = json.loads(b)
+				except Exception as e:
+					exception(f'{e}, {b=}')
+					new_output = {
+						'status': 'FAILED', 
+						'error': f'{b},{e}'
+					}
+				if not new_output.get('status'):
+					e = Exception(f"{new_output=} {upappid=}, {apiname=} has not status field")
+					critical(f'{e}')
+					raise e
+				if lastoutout['status'] != new_output.get('status'):
+					llmusage.status = new_output['status']
+					ns = {
+						'id': llmusage.id,
+						'status': llmusage.status
+					}
+					if 'usage' in new_output.keys():
+						ns['usages'] = json.dumps(new_output['usage'])
+					await append_new_llmoutput(llmusage.ioinfo, new_output)
+					await modify_llmusage(ns)
+				if  llmusage.status in ['UNKNOWN', 'FAILED', 'SUCCEEDED']:
+					critical(f'finished .. {llmusage.status=}')
+					return
 
-			if onetime:
-				critical(f'onetime is true, returned')
-				return
-			await asyncio.sleep(llm.query_period or 30)
-			critical(f'{llm.query_period=} seconds will retry, {new_output["status"]=}')
+				if onetime:
+					critical(f'onetime is true, returned')
+					return
+				await asyncio.sleep(llm.query_period or 30)
+				critical(f'{llm.query_period=} seconds will retry, {new_output["status"]=}')
+	except asyncio.CancelledError:
+		critical(f'query_task_status cancelled for {luid=}')
+		raise
+	except Exception as e:
+		exception(f'query_task_status error for {luid=}: {e}')
+		raise
 
 
 async def async_uapi_request_product(llm, api_userid, user_id, user_org_id, params_kw, luid):
