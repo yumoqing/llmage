@@ -22,14 +22,6 @@
 #	 "created": 1234567890
 # }
 
-import json
-import time
-from functools import partial
-from appPublic.log import debug
-from appPublic.dictObject import DictObject
-from appPublic.uniqueID import getID
-from appPublic.timeUtils import curDateString, timestampstr
-from sqlor.dbpools import get_sor_context
 
 debug_params('params_kw', params_kw)
 

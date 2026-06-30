@@ -21,6 +21,8 @@ from .utils import (
 	get_llmage_llm,
 	get_llm_catelogs,
 	invalidate_uapi_cache,
+	get_llmusage_by_id,
+	read_ioinfo_content,
 )
 
 from .llmclient import (
@@ -153,6 +155,8 @@ def load_llmage():
 	env.llm_query_price = llm_query_price
 	env.get_llms_by_catelog_to_customer = get_llms_by_catelog_to_customer
 	env.backup_accounted_llmusage = backup_accounted_llmusage
+	env.read_ioinfo_content = read_ioinfo_content
+	env.get_llmusage_by_id = get_llmusage_by_id
 	env.get_failed_accounting_records = get_failed_accounting_records
 	env.get_llmage_stats = get_llmage_stats
 	# Product module standard interface

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import json
 
 result = {'success': False, 'data': {'llms': [], 'catelogs': [], 'apis': [], 'ppids': []}}
 

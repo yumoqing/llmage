@@ -1,4 +1,3 @@
 #!/usr/bin/env python3
-import json
 result = {'success': False, 'message': '历史数据为只读，不可删除'}
 return json.dumps(result, ensure_ascii=False, default=str)

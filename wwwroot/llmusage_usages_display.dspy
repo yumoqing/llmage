@@ -1,5 +1,3 @@
-import json
-from llmage.utils import get_llmusage_by_id
 
 usage_id = params_kw.get('id')
 if not usage_id:

@@ -14,14 +14,6 @@
 #
 # Response format depends on the upstream model (sync returns image data, async returns task info)
 
-import json
-import time
-from functools import partial
-from appPublic.log import debug
-from appPublic.dictObject import DictObject
-from appPublic.uniqueID import getID
-from appPublic.timeUtils import curDateString, timestampstr
-from sqlor.dbpools import get_sor_context
 
 debug_params('params_kw', params_kw)
 

@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import json
-from appPublic.uniqueID import getID
 
 result = {'success': False, 'message': ''}
 
