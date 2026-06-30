@@ -2,7 +2,7 @@ import asyncio
 import json
 import time
 from datetime import datetime, timedelta
-from appPublic.log import exception, debug
+from appPublic.log import exception, debug, info
 from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from sqlor.dbpools import get_sor_context
@@ -327,13 +327,14 @@ order by failed_time desc limit {page_size} offset {offset}"""
 
 async def backend_accounting():
 	env = ServerEnv()
-	debug(f'backend accounting started ...')
+	info(f"backend accounting started ...")
 	last_backup_date = None
 	while True:
 		try:
 			lus = await get_accounting_llmusages()
+			info(f"accounting loop: got {len(lus)} records")
 		except Exception as e:
-			exception(f'{e}')
+			exception(f"get_accounting_llmusages failed: {e}")
 			lus = []
 		for lu in lus:
 			try:
