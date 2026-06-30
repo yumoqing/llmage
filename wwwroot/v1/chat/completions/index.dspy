@@ -44,6 +44,7 @@ where (b.id = ${catelogid}$ OR b.name = ${catelogid}$)
 		debug(f'{params_kw.model=} not found')
 		return openai_400()
 	params_kw.llmid = recs[0].id
+	params_kw.llmcatelogid = catelogid
 
 debug(f'{params_kw.llmid=}')
 f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)

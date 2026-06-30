@@ -54,6 +54,7 @@ where (b.id = ${lctype}$ OR b.name = ${lctype}$)
         debug(f'{params_kw.model=} not found for catalog {lctype}')
         return openai_400()
     params_kw.llmid = recs[0].id
+    params_kw.llmcatelogid = lctype
 
 debug(f'{params_kw.llmid=}')
 
