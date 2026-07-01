@@ -53,7 +53,7 @@ async with get_sor_context(env, 'llmage') as sor:
 join llm_api_map m on a.id = m.llmid
 join llmcatelog b on m.llmcatelogid = b.id
 where (b.id = ${lctype}$ OR b.name = ${lctype}$)
-    and a.model=${model}$
+    and a.name=${model}$
     and a.status = 'published'"""
     recs = await sor.sqlExe(sql, {
         'lctype': lctype,

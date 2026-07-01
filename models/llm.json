@@ -116,5 +116,12 @@
             "textfield": "v",
             "cond": "parentid='llm_status'"
         }
+    ],
+    "indexes": [
+        {
+            "name": "idx_llm_name",
+            "idxtype": "unique",
+            "idxfields": ["name"]
+        }
     ]
 }
