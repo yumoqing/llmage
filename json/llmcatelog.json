@@ -10,9 +10,9 @@
             "delete_data_url": "{{entire_url('../api/llmcatelog_delete.dspy')}}"
         },
         "browserfields": {
-            "exclouded": ["id"],
+            "exclouded": [],
             "alters": {}
         },
-        "editexclouded": ["id"]
+        "editexclouded": []
     }
 }
