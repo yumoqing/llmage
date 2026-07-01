@@ -127,6 +127,9 @@ PATHS_LOGINED = [
     f"/{MOD}/api/llmusage_update.dspy",
     f"/{MOD}/api/retry_accounting.dspy",
     f"/{MOD}/api/uapi_options.dspy",
+    f"/{MOD}/api/copy_api_form.ui",
+    f"/{MOD}/api/copy_api.dspy",
+    f"/{MOD}/api/get_search_llm_for_copy.dspy",
 
     # CRUD 子目录 — llm/
     f"/{MOD}/llm/index.ui",

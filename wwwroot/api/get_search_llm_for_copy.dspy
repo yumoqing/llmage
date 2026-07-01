@@ -1,0 +1,12 @@
+# 返回可选llm列表供复制API时选择源和目标
+result = [{'value':'','text':'请选择'}]
+try:
+    dbname = get_module_dbname('llmage')
+    async with DBPools().sqlorContext(dbname) as sor:
+        sql = "SELECT id as value, name as text FROM llm WHERE status='published' ORDER BY name"
+        recs = await sor.sqlExe(sql, {})
+        if recs:
+            result.extend([{'value':r.value,'text':r.text} for r in recs])
+except Exception as e:
+    debug(f'get_search_llm_for_copy error: {e}')
+return result

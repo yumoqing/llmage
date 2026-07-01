@@ -1,0 +1,34 @@
+{
+	"widgettype": "Form",
+	"options": {
+		"submit_url": "{{entire_url('../api/copy_api.dspy')}}",
+		"fields": [
+			{
+				"name": "from_llmid",
+				"label": "源模型",
+				"uitype": "code",
+				"required": true,
+				"dataurl": "{{entire_url('../api/get_search_llm_for_copy.dspy')}}",
+				"valueField": "from_llmid",
+				"textField": "from_llmid_text"
+			},
+			{
+				"name": "to_llmid",
+				"label": "目标模型",
+				"uitype": "code",
+				"required": true,
+				"dataurl": "{{entire_url('../api/get_search_llm_for_copy.dspy')}}",
+				"valueField": "to_llmid",
+				"textField": "to_llmid_text"
+			}
+		]
+	},
+	"binds": [
+		{
+			"wid": "self",
+			"event": "submited",
+			"actiontype": "close",
+			"target": "PopupWindow"
+		}
+	]
+}
