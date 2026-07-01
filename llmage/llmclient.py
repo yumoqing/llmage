@@ -124,8 +124,7 @@ async def _inference_generator(request, callerid, callerorgid,
 		exception(errmsg)
 		yield errmsg
 		return
-	if not params_kw.model:
-		params_kw.model = llm.model
+	params_kw.model = llm.model
 	if llm.stream == 'async':
 		if llm.callbackurl:
 			cb_url = env.entire_url(llm.callbackurl)

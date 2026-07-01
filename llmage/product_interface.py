@@ -215,8 +215,7 @@ async def execute_product_service(resource_ref_id, user_id, user_org_id, request
 
     luid = getID()
     params_kw = DictObject(**request_data)
-    if not params_kw.get('model'):
-        params_kw.model = full_llm.model
+    params_kw.model = full_llm.model
     if not params_kw.get('transno'):
         params_kw.transno = luid
 
@@ -344,8 +343,7 @@ async def execute_product_service_stream(resource_ref_id, user_id, user_org_id, 
         full_llm.upappid, orgid=full_llm.ownerid)
 
     params_kw = DictObject(**request_data)
-    if not params_kw.get('model'):
-        params_kw.model = full_llm.model
+    params_kw.model = full_llm.model
     luid = getID()
     if not params_kw.get('transno'):
         params_kw.transno = luid
