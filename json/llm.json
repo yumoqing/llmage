@@ -58,10 +58,6 @@
 					"name":"unpublish",
 					"label":"下架",
 					"selected_row":true
-				},
-				{
-					"name":"copy_api",
-					"label":"复制API"
 				}
 			]
 		},
@@ -117,21 +113,6 @@
 						"id":"${id}",
 						"action":"unpublished"
 					}
-				}
-			},
-			{
-				"wid":"self",
-				"event":"copy_api",
-				"actiontype":"urlwidget",
-				"target":"PopupWindow",
-				"popup_options":{
-					"title":"复制API配置",
-					"cwidth":24,
-					"cheight":14,
-					"dismiss_events":["cancel","submited"]
-				},
-				"options":{
-					"url":"{{entire_url('../api/copy_api_form.ui')}}"
 				}
 			}
 		],
