@@ -62,27 +62,22 @@ elif action == 'check_charging':
 		if not ppids:
 			return json.dumps({'widgettype':'Error','options':{'text':'无定价项目(ppid)'}}, ensure_ascii=False)
 		
-		ppid = ppids[0]
-		
-		# 检查 pricing_program
-		async with get_sor_context(request._run_ns, 'pricing') as psor:
-			pregs = await psor.sqlExe(
-				"select * from pricing_program where id=${ppid}$", {'ppid': ppid})
-			if not pregs:
-				return json.dumps({'widgettype':'Error','options':{'text':f'定价项目不存在 (ppid={ppid})'}}, ensure_ascii=False)
+		# 实际调用定价计算
+		try:
+			prices = await llm_query_price(llmid, usages)
+			if not prices:
+				return json.dumps({'widgettype':'Error','options':{'text':'定价计算返回空'}}, ensure_ascii=False)
 			
-			pp = pregs[0]
-			
-			# 检查 pricing_program_timing
-			try:
-				timings = await psor.sqlExe(
-					"select * from pricing_program_timing where ppid=${ppid}$",
-					{'ppid': ppid})
-				if timings:
-					return json.dumps({'widgettype':'Message','options':{'text':f'计费配置验证通过\n定价项目: {pp.name}\n定价数据: {len(timings)}条记录\n测试用量: {json.dumps(usages)}'}}, ensure_ascii=False)
-				else:
-					return json.dumps({'widgettype':'Warning','options':{'text':f'定价项目存在但无定价数据\n定价项目: {pp.name}'}}, ensure_ascii=False)
-			except Exception as e:
-				return json.dumps({'widgettype':'Error','options':{'text':f'定价数据查询失败: {e}'}}, ensure_ascii=False)
+			lines = []
+			total = 0
+			for p in prices:
+				amount = getattr(p, 'amount', 0) or 0
+				name = getattr(p, 'timing_name', '') or ''
+				total += amount
+				lines.append(f'{name}: {amount}')
+			lines.append(f'合计: {total}')
+			return json.dumps({'widgettype':'Message','options':{'text':f'计费测试通过\n' + chr(10).join(lines)}}, ensure_ascii=False)
+		except Exception as e:
+			return json.dumps({'widgettype':'Error','options':{'text':f'计费测试失败: {e}'}}, ensure_ascii=False)
 
 return json.dumps({'widgettype':'Error','options':{'text':'无效的操作'}}, ensure_ascii=False)

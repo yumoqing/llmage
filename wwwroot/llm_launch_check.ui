@@ -82,14 +82,6 @@
 				},
 				{
 					"widgettype": "Text",
-					"id": "test_result",
-					"options": {
-						"text": "",
-						"i18n": false
-					}
-				},
-				{
-					"widgettype": "Text",
 					"id": "charge_result",
 					"options": {
 						"text": "",
@@ -128,10 +120,16 @@
 		{
 			"wid": "test_btn",
 			"event": "click",
-			"actiontype": "urldata",
-			"target": "test_result",
+			"actiontype": "urlwidget",
+			"target": "PopupWindow",
+			"popup_options": {
+				"title": "模型体验",
+				"resizable": true,
+				"height": "80%",
+				"width": "80%"
+			},
 			"options": {
-				"url": "/llmage/api/llm_launch_check_api.dspy?llmid={{llmid}}&action=inference"
+				"url": "{{entire_url('/llmage/llm_dialog.ui')}}?id={{llmid}}"
 			}
 		},
 		{
@@ -140,7 +138,7 @@
 			"actiontype": "urldata",
 			"target": "charge_result",
 			"options": {
-				"url": "/llmage/api/llm_launch_check_api.dspy?llmid={{llmid}}&action=check_charging&usages={\"prompt_tokens\":1000,\"completion_tokens\":500}"
+				"url": "{{entire_url('/llmage/api/llm_launch_check_api.dspy')}}?llmid={{llmid}}&action=check_charging&usages={\"prompt_tokens\":1000,\"completion_tokens\":500}"
 			}
 		}
 	]
