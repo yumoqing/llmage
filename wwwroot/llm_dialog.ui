@@ -15,6 +15,7 @@
 {% if len(catelogs) > 1 %}
 {
 	"widgettype":"VBox",
+	"id":"llm_dialog_root",
 	"options":{
 		"width":"100%",
 		"height":"100%"
@@ -42,7 +43,7 @@
 						"wid":"self",
 						"event":"click",
 						"actiontype":"urlwidget",
-						"target":"app.sage_main_content",
+						"target":"app.llm_dialog_root",
 						"mode":"replace",
 						"options":{
 							"url":"{{entire_url('/llmage/llm_dialog.ui')}}?id={{params_kw.id}}&catelogid={{c.catelogid}}"
