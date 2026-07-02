@@ -33,12 +33,21 @@
 					"widgettype":"Button",
 					"options":{
 						"label":"{{c.catelogname}}",
-						"actiontype":"link",
 {% if c.catelogid == ns.active_catelogid %}
 						"css":"primary",
 {% endif %}
 						"url":"{{entire_url('/llmage/llm_dialog.ui')}}?id={{params_kw.id}}&catelogid={{c.catelogid}}"
-					}
+					},
+					"binds":[{
+						"wid":"self",
+						"event":"click",
+						"actiontype":"urlwidget",
+						"target":"app.sage_main_content",
+						"mode":"replace",
+						"options":{
+							"url":"{{entire_url('/llmage/llm_dialog.ui')}}?id={{params_kw.id}}&catelogid={{c.catelogid}}"
+						}
+					}]
 				}{% if not loop.last %},{% endif %}
 {% endfor %}
 			]
