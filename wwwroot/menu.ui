@@ -36,6 +36,16 @@
 			"name":"failed_accounting",
 			"label":"记账失败记录",
 			"url":"{{entire_url('/llmage/failed_accounting.ui')}}"
+		},
+		{
+			"name":"user_llm_policy",
+			"label":"用户模型策略",
+			"url":"{{entire_url('/llmage/user_llm_policy')}}"
+		},
+		{
+			"name":"llm_metrics",
+			"label":"模型使用指标",
+			"url":"{{entire_url('/llmage/llm_metrics')}}"
 		}
 		]
 	}

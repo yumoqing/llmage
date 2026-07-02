@@ -1,0 +1,21 @@
+{
+    "tblname": "llm_metrics",
+    "title": "模型使用指标",
+    "params": {
+        "sortby": "use_time",
+        "logined_userorgid": "userorgid",
+        "browserfields": {
+            "exclouded": ["id", "taskid"],
+            "cwidth": {}
+        },
+        "editexclouded": ["id", "amount", "responsed_seconds", "finish_seconds", "status", "taskid"],
+        "data_filter": {
+            "AND": [
+                {"field": "userorgid", "op": "=", "var": "userorgid"},
+                {"field": "use_date", "op": "between", "var": "use_date"}
+            ]
+        },
+        "filter_labels": {"use_date": "使用日期"},
+        "filter_title": "查询条件"
+    }
+}

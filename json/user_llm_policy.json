@@ -1,0 +1,18 @@
+{
+    "tblname": "user_llm_policy",
+    "title": "用户模型策略",
+    "params": {
+        "sortby": "userid",
+        "logined_userorgid": "orgid",
+        "browserfields": {
+            "exclouded": ["id", "orgid", "created_at", "updated_at"],
+            "cwidth": {}
+        },
+        "editexclouded": ["id", "orgid", "created_at", "updated_at", "created_by"],
+        "data_filter": {
+            "AND": [
+                {"field": "orgid", "op": "=", "var": "orgid"}
+            ]
+        }
+    }
+}
