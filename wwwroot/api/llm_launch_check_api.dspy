@@ -2,7 +2,7 @@ llmid = params_kw.get('llmid', '')
 action = params_kw.get('action', 'check')
 
 if not llmid:
-	return json.dumps({'error': 'missing llmid'}, ensure_ascii=False)
+	return json.dumps({'widgettype':'Error','options':{'text':'missing llmid'}}, ensure_ascii=False)
 
 if action == 'inference':
 	# 验证推理配置是否完整
@@ -10,7 +10,7 @@ if action == 'inference':
 		recs = await sor.sqlExe(
 			"select * from llm where id=${llmid}$", {'llmid': llmid})
 		if not recs:
-			return '❌ 模型记录不存在'
+			return json.dumps({'widgettype':'Error','options':{'text':'模型记录不存在'}}, ensure_ascii=False)
 		llm = recs[0]
 		
 		# 检查 API 映射
@@ -18,7 +18,7 @@ if action == 'inference':
 			"select * from llm_api_map where llmid=${llmid}$",
 			{'llmid': llmid})
 		if not maps:
-			return '❌ 无 API 映射配置'
+			return json.dumps({'widgettype':'Error','options':{'text':'无 API 映射配置'}}, ensure_ascii=False)
 		
 		# 检查 upapp 和 uapi
 		uapi_recs = await sor.sqlExe("""
@@ -30,7 +30,7 @@ if action == 'inference':
 			where a.id=${llmid}$""", {'llmid': llmid})
 		
 		if not uapi_recs:
-			return '❌ uapi 配置不完整，无法调用'
+			return json.dumps({'widgettype':'Error','options':{'text':'uapi 配置不完整，无法调用'}}, ensure_ascii=False)
 		
 		uapi = uapi_recs[0]
 		
@@ -38,9 +38,9 @@ if action == 'inference':
 		io_recs = await sor.sqlExe(
 			"select * from uapiio where id=${ioid}$", {'ioid': uapi.ioid})
 		if not io_recs:
-			return '❌ IO 定义不存在'
+			return json.dumps({'widgettype':'Error','options':{'text':'IO 定义不存在'}}, ensure_ascii=False)
 		
-		return f'✅ 推理配置验证通过\n模型: {llm.name}\nAPI: {uapi.api_name}\nIO: {uapi.ioid}\nStream: {uapi.stream}'
+		return json.dumps({'widgettype':'Message','options':{'text':f'推理配置验证通过\n模型: {llm.name}\nAPI: {uapi.api_name}\nIO: {uapi.ioid}\nStream: {uapi.stream}'}}, ensure_ascii=False)
 
 elif action == 'check_charging':
 	# 验证计费配置是否完整
@@ -56,11 +56,11 @@ elif action == 'check_charging':
 			"select * from llm_api_map where llmid=${llmid}$",
 			{'llmid': llmid})
 		if not maps:
-			return '❌ 无 API 映射'
+			return json.dumps({'widgettype':'Error','options':{'text':'无 API 映射'}}, ensure_ascii=False)
 		
 		ppids = [m.ppid for m in maps if m.ppid]
 		if not ppids:
-			return '❌ 无定价项目(ppid)'
+			return json.dumps({'widgettype':'Error','options':{'text':'无定价项目(ppid)'}}, ensure_ascii=False)
 		
 		ppid = ppids[0]
 		
@@ -69,7 +69,7 @@ elif action == 'check_charging':
 			pregs = await psor.sqlExe(
 				"select * from pricing_program where id=${ppid}$", {'ppid': ppid})
 			if not pregs:
-				return f'❌ 定价项目不存在 (ppid={ppid})'
+				return json.dumps({'widgettype':'Error','options':{'text':f'定价项目不存在 (ppid={ppid})'}}, ensure_ascii=False)
 			
 			pp = pregs[0]
 			
@@ -79,10 +79,10 @@ elif action == 'check_charging':
 					"select * from pricing_program_timing where ppid=${ppid}$",
 					{'ppid': ppid})
 				if timings:
-					return f'✅ 计费配置验证通过\n定价项目: {pp.name}\n定价数据: {len(timings)}条记录\n测试用量: {json.dumps(usages)}'
+					return json.dumps({'widgettype':'Message','options':{'text':f'计费配置验证通过\n定价项目: {pp.name}\n定价数据: {len(timings)}条记录\n测试用量: {json.dumps(usages)}'}}, ensure_ascii=False)
 				else:
-					return f'⚠️ 定价项目存在但无定价数据\n定价项目: {pp.name}'
+					return json.dumps({'widgettype':'Warning','options':{'text':f'定价项目存在但无定价数据\n定价项目: {pp.name}'}}, ensure_ascii=False)
 			except Exception as e:
-				return f'⚠️ 定价数据查询失败: {e}'
+				return json.dumps({'widgettype':'Error','options':{'text':f'定价数据查询失败: {e}'}}, ensure_ascii=False)
 
-return '无效的操作'
+return json.dumps({'widgettype':'Error','options':{'text':'无效的操作'}}, ensure_ascii=False)
