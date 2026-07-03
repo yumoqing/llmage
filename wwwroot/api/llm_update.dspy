@@ -9,11 +9,10 @@ try:
         data.pop('page', None)
         data.pop('rows', None)
         data.pop('data_filter', None)
-        record_id = data.pop('id', None)
-        if not record_id:
+        if not data.get('id'):
             result['message'] = '缺少id'
         else:
-            await sor.U('llm', data, {'id': record_id})
+            await sor.U('llm', data.copy())
             result['success'] = True
             result['message'] = '更新成功'
 except Exception as e:
