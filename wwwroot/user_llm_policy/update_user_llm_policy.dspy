@@ -1,0 +1,78 @@
+
+ns = params_kw.copy()
+for k,v in list(ns.items()):
+	if v == 'NaN' or v == 'null' or v == '' or v is None:
+		if k != 'id':
+			del ns[k]
+		else:
+			ns[k] = None if v in ('NaN', 'null') else v
+
+
+userorgid = await get_userorgid()
+if not userorgid:
+	return {
+		"widgettype":"Error",
+		"options":{
+			"title":"Authorization Error",
+			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
+			"message":"Please login"
+		}
+	}
+ns['orgid'] = userorgid
+
+
+
+
+db = DBPools()
+dbname = get_module_dbname('llmage')
+async with db.sqlorContext(dbname) as sor:
+
+	ns1 = {
+
+		"orgid": userorgid,
+
+
+		"id": params_kw.id
+	}
+	recs = await sor.R('user_llm_policy', ns1)
+	if len(recs) < 1:
+		return {
+			"widgettype":"Error",
+			"options":{
+				"title":"Update Error",
+				"cwidth":16,
+				"cheight":9,
+				"timeout":3,
+				"message":"Record no exist or with wrong ownership"
+			}
+		}
+
+	tblfields = json.loads('[{"name":"id","title":"id","type":"str","length":32},{"name":"orgid","title":"所属机构","type":"str","length":32},{"name":"userid","title":"用户","type":"str","length":32},{"name":"llmid","title":"模型","type":"str","length":32,"nullable":true},{"name":"daily_call_limit","title":"日调用上限","type":"int","nullable":true},{"name":"monthly_call_limit","title":"月调用上限","type":"int","nullable":true},{"name":"spending_alert","title":"花费预警","type":"float","length":18,"dec":2,"nullable":true},{"name":"spending_ceiling","title":"费用上限","type":"float","length":18,"dec":2,"nullable":true},{"name":"max_concurrency","title":"并发上限","type":"int","nullable":true},{"name":"status","title":"状态","type":"str","length":10,"default":"active"},{"name":"created_at","title":"创建时间","type":"timestamp","nullable":true},{"name":"updated_at","title":"更新时间","type":"timestamp","nullable":true},{"name":"created_by","title":"创建人","type":"str","length":32,"nullable":true},{"name":"remark","title":"备注","type":"str","length":500,"nullable":true}]')
+	tblfname = [ f['name'] for f in tblfields ]
+	other_keys = [ k for k in ns.keys() if k in tblfname and k != 'id' ]
+	if len(other_keys) > 0:
+		r = await sor.U('user_llm_policy', ns)
+	debug('update success');
+	return {
+		"widgettype":"Message",
+		"options":{
+			"title":"Update Success",
+			"cwidth":16,
+			"cheight":9,
+			"timeout":3,
+			"message":"ok"
+		} 
+	}
+		
+return {
+	"widgettype":"Error",
+	"options":{
+		"title":"Update Error",
+		"cwidth":16,
+		"cheight":9,
+		"timeout":3,
+		"message":"failed"
+	}
+}

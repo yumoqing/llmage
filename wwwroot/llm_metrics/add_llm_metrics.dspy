@@ -1,0 +1,55 @@
+
+ns = params_kw.copy()
+for k,v in ns.items():
+	if v == 'NaN' or v == 'null':
+		ns[k] = None
+id = params_kw.id
+if not id or len(id) > 32:
+	id = uuid()
+ns['id'] = id
+
+
+
+userorgid = await get_userorgid()
+if not userorgid:
+	return {
+		"widgettype":"Error",
+		"options":{
+			"title":"Authorization Error",
+			"timeout":3,
+			"cwidth":16,
+			"cheight":9,
+			"message":"Please login"
+		}
+	}
+ns['userorgid'] = userorgid
+
+
+db = DBPools()
+dbname = get_module_dbname('llmage')
+async with db.sqlorContext(dbname) as sor:
+	r = await sor.C('llm_metrics', ns.copy())
+	_new_rows = await sor.sqlExe("SELECT * FROM llm_metrics WHERE id = ${id}$", {'id': id})
+	_user_data = _new_rows[0] if _new_rows else ns
+	return {
+		"widgettype":"Message",
+		"options":{
+			"cwidth":16,
+			"cheight":9,
+			"title":"Add Success",
+			"timeout":3,
+			"message":"ok",
+			"user_data": _user_data
+		}
+	}
+
+return {
+	"widgettype":"Error",
+	"options":{
+		"title":"Add Error",
+		"cwidth":16,
+		"cheight":9,
+		"timeout":3,
+		"message":"failed"
+	}
+}

@@ -7,13 +7,13 @@ data.pop('rows', None)
 data.pop('data_filter', None)
 
 if not data.get('id'):
-	return json.dumps({'widgettype':'Error','options':{'title':'Update Error','message':'缺少id'}}, ensure_ascii=False)
+	return {'widgettype':'Error','options':{'title':'Update Error','message':'缺少id'}}
 
 try:
 	db = DBPools()
 	dbname = get_module_dbname('llmage')
 	async with db.sqlorContext(dbname) as sor:
 		await sor.U('llm', data)
-	return json.dumps({'widgettype':'Message','options':{'title':'Update Success','message':'ok'}}, ensure_ascii=False)
+	return {'widgettype':'Message','options':{'title':'Update Success','message':'ok'}}
 except Exception as e:
-	return json.dumps({'widgettype':'Error','options':{'title':'Update Error','message':str(e)}}, ensure_ascii=False)
+	return {'widgettype':'Error','options':{'title':'Update Error','message':str(e)}}

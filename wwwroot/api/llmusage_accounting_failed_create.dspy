@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-result = {'success': False, 'message': ''}
+result = {"widgettype":"Error","options":{"title":"操作失败","message":"Invalid request","cwidth":16,"cheight":9,"timeout":3}}
 
 try:
     dbname = get_module_dbname('llmage')
@@ -8,9 +8,8 @@ try:
         data = params_kw
         data['id'] = getID()
         await sor.C('llmusage_accounting_failed', data)
-        result['success'] = True
-        result['message'] = '创建成功'
+        result = {"widgettype":"Message","options":{"title":"创建成功","message":"ok","cwidth":16,"cheight":9,"timeout":3}}
 except Exception as e:
-    result['message'] = str(e)
+    result["options"] = {"title":"操作失败","message":str(e),"cwidth":16,"cheight":9,"timeout":3}
 
-return json.dumps(result, ensure_ascii=False, default=str)
+return result

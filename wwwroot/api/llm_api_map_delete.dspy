@@ -27,4 +27,4 @@ try:
 except Exception as e:
     result['options'] = {'title': 'Error', 'message': f'删除失败: {str(e)}', 'type': 'error'}
 
-return json.dumps(result, ensure_ascii=False)
+return result

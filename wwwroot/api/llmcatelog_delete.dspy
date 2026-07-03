@@ -29,4 +29,4 @@ try:
 except Exception as e:
     result['options'] = {'title': '错误', 'message': str(e), 'type': 'error'}
 
-return json.dumps(result, ensure_ascii=False)
+return result

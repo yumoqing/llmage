@@ -1,0 +1,301 @@
+
+{
+	"widgettype":"VBox",
+	"options":{"height":"100%","width":"100%"},
+	"subwidgets":[
+{
+	"id":"llm_metrics_tbl",
+	"widgettype":"Tabular",
+	"options":{
+		"width":"100%",
+		"height":"100%",
+
+
+		"title":"模型使用指标",
+
+
+
+
+			"toolbar":{
+    "tools": [
+        {
+            "name": "filter",
+            "label": "搜索"
+        }
+    ]
+},
+
+		"css":"card",
+
+
+		"editable":{
+
+			"new_data_url":"{{entire_url('add_llm_metrics.dspy')}}",
+
+
+			"delete_data_url":"{{entire_url('delete_llm_metrics.dspy')}}",
+
+
+			"update_data_url":"{{entire_url('update_llm_metrics.dspy')}}"
+
+
+		},
+
+
+		"data_url":"{{entire_url('./get_llm_metrics.dspy')}}",
+
+		"data_method":"GET",
+		"data_params":{{json.dumps(params_kw, indent=4, ensure_ascii=False)}},
+		"row_options":{
+
+
+
+			"browserfields": {
+    "exclouded": [
+        "id",
+        "taskid"
+    ],
+    "cwidth": {},
+    "alters": null
+},
+
+
+			"editexclouded":[
+    "id",
+    "amount",
+    "responsed_seconds",
+    "finish_seconds",
+    "status",
+    "taskid"
+],
+
+			"fields":[
+    {
+        "name": "id",
+        "title": "id",
+        "type": "str",
+        "length": 32,
+        "cwidth": 18,
+        "uitype": "str",
+        "datatype": "str",
+        "label": "id"
+    },
+    {
+        "name": "userid",
+        "title": "用户id",
+        "type": "str",
+        "length": 32,
+        "label": "用户id",
+        "uitype": "code",
+        "valueField": "userid",
+        "textField": "userid_text",
+        "params": {
+            "dbname": "{{get_module_dbname('llmage')}}",
+            "table": "users",
+            "tblvalue": "id",
+            "tbltext": "username",
+            "valueField": "userid",
+            "textField": "userid_text"
+        },
+        "dataurl": "{{entire_url('/appbase/get_code.dspy')}}"
+    },
+    {
+        "name": "userorgid",
+        "title": "用户机构",
+        "type": "str",
+        "length": 32,
+        "label": "用户机构",
+        "uitype": "code",
+        "valueField": "userorgid",
+        "textField": "userorgid_text",
+        "params": {
+            "dbname": "{{get_module_dbname('llmage')}}",
+            "table": "organization",
+            "tblvalue": "id",
+            "tbltext": "orgname",
+            "valueField": "userorgid",
+            "textField": "userorgid_text"
+        },
+        "dataurl": "{{entire_url('/appbase/get_code.dspy')}}"
+    },
+    {
+        "name": "llmid",
+        "title": "模型",
+        "type": "str",
+        "length": 32,
+        "label": "模型",
+        "uitype": "code",
+        "valueField": "llmid",
+        "textField": "llmid_text",
+        "params": {
+            "dbname": "{{get_module_dbname('llmage')}}",
+            "table": "llm",
+            "tblvalue": "id",
+            "tbltext": "model",
+            "valueField": "llmid",
+            "textField": "llmid_text"
+        },
+        "dataurl": "{{entire_url('/appbase/get_code.dspy')}}"
+    },
+    {
+        "name": "use_date",
+        "title": "使用日期",
+        "type": "date",
+        "length": 0,
+        "uitype": "date",
+        "datatype": "date",
+        "label": "使用日期"
+    },
+    {
+        "name": "use_time",
+        "title": "使用时间",
+        "type": "timestamp",
+        "length": 0,
+        "uitype": "str",
+        "datatype": "timestamp",
+        "label": "使用时间"
+    },
+    {
+        "name": "input_tokens",
+        "title": "输入tokens",
+        "type": "int",
+        "default": "0",
+        "length": 0,
+        "uitype": "int",
+        "datatype": "int",
+        "label": "输入tokens"
+    },
+    {
+        "name": "output_tokens",
+        "title": "输出tokens",
+        "type": "int",
+        "default": "0",
+        "length": 0,
+        "uitype": "int",
+        "datatype": "int",
+        "label": "输出tokens"
+    },
+    {
+        "name": "total_tokens",
+        "title": "总tokens",
+        "type": "int",
+        "default": "0",
+        "length": 0,
+        "uitype": "int",
+        "datatype": "int",
+        "label": "总tokens"
+    },
+    {
+        "name": "amount",
+        "title": "金额",
+        "type": "float",
+        "length": 18,
+        "dec": 4,
+        "default": "0",
+        "cwidth": 18,
+        "uitype": "float",
+        "datatype": "float",
+        "label": "金额"
+    },
+    {
+        "name": "responsed_seconds",
+        "title": "响应时长(秒)",
+        "type": "float",
+        "length": 18,
+        "dec": 2,
+        "nullable": true,
+        "cwidth": 18,
+        "uitype": "float",
+        "datatype": "float",
+        "label": "响应时长(秒)"
+    },
+    {
+        "name": "finish_seconds",
+        "title": "完成时长(秒)",
+        "type": "float",
+        "length": 18,
+        "dec": 2,
+        "nullable": true,
+        "cwidth": 18,
+        "uitype": "float",
+        "datatype": "float",
+        "label": "完成时长(秒)"
+    },
+    {
+        "name": "status",
+        "title": "状态",
+        "type": "str",
+        "length": 32,
+        "nullable": true,
+        "cwidth": 18,
+        "uitype": "str",
+        "datatype": "str",
+        "label": "状态"
+    },
+    {
+        "name": "taskid",
+        "title": "任务号",
+        "type": "str",
+        "length": 32,
+        "nullable": true,
+        "cwidth": 18,
+        "uitype": "str",
+        "datatype": "str",
+        "label": "任务号"
+    }
+]
+		},  
+
+
+
+		"search_form":{
+			"css":"card",
+			"padding":"8px",
+			"show_label":false,
+			"submit_label":"搜索",
+			"submit_css":"primary",
+			"fields":[
+    {
+        "name": "userorgid",
+        "uitype": "code",
+        "placeholder": "用户机构",
+        "cwidth": 15,
+        "valueField": "userorgid",
+        "textField": "userorgid_text",
+        "params": {
+            "dbname": "{{get_module_dbname('llmage')}}",
+            "table": "organization",
+            "tblvalue": "id",
+            "tbltext": "orgname",
+            "valueField": "userorgid",
+            "textField": "userorgid_text"
+        },
+        "dataurl": "{{entire_url('/appbase/get_code.dspy')}}?prepend_all=1"
+    },
+    {
+        "name": "use_date",
+        "uitype": "date",
+        "placeholder": "使用日期",
+        "cwidth": 15
+    }
+]
+		},
+
+
+		"filter_labels":{
+    "use_date": "使用日期"
+},
+
+
+		"filter_title":"查询条件",
+
+
+
+		"page_rows":160,
+		"cache_limit":5
+	}
+
+	,"binds":[]
+
+}]
+}
