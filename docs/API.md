@@ -799,3 +799,27 @@ Authorization: Bearer ***
 ### 计费
 
 请求成功后自动创建 `llmusage` 记录，状态为 `created`。后台定时任务会定期执行计费流程。
+
+# 视频制作 API (KTV产线)
+
+Base url: `https://token.opencomputing.cn/llmage/v1`
+
+供应商: 开元云(北京)科技, 28端点覆盖KTV全流程。
+
+## 模型列表
+
+| model | 功能 | 计费 |
+|-------|------|------|
+| `ktv-media-server` | 流水线/状态/合并/校准/字幕 | 2元/次+0.03元/秒 |
+| `ktv-video-eval` | 视频质量评估 | 0.05元/秒 |
+| `ktv-realesrgan` | 超分辨率 | 0.5元/张 |
+| `ktv-asr` | 语音识别 | 0.01元/秒 |
+| `ktv-face` | 人脸检测/识别/比对 | 0.1元/次 |
+| `ktv-graph` | 图谱查询/写入 | 0.05~0.1元/次 |
+| `ktv-ner` | 实体识别 | 0.5元/千字 |
+| `ktv-songrate` | 歌曲评分 | 0.005元/秒 |
+| `ktv-synth` | 音乐合成 | 0.2元/秒 |
+| `ktv-demucs` | 音频分离 | 0.02元/秒 |
+| `ktv-rvc` | 声音转换 | 0.15元/秒 |
+
+调用方式: `/v1/chat/completions` + `model` 参数。详细参数见 dashboard_for_sage 文档。
