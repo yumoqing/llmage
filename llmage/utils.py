@@ -263,7 +263,7 @@ where a.enabled_date <= ${today}$
 			pricing_list = []
 			for ppid in pp_map.get(l.id, []):
 				try:
-					pd = await env.get_pricing_display(ppid)
+					pd = await env.get_pricing_display(ppid, model=l.name)
 					if pd:
 						pricing_list.append(pd.get('display_text', ''))
 				except:
@@ -413,7 +413,7 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 			pricing_list = []
 			for ppid in pp_map.get(r.id, []):
 				try:
-					pd = await env.get_pricing_display(ppid)
+					pd = await env.get_pricing_display(ppid, model=r.name)
 					if pd:
 						pricing_list.append(pd.get('display_text', ''))
 				except:
