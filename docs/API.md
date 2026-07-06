@@ -90,7 +90,7 @@ data: [DONE]
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| `image_url` | string | 图生视频时提供参考图 URL |
+| `image_file` | string | 图生视频时提供参考图 URL |
 | `duration` | string | 视频时长，如 `"5s"` |
 | `resolution` | string | 分辨率，如 `"1080p"` |
 | `n` | integer | 生成数量 |
@@ -360,7 +360,7 @@ data: [DONE]
 
 输入参数同通义万象 I2V。可用模型：`happyhorse-1.0-i2v`
 
-> **注意：** 图片参数名为 `image_file`（非 `image_url`），传入图片 URL。
+> **注意：** 图片参数名为 `image_file`，传入图片 URL。
 
 ##### Ref2V - 参考生视频
 
@@ -391,7 +391,7 @@ data: [DONE]
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| `image_url` | string | 图生图时提供参考图 URL |
+| `image_file` | string | 图生图时提供参考图 URL |
 | `size` | string | 尺寸，如 `"1024x1024"` |
 | `n` | integer | 生成数量 |
 | `style` | string | 风格参数 |
