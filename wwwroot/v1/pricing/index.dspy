@@ -27,7 +27,7 @@ try:
 			return json.dumps({"status": "error", "message": f"model '{model}' not found or has no pricing"}, ensure_ascii=False)
 		ppid = recs[0].ppid
 
-	result = await env.get_pricing_display(ppid)
+	result = await env.get_pricing_display(ppid, model=model)
 	return json.dumps({"status": "ok", "data": result}, ensure_ascii=False, default=str)
 except Exception as e:
 	exception(f'get pricing for {model} failed: {e}\n{format_exc()}')
