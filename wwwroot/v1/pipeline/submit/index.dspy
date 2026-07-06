@@ -1,0 +1,74 @@
+# KTV Pipeline / GPU Service Inference API
+# POST /v1/pipeline/submit
+# catelogid 固定为 ktv_pipeline，无需传 catelogid
+#
+# Required params:
+#   model: string - 模型名称，如 "ky-asr-transcribe"
+#
+# 各服务特定参数见 API 文档
+#
+# 同步服务直接返回结果：
+# {
+#   "taskid": "luid_xxx",
+#   "taskstatus": "SUCCEEDED",
+#   ...服务特定结果字段...,
+#   "usage": {...}
+# }
+#
+# 异步服务返回任务信息：
+# {
+#   "taskid": "luid_xxx",
+#   "taskstatus": "PENDING"
+# }
+# 异步结果通过 /v1/tasks?taskid=xxx 查询
+
+debug_params('params_kw', params_kw)
+
+userid = await get_user()
+userorgid = await get_userorgid()
+if userid is None:
+	debug('need login')
+	return openai_403()
+
+# Validate required parameters
+if not params_kw.model:
+	d = return_error('Missing required parameter: model')
+	return json_response(d, status=400)
+
+catelogid = 'ktv_pipeline'
+params_kw.catelogid = catelogid
+
+env = request._run_ns
+async with get_sor_context(env, 'llmage') as sor:
+	# Look up llm by model name through llm_api_map (fixed catelogid=ktv_pipeline)
+	sql = """select distinct a.* from llm a
+join llm_api_map m on a.id = m.llmid
+join llmcatelog b on m.llmcatelogid = b.id
+where (b.id = ${catelogid}$ OR b.name = ${catelogid}$)
+	and a.name=${model}$
+	and a.status = 'published'"""
+	recs = await sor.sqlExe(sql, {
+		'catelogid': catelogid,
+		'model': params_kw.model
+	})
+	if len(recs) == 0:
+		debug(f'{params_kw.model=} not found under ktv_pipeline catalog')
+		d = return_error(f'Model "{params_kw.model}" not found or not available')
+		return json_response(d, status=400)
+	params_kw.llmid = recs[0].id
+	params_kw.llmcatelogid = catelogid
+
+debug(f'{params_kw.llmid=}')
+
+# Check balance
+f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
+if not f:
+	debug(f'{userid=} balance not enough')
+	return openai_429()
+
+# Generate task ID
+if not params_kw.transno:
+	params_kw.transno = getID()
+
+# Call inference
+return await inference(request, env=env)
