@@ -30,30 +30,21 @@
 					"subwidgets":[
 						{
 							"widgettype":"HBox",
-							"options":{
-								"cheight":2
-							},
+							"options":{"cheight":2},
 							"subwidgets":[
 								{
 									"widgettype":"Svg",
-									"options":{
-										"rate":1.5,
-										"url":"{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}"
-									}
+									"options":{"rate":1.5,"url":"{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}"}
 								},
 								{
 									"widgettype":"Title6",
-									"options":{
-										"text":"{{llm.name}}"
-									}
+									"options":{"text":"{{llm.name}}"}
 								}
 							]
 						},
 						{
 							"widgettype":"VScrollPanel",
-							"options":{
-								"css":"card-body-scroll"
-							},
+							"options":{"css":"card-body-scroll","flex":"1"},
 							"subwidgets":[
 								{
 									"widgettype":"Text",
@@ -62,30 +53,28 @@
 										"wrap":true,
 										"halign":"left"
 									}
-								},
-								{
-									"widgettype":"Filler",
-									"options":{
-										"css":"pricing-box"
-									},
-									"subwidgets":[
-										{% for pricing_text in llm.pricing_display %}
-										{
-											"widgettype":"Text",
-											"options":{
-												"text":{{json.dumps(pricing_text, ensure_ascii=False)}},
-												"wrap":true,
-												"halign":"left",
-												"css":"pricing-text"
-											}
-										}{% if not loop.last %},{% endif %}
-										{% endfor %}
-									]
 								}
 							]
+						},
+						{
+							"widgettype":"VBox",
+							"options":{"css":"pricing-box","cheight":4},
+							"subwidgets":[
+								{% for pricing_text in llm.pricing_display %}
+								{
+									"widgettype":"Text",
+									"options":{
+										"text":{{json.dumps(pricing_text, ensure_ascii=False)}},
+										"wrap":true,
+										"halign":"left",
+										"css":"pricing-text"
+									}
+								}{% if not loop.last %},{% endif %}
+								{% endfor %}
+							]
 						}
-						],
-						"binds":[
+					],
+					"binds":[
 						{
 							"wid":"self",
 							"event":"click",
@@ -102,9 +91,7 @@
 {% endif %}
 							},
 							"options":{
-								"params":{
-									"id":"{{llm.id}}"
-								},
+								"params":{"id":"{{llm.id}}"},
 								"url":"{{entire_url('./llm_dialog.ui')}}"
 							}
 						}
