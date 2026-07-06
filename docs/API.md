@@ -828,20 +828,20 @@ Base url: `https://token.opencomputing.cn/llmage/v1`
 
 | model | 功能 | 模式 | 计费 |
 |-------|------|------|------|
-| `ky-asr-transcribe` | 语音转文字+时间戳 | 同步 | 0.01元/次 |
-| `ky-demucs-separate` | 人声/伴奏分离（支持MIDI乐器替换） | 同步 | 0.01元/次 |
-| `ky-face-detect` | 人脸检测 | 同步 | 0.01元/次 |
-| `ky-face-recognize` | 人脸识别 | 同步 | 0.01元/次 |
-| `ky-face-compare` | 人脸比对 | 同步 | 0.01元/次 |
-| `ky-subtitle-render` | 歌词→ASS字幕渲染 | 同步 | 0.01元/次 |
-| `ky-merge-video` | 视频+音频+字幕合并 | 同步 | 0.01元/次 |
-| `ky-songrate-evaluate` | AI歌曲质量评分 | 同步 | 0.01元/次 |
-| `ky-synth-generate` | AI歌声合成 | **异步** | 0.01元/次 |
+| `ky-asr-transcribe` | 语音转文字+时间戳 | 同步 | 0.01元/秒 |
+| `ky-demucs-separate` | 人声/伴奏分离 | 同步 | 0.02元/秒 |
+| `ky-face-detect` | 人脸检测 | 同步 | 0.10元/次 |
+| `ky-face-recognize` | 人脸识别 | 同步 | 0.10元/次 |
+| `ky-face-compare` | 人脸比对 | 同步 | 0.10元/次 |
+| `ky-subtitle-render` | 歌词→ASS字幕渲染 | 同步 | 0.01元/条 |
+| `ky-merge-video` | 视频+音频+字幕合并 | 同步 | 0.01元/秒 |
+| `ky-songrate-evaluate` | AI歌曲质量评分 | 同步 | 0.005元/秒 |
+| `ky-synth-generate` | AI歌声合成 | **异步** | 0.20元/秒 |
 | `ky-synth-status` | 合成任务状态查询 | 同步 | 0.01元/次 |
-| `ky-realesrgan-upscale` | 图像/视频超分辨率 | **异步** | 0.01元/次 |
+| `ky-realesrgan-upscale` | 图像/视频超分辨率 | **异步** | 0.50元/张 |
 | `ky-realesrgan-status` | 超分任务状态查询 | 同步 | 0.01元/次 |
-| `ky-rvc-convert` | 声音克隆/变声 | 同步 | 0.01元/次 |
-| `ky-video-eval-evaluate` | 视频质量评估 | 同步 | 0.01元/次 |
+| `ky-rvc-convert` | 声音克隆/变声 | 同步 | 0.15元/秒 |
+| `ky-video-eval-evaluate` | 视频质量评估 | 同步 | 0.05元/秒 |
 
 ## 模型发现
 
