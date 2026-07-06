@@ -829,7 +829,7 @@ Base url: `https://token.opencomputing.cn/llmage/v1`
 | model | 功能 | 模式 | 计费 |
 |-------|------|------|------|
 | `ky-asr-transcribe` | 语音转文字+时间戳 | 同步 | 0.01元/次 |
-| `ky-demucs-separate` | 人声/伴奏分离 | 同步 | 0.01元/次 |
+| `ky-demucs-separate` | 人声/伴奏分离（支持MIDI乐器替换） | 同步 | 0.01元/次 |
 | `ky-face-detect` | 人脸检测 | 同步 | 0.01元/次 |
 | `ky-face-recognize` | 人脸识别 | 同步 | 0.01元/次 |
 | `ky-face-compare` | 人脸比对 | 同步 | 0.01元/次 |
