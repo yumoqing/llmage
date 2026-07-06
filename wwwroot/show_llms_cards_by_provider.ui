@@ -82,7 +82,7 @@
 							"target":"PopupWindow",
 							"popup_options":{
 								"title":"{{llm.name}}",
-{% if int(params_kw._is_mobile) %}
+{% if int(params_kw._is_mobile or 0) %}
 								"width": "100%",
 								"height": "100%"
 {% else %}
