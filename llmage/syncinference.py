@@ -60,7 +60,7 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 		llmusage.responsed_seconds = responsed_seconds
 		llmusage.finish_seconds = finish_seconds
 		llmusage.status = 'SUCCEEDED'
-		llmusage.amount = llmusage.cost = 0.00
+		llmusage.amount = 0.00
 		""" 联机不记账
 		if llm.ppid:
 			try:
@@ -132,7 +132,7 @@ async def sync_uapi_request_product(llm, api_userid, user_id, user_org_id, param
 		llmusage.responsed_seconds = responsed_seconds
 		llmusage.finish_seconds = finish_seconds
 		llmusage.status = 'SUCCEEDED'
-		llmusage.amount = llmusage.cost = 0.00
+		llmusage.amount = 0.00
 		llmusage.userorgid = user_org_id
 		llmusage.ownerid = llm.ownerid
 		llmusage.accounting_status = 'created'

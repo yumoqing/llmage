@@ -23,17 +23,13 @@ async def llm_charging(ppid, llmusage):
 		raise e
 		return None
 	amount = 0
-	cost = 0
 	for p in prices:
 		amount += p.amount
-		if p.cost:
-			cost += p.cost
 	discount = await env.get_customer_discount(llmusage.ownerid, 
 				llmusage.userorgid)
 	return DictObject(**{
 		'original_amount': amount,
 		'amount': amount * discount,
-		'cost': cost
 	})
 
 async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
@@ -181,7 +177,6 @@ where a.llmid = b.id
 			sql += " and a.id=${luid}$"
 			ns['luid'] = luid
 		recs = await sor.sqlExe(sql, ns)
-		# debug(f'{sql=}, {ns=}, {len(recs)=}')
 		for r in recs:
 			if r.usages is None:
 				try:
@@ -190,24 +185,21 @@ where a.llmid = b.id
 					continue
 				r.usages = output.get('usage')
 			if r.usages is None:
-				debug(f'{r.usages=} is None, accoiunting failed')
+				debug(f'{r.usages=} is None, accounting failed')
 				await llm_accoung_failed(r.id, reason='usages is None')
 				continue
 			d = None
 			try:
 				debug(f'{r.ppid=}, {r.usages=} {r.id=}')
 				d = await llm_charging(r.ppid, r)
-
 			except Exception as e:
 				exception(f'{r.ppid=}, {r.usages=} llm_charging() failed,{e}')
 				await llm_accoung_failed(r.id, reason=f'llm_charging failed: {e}')
 				continue
 			r.amount = d.amount
-			r.cost = d.cost
 			ns = {
 				'id': r.id,
 				'amount': r.amount,
-				'cost': r.cost,
 				'usage': json.dumps(r.usage, ensure_ascii=False, indent=4)
 			}
 			await sor.U('llmusage', ns)
@@ -235,7 +227,6 @@ async def llm_accoung_failed(luid, reason=None):
 				'use_date': r.use_date,
 				'use_time': r.use_time,
 				'amount': r.amount,
-				'cost': r.cost,
 				'failed_reason': reason or 'accounting failed',
 				'failed_time': env.timestampstr(),
 				'retry_count': 0,
@@ -261,8 +252,8 @@ WHERE accounting_status='accounted' AND use_date < ${cutoff_date}$"""
 		
 		# Step 1: INSERT INTO history SELECT from main table
 		insert_sql = """INSERT INTO llmusage_history 
-(id, llmid, use_date, use_time, userid, usages, ioinfo, transno, responsed_seconds, finish_seconds, status, taskid, amount, cost, userorgid, ownerid, accounting_status, backup_time)
-SELECT id, llmid, use_date, use_time, userid, usages, ioinfo, transno, responsed_seconds, finish_seconds, status, taskid, amount, cost, userorgid, ownerid, accounting_status, ${ts}$
+(id, llmid, use_date, use_time, userid, usages, ioinfo, transno, responsed_seconds, finish_seconds, status, taskid, amount, userorgid, ownerid, accounting_status, tenantid, backup_time)
+SELECT id, llmid, use_date, use_time, userid, usages, ioinfo, transno, responsed_seconds, finish_seconds, status, taskid, amount, userorgid, ownerid, accounting_status, tenantid, ${ts}$
 FROM llmusage
 WHERE accounting_status='accounted' AND use_date < ${cutoff_date}$"""
 		await sor.execute(insert_sql, {'cutoff_date': cutoff_date, 'ts': ts})
