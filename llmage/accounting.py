@@ -21,15 +21,43 @@ async def llm_charging(ppid, llmusage):
 		e = Exception(f'{ppid=}, {usages=}{llmusage.id=}  env.buffered_charging() return None')
 		exception(f'{e}')
 		raise e
-		return None
 	amount = 0
 	for p in prices:
 		amount += p.amount
 	discount = await env.get_customer_discount(llmusage.ownerid, 
 				llmusage.userorgid)
+	# Get pricing program currency (provider's settlement currency)
+	cost_currency = 'CNY'
+	try:
+		pp = await env.get_ppid_pricing(ppid)
+		if pp and hasattr(pp, 'pp') and hasattr(pp.pp, 'currency'):
+			cost_currency = pp.pp.currency or 'CNY'
+	except Exception:
+		pass
+	
+	# Get user's billing currency
+	user_currency = 'CNY'
+	try:
+		user_currency = await env.get_user_currency(llmusage.userorgid)
+	except Exception:
+		pass
+	
+	# Convert cost to user currency at real-time rate
+	cost_in_user_currency = amount
+	if cost_currency != user_currency:
+		rate = await env.get_exchange_rate(cost_currency, user_currency, 'buy_rate')
+		cost_in_user_currency = round(amount * rate, 2)
+	
+	# Convert both to base currency (CNY) for reporting
+	amount_base = await env.convert_to_base(cost_in_user_currency, user_currency, 'sell_rate')
+	
 	return DictObject(**{
 		'original_amount': amount,
-		'amount': amount * discount,
+		'amount': cost_in_user_currency * discount,
+		'cost_currency': cost_currency,
+		'amount_currency': user_currency,
+		'amount_base': amount_base * discount,
+		'cost_base': await env.convert_to_base(amount, cost_currency, 'buy_rate'),
 	})
 
 async def checkCustomerBalance(llmid, userid, userorgid, catelogid=None):
@@ -95,6 +123,10 @@ async def llm_accounting(llmusage):
 	providerid = llm.providerid
 	trans_amount = llmusage.amount
 	trans_cost = llmusage.cost
+	amount_currency = getattr(llmusage, 'amount_currency', 'CNY')
+	cost_currency = getattr(llmusage, 'cost_currency', 'CNY')
+	amount_base = getattr(llmusage, 'amount_base', trans_amount)
+	cost_base = getattr(llmusage, 'cost_base', trans_cost)
 	async with get_sor_context(env, 'llmage') as sor:
 		biz_date = await env.get_business_date(sor)
 		timestamp = env.timestampstr()
@@ -116,7 +148,8 @@ async def llm_accounting(llmusage):
 			"orderid": orderid,
 			"productid": llmid,
 			"product_cnt": 1,
-			"trans_amount": trans_amount
+			"trans_amount": trans_amount,
+			"currency": amount_currency,
 		}
 		await sor.C('biz_orderdetail', orderdetail)
 		ais = []
@@ -130,8 +163,12 @@ async def llm_accounting(llmusage):
 			ai0.timestamp = timestamp
 			ai0.productid = llmid
 			ai0.transamt = trans_amount
+			ai0.currency = amount_currency
+			ai0.base_amount = amount_base
 			ai0.variable = {
 				"交易金额": trans_amount,
+				"交易币种": amount_currency,
+				"折本位币": amount_base,
 				"交易手续费": 0
 			}
 			ais.append(ai0)
@@ -145,6 +182,8 @@ async def llm_accounting(llmusage):
 		ai1.providerid = providerid
 		ai1.productid = llmid
 		ai1.transamt = trans_cost
+		ai1.currency = cost_currency
+		ai1.base_amount = cost_base
 		ai1.variable = {
 			"采购成本": trans_cost
 		}
@@ -200,6 +239,10 @@ where a.llmid = b.id
 			ns = {
 				'id': r.id,
 				'amount': r.amount,
+				'amount_currency': getattr(d, 'amount_currency', 'CNY'),
+				'amount_base': getattr(d, 'amount_base', r.amount),
+				'cost_currency': getattr(d, 'cost_currency', 'CNY'),
+				'cost_base': getattr(d, 'cost_base', 0),
 				'usage': json.dumps(r.usage, ensure_ascii=False, indent=4)
 			}
 			await sor.U('llmusage', ns)

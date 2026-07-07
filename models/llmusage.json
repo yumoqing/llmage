@@ -88,11 +88,41 @@
             "dec": 2
         },
         {
+            "name": "amount_currency",
+            "title": "计费币种",
+            "type": "str",
+            "length": 3,
+            "default": "CNY"
+        },
+        {
+            "name": "amount_base",
+            "title": "折本位币金额",
+            "type": "float",
+            "length": 20,
+            "dec": 2,
+            "default": 0
+        },
+        {
             "name": "cost",
             "title": "交易成本",
             "type": "float",
             "length": 18,
             "dec": 2
+        },
+        {
+            "name": "cost_currency",
+            "title": "成本币种",
+            "type": "str",
+            "length": 3,
+            "default": "CNY"
+        },
+        {
+            "name": "cost_base",
+            "title": "折本位币成本",
+            "type": "float",
+            "length": 20,
+            "dec": 2,
+            "default": 0
         },
         {
             "name": "userorgid",
