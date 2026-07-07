@@ -1,0 +1,37 @@
+# KTV Media API - face-compare
+# /v1/media/face-compare
+
+debug_params('params_kw', params_kw)
+
+userid = await get_user()
+userorgid = await get_userorgid()
+if userid is None:
+	return openai_403()
+
+catelogid = 'ktv_pipeline'
+model_name = 'face-compare'
+params_kw.model = model_name
+params_kw.catelogid = catelogid
+
+env = request._run_ns
+async with get_sor_context(env, 'llmage') as sor:
+	sql = """select distinct a.* from llm a
+join llm_api_map m on a.id = m.llmid
+join llmcatelog b on m.llmcatelogid = b.id
+where (b.id = ${catelogid}$ OR b.name = ${catelogid}$)
+	and a.model=${model}$
+	and a.status = 'published'"""
+	recs = await sor.sqlExe(sql, {'catelogid': catelogid, 'model': model_name})
+	if len(recs) == 0:
+		return openai_400()
+	params_kw.llmid = recs[0].id
+	params_kw.llmcatelogid = catelogid
+
+f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
+if not f:
+	return openai_429()
+
+if not params_kw.transno:
+	import uuid; params_kw.transno = str(uuid.uuid4()).replace("-","")
+
+return await inference(request, env=env)
