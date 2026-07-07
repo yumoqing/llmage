@@ -8,3 +8,7 @@ wwwroot/llmusage_accounting_failed/
 !wwwroot/llmusage_accounting_failed/recover_usages.dspy
 wwwroot/llmusage_history/
 build/
+
+# Generated CRUD files (managed by xls2ddl/build.sh, not tracked in git)
+wwwroot/llm_metrics/
+wwwroot/user_llm_policy/
