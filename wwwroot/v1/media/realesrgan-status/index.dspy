@@ -31,6 +31,4 @@ f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
 if not f:
 	return openai_429()
 
-if not params_kw.transno:
-
 return await inference(request, env=env)
