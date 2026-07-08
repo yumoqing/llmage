@@ -836,10 +836,8 @@ Base url: `https://token.opencomputing.cn/llmage/v1`
 | `ky-subtitle-render` | 歌词→ASS字幕渲染 | 同步 | 0.01元/条 |
 | `ky-merge-video` | 视频+音频+字幕合并 | 同步 | 0.01元/秒 |
 | `ky-songrate-evaluate` | AI歌曲质量评分 | 同步 | 0.005元/秒 |
-| `ky-synth-generate` | AI歌声合成 | **异步** | 0.20元/秒 |
-| `ky-synth-status` | 合成任务状态查询 | 同步 | 0.01元/次 |
-| `ky-realesrgan-upscale` | 图像/视频超分辨率 | **异步** | 0.50元/张 |
-| `ky-realesrgan-status` | 超分任务状态查询 | 同步 | 0.01元/次 |
+| `ky-synth-generate` | AI歌声合成 | **异步** | 0.20元/秒，任务状态通过 `GET /v1/tasks?taskid=xxx` 查询 |
+| `ky-realesrgan-upscale` | 图像/视频超分辨率 | **异步** | 0.50元/张，任务状态通过 `GET /v1/tasks?taskid=xxx` 查询 |
 | `ky-rvc-convert` | 声音克隆/变声 | 同步 | 0.15元/秒 |
 | `ky-video-eval-evaluate` | 视频质量评估 | 同步 | 0.05元/秒 |
 
