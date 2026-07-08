@@ -32,6 +32,5 @@ if not f:
 	return openai_429()
 
 if not params_kw.transno:
-	import uuid; params_kw.transno = str(uuid.uuid4()).replace("-","")
 
 return await inference(request, env=env)
