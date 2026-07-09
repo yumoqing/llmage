@@ -87,7 +87,7 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		llmusage.finish_seconds = finish_seconds
 		llmusage.status = 'SUCCEEDED'
 		llmusage.userorgid = callerorgid
-        llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
+		llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
 		llmusage.ownerid = llm.ownerid
 		llmusage.accounting_status = 'created'
 		await write_llmusage(llmusage)

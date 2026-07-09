@@ -107,7 +107,7 @@ async def async_uapi_request(request, llm,
 		llmusage.finish_seconds = finish_seconds
 		llmusage.status = d.status
 		llmusage.userorgid = callerorgid
-        llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
+		llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
 		llmusage.ownerid = llm.ownerid
 		llmusage.accounting_status = 'created'
 		b = json.dumps(d, ensure_ascii=False)
@@ -259,7 +259,7 @@ async def async_uapi_request_product(llm, api_userid, user_id, user_org_id, para
 		llmusage.finish_seconds = finish_seconds
 		llmusage.status = d.status
 		llmusage.userorgid = user_org_id
-        llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
+		llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
 		llmusage.ownerid = llm.ownerid
 		llmusage.accounting_status = 'created'
 		await write_llmusage(llmusage)
