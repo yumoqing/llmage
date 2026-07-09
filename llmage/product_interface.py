@@ -299,7 +299,7 @@ async def _collect_stream(llm, api_userid, user_id, user_org_id, params_kw, luid
         llmusage.finish_seconds = finish_seconds
         llmusage.status = 'SUCCEEDED'
         llmusage.userorgid = user_org_id
-		llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
+        llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
         llmusage.ownerid = llm.ownerid
         llmusage.accounting_status = 'created'
         await write_llmusage(llmusage)
@@ -402,7 +402,7 @@ async def execute_product_service_stream(resource_ref_id, user_id, user_org_id, 
         llmusage.finish_seconds = finish_seconds
         llmusage.status = 'SUCCEEDED'
         llmusage.userorgid = user_org_id
-		llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
+        llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
         llmusage.ownerid = full_llm.ownerid
         llmusage.accounting_status = 'created'
         await write_llmusage(llmusage)
