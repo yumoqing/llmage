@@ -1,8 +1,7 @@
 result = [{'providerid': '', 'providerid_text': '全部'}]
 
 try:
-	dbname = get_module_dbname('supplychain')
-	async with DBPools().sqlorContext(dbname) as sor:
+	async with get_sor_context(request._run_ns, 'rbac') as sor:
 		rows = await sor.sqlExe(
 			"select id as providerid, supplier_name as providerid_text from suppliers where status = '1' order by supplier_name",
 			{}
