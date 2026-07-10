@@ -1,12 +1,13 @@
 result = [{'providerid': '', 'providerid_text': '全部'}]
 
 try:
-	async with get_sor_context(request._run_ns, 'rbac') as sor:
-		orgs = await sor.sqlExe(
-			"select id as providerid, orgname as providerid_text from organization order by orgname",
+	dbname = get_module_dbname('supplychain')
+	async with DBPools().sqlorContext(dbname) as sor:
+		rows = await sor.sqlExe(
+			"select id as providerid, supplier_name as providerid_text from suppliers where status = '1' order by supplier_name",
 			{}
 		)
-		return json.dumps([{'providerid': '', 'providerid_text': '全部'}] + list(orgs), ensure_ascii=False)
+		return json.dumps([{'providerid': '', 'providerid_text': '全部'}] + list(rows), ensure_ascii=False)
 except Exception as e:
 	debug(f'get_search_providerid error: {e}')
 
