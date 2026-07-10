@@ -87,7 +87,7 @@
     "codes": [
         {
             "field": "providerid",
-            "table": "supplychain.suppliers",
+            "table": "suppliers",
             "valuefield": "id",
             "textfield": "supplier_name"
         },
