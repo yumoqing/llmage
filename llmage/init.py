@@ -111,6 +111,7 @@ order by lc.name, a.name"""
 			'product_type': 'llm_model',
 			'brief_intro': getattr(llm, 'description', '') or '',
 			'sort_order': 0,
+			'providerid': getattr(llm, 'providerid', '') or '',
 		})
 
 	return {
