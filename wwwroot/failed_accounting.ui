@@ -182,7 +182,7 @@
             "event": "retry_accounting",
             "actiontype": "script",
             "target": "self",
-            "script": "var dv = bricks.getWidgetById('failed_table', bricks.app.root); if(!dv || !dv.select_row || !dv.select_row.user_data) { alert('请先选中一条记录'); return; } var row = dv.select_row.user_data; if(!row.llmusageid) { alert('记录缺少llmusageid'); return; } var resp = await fetch('{{entire_url('/llmage/api/retry_accounting.dspy')}}?id=' + row.llmusageid); var d = await resp.json(); if(d.success) { alert(d.message); await dv.render({}); } else { alert('失败: ' + d.message); }"
+            "script": "var dv = bricks.getWidgetById('failed_table', bricks.app.root); if(!dv || !dv.select_row || !dv.select_row.user_data) { alert('请先选中一条记录'); return; } var row = dv.select_row.user_data; if(!row.llmusageid) { alert('记录缺少llmusageid'); return; } try { var resp = await fetch('{{entire_url('/llmage/api/retry_accounting.dspy')}}?id=' + encodeURIComponent(row.llmusageid), { credentials: 'include' }); var d = await resp.json(); if(d.success) { alert(d.message); await dv.render({}); } else { alert('失败: ' + d.message); } } catch(e) { alert('请求失败: ' + e.message); }"
         }
     ]
 }
