@@ -1,17 +1,82 @@
 llmid = params_kw.get('llmid', '')
 if not llmid:
-    return json.dumps({'status': 'error', 'data': {'message': '请选择模型'}}, ensure_ascii=False)
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "请先选择模型"}
+    }, ensure_ascii=False)
 
 async with get_sor_context(request._run_ns, 'llmage') as sor:
     maps = await sor.sqlExe(
-        "select ppid from llm_api_map where llmid=${llmid}$", {'llmid': llmid})
-    ppids = [m.ppid for m in maps if m.ppid] if maps else []
+        "select a.ppid, b.name as model_name from llm_api_map a join llm b on a.llmid=b.id where a.llmid=${llmid}$",
+        {'llmid': llmid})
+    ppid = maps[0].ppid if maps else None
+    model_name = maps[0].model_name if maps else 'Unknown'
 
-if not ppids:
-    return json.dumps({'status': 'error', 'data': {'message': '该模型未配置定价'}}, ensure_ascii=False)
+if not ppid:
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "该模型未配置定价"}
+    }, ensure_ascii=False)
 
 try:
-    data = await get_pricing_display(ppids[0])
-    return json.dumps({'status': 'ok', 'data': data}, ensure_ascii=False, default=str)
+    data = await get_pricing_display(ppid)
 except Exception as e:
-    return json.dumps({'status': 'error', 'data': {'message': str(e)}}, ensure_ascii=False)
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": f"获取定价失败: {e}"}
+    }, ensure_ascii=False)
+
+if not data or not data.get('items'):
+    return json.dumps({
+        "widgettype": "Text",
+        "options": {"text": "该模型暂无定价数据"}
+    }, ensure_ascii=False)
+
+# Build a read-friendly card for each pricing item
+cards = []
+for item in data['items']:
+    fl = item.get('filter_labels', {})
+    label_parts = [f"{k}: {v}" for k, v in fl.items()]
+    header = ', '.join(label_parts) if label_parts else model_name
+    
+    factor_lines = []
+    for pf in item.get('price_factors', []):
+        lbl = pf.get('label', pf.get('factor', '?'))
+        unit = pf.get('unit_label', '')
+        price = pf.get('unit_price', 0)
+        factor_lines.append({
+            "widgettype": "HBox",
+            "options": {"gap": "12px", "padding": "4px 0"},
+            "subwidgets": [
+                {"widgettype": "Text", "options": {"text": lbl, "cwidth": 14, "fontSize": "14px", "color": "#94a3b8"}},
+                {"widgettype": "Text", "options": {"text": f"{price}", "cwidth": 10, "fontSize": "14px", "fontWeight": "600"}},
+                {"widgettype": "Text", "options": {"text": unit, "cwidth": 20, "fontSize": "13px", "color": "#64748b"}}
+            ]
+        })
+    
+    formula = item.get('formula', '')
+    min_amount = item.get('min_amount', 0)
+    
+    subwidgets = [
+        {"widgettype": "Text", "options": {"text": header, "fontSize": "15px", "fontWeight": "600", "marginBottom": "8px", "color": "#e2e8f0"}}
+    ] + factor_lines
+    
+    if formula:
+        subwidgets.append({"widgettype": "Text", "options": {"text": f"公式: {formula}", "fontSize": "12px", "color": "#64748b", "marginTop": "6px"}})
+    if min_amount > 0:
+        subwidgets.append({"widgettype": "Text", "options": {"text": f"最低消费: {min_amount}元", "fontSize": "12px", "color": "#f59e0b", "marginTop": "4px"}})
+    
+    cards.append({
+        "widgettype": "VBox",
+        "options": {"css": "card", "padding": "14px", "gap": "2px", "marginBottom": "10px"},
+        "subwidgets": subwidgets
+    })
+
+return json.dumps({
+    "widgettype": "VBox",
+    "options": {"width": "100%", "gap": "8px"},
+    "subwidgets": [
+        {"widgettype": "Title4", "options": {"text": f"模型: {model_name}", "marginBottom": "10px"}},
+        {"widgettype": "Text", "options": {"text": f"定价方案: {data.get('name', '')} ({data.get('pricing_type', '')})", "fontSize": "13px", "color": "#94a3b8", "marginBottom": "12px"}}
+    ] + cards
+}, ensure_ascii=False, default=str)

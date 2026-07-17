@@ -35,17 +35,23 @@
                 {
                     "wid": "self",
                     "event": "submit",
-                    "actiontype": "script",
-                    "script": "var v=this.values||{};if(!v.llmid)return;var url='{{entire_url('/llmage/model_pricing.dspy')}}?llmid='+encodeURIComponent(v.llmid);fetch(url,{credentials:'include'}).then(function(r){return r.json()}).then(function(d){var box=bricks.getWidgetById('pricing_result');if(!box)return;if(d.status!=='ok'){box.clear();box.add({widgettype:'Text',options:{text:d.data.message,color:'#ef4444',fontSize:'14px'}});return;}var items=d.data.items||[];var rows=[];for(var i=0;i<items.length;i++){var it=items[i];var fl=it.filter_labels||{};var label=[];for(var k in fl)label.push(fl[k]);var pfs=it.price_factors||[];for(var j=0;j<pfs.length;j++){var pf=pfs[j];rows.push({model:label.join(' '),factor:pf.label||pf.factor,unit:pf.unit_label||(pf.unit_price+'/'+pf.unit),price:pf.unit_price});}}var tbl=bricks.getWidgetById('pricing_table');if(tbl){tbl.setData({total:rows.length,rows:rows})}else{box.clear();box.add({widgettype:'Tabular',id:'pricing_table',options:{width:'100%',editable:false,row_options:{fields:[{name:'model',title:'模型/规格',cwidth:20},{name:'factor',title:'计费因子',cwidth:14},{name:'unit',title:'单价',cwidth:18},{name:'price',title:'价格',cwidth:10,type:'float'}]}},data:{total:rows.length,rows:rows}});}}).catch(function(e){var box=bricks.getWidgetById('pricing_result');if(box){box.clear();box.add({widgettype:'Text',options:{text:'查询失败: '+e.toString(),color:'#ef4444'}})}})"
+                    "actiontype": "urlwidget",
+                    "target": "pricing_result",
+                    "mode": "replace",
+                    "options": {
+                        "url": "{{entire_url('/llmage/model_pricing.dspy')}}",
+                        "method": "GET",
+                        "params": {}
+                    }
                 }
             ]
         },
         {
-            "widgettype": "VBox",
+            "widgettype": "VScrollPanel",
             "id": "pricing_result",
             "options": {
-                "width": "100%",
-                "flex": "1"
+                "css": "filler",
+                "padding": "8px"
             }
         }
     ]
