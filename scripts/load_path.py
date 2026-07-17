@@ -69,6 +69,8 @@ PATHS_LOGINED = [
     f"/{MOD}/show_llms.ui",
     f"/{MOD}/show_llms_by_providers.ui",
     f"/{MOD}/model_plaza.ui",
+    f"/{MOD}/model_pricing.dspy",
+    f"/{MOD}/model_pricing.ui",
     f"/{MOD}/failed_accounting.ui",
     f"/{MOD}/llmcatelog_list.ui",
 
@@ -101,6 +103,7 @@ PATHS_LOGINED = [
     f"/{MOD}/api/get_search_apiname.dspy",
     f"/{MOD}/api/get_search_providerid.dspy",
     f"/{MOD}/api/get_search_upappid.dspy",
+    f"/{MOD}/api/get_search_model.dspy",
     f"/{MOD}/api/get_upapps.dspy",
     f"/{MOD}/api/llm_launch_check_api.dspy",
     f"/{MOD}/api/llm_api_map_create.dspy",

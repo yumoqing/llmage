@@ -1,0 +1,17 @@
+llmid = params_kw.get('llmid', '')
+if not llmid:
+    return json.dumps({'status': 'error', 'data': {'message': '请选择模型'}}, ensure_ascii=False)
+
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+    maps = await sor.sqlExe(
+        "select ppid from llm_api_map where llmid=${llmid}$", {'llmid': llmid})
+    ppids = [m.ppid for m in maps if m.ppid] if maps else []
+
+if not ppids:
+    return json.dumps({'status': 'error', 'data': {'message': '该模型未配置定价'}}, ensure_ascii=False)
+
+try:
+    data = await get_pricing_display(ppids[0])
+    return json.dumps({'status': 'ok', 'data': data}, ensure_ascii=False, default=str)
+except Exception as e:
+    return json.dumps({'status': 'error', 'data': {'message': str(e)}}, ensure_ascii=False)

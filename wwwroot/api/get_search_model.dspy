@@ -1,0 +1,7 @@
+async with get_sor_context(request._run_ns, 'llmage') as sor:
+    recs = await sor.sqlExe(
+        "SELECT id, name FROM llm ORDER BY name", {})
+    result = [{'value': '', 'text': '全部'}]
+    for r in recs:
+        result.append({'value': r.id, 'text': r.name})
+    return result
