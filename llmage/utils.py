@@ -502,3 +502,34 @@ async def llm_query_price(llmid, config_data):
 	prices = await env.buffered_charging(llm.ppid, config_data)
 	return prices
 
+def build_kimi_content(prompt='', image_files=None, video_files=None):
+	"""构造 kimi 多模态 content 数组 JSON，注册到 ServerEnv 供 uapi data 模板调用"""
+	import base64, json, mimetypes, os
+	fs = FileStorage()
+	parts = []
+	if prompt:
+		parts.append({"type": "text", "text": prompt})
+	for f in (image_files or []):
+		fp = fs.realPath(f)
+		if not os.path.isfile(fp):
+			continue
+		mime, _ = mimetypes.guess_type(fp)
+		if not mime:
+			mime = 'application/octet-stream'
+		with open(fp, 'rb') as fh:
+			b64 = base64.b64encode(fh.read()).decode('utf-8')
+		parts.append({"type": "image_url", "image_url": f'data:{mime};base64,{b64}'})
+	for f in (video_files or []):
+		fp = fs.realPath(f)
+		if not os.path.isfile(fp):
+			continue
+		mime, _ = mimetypes.guess_type(fp)
+		if not mime:
+			mime = 'application/octet-stream'
+		with open(fp, 'rb') as fh:
+			b64 = base64.b64encode(fh.read()).decode('utf-8')
+		parts.append({"type": "video_url", "video_url": f'data:{mime};base64,{b64}'})
+	return json.dumps(parts, ensure_ascii=False)
+
+ServerEnv().build_kimi_content = build_kimi_content
+
