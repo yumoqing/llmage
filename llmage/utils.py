@@ -360,8 +360,7 @@ m.ppid
 			and m.ppid is not null
 			and a.expired_date > ${today}$
 			"""
-		sortstr='catelog_id, ' + orderby
-		params = {'today': today, 'sort': sortstr}
+		params = {'today': today, 'sort': ['catelog_id', 'providerid', 'name'}
 		if catelogid:
 			sql += " and m.llmcatelogid = ${catelogid}$"
 			params['catelogid'] = catelogid
