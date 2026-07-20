@@ -2,7 +2,7 @@
 -- Kimi K3 API 接入 (月之暗面 / Moonshot)
 -- Base URL: https://api.moonshot.cn/v1
 -- 兼容 OpenAI 格式, 文档: https://platform.kimi.com/docs/api/chat
--- 多模态: image_files/video_files 通过 build_kimi_content() 转 data URI 数组
+-- 多模态: image_files/video_files 在 data 模板中用纯 Jinja2 构造 content 数组
 -- ============================================================
 
 -- ============================================================
@@ -41,7 +41,31 @@ VALUES (
 {% if sys_prompt %}
         {"role": "system", "content": {{json.dumps(sys_prompt, ensure_ascii=False)}}},
 {% endif %}
-        {"role": "user", "content": {{build_kimi_content(prompt, image_files, video_files)}}}
+{% set _parts = [] %}
+{% if prompt %}
+{% set _ = _parts.append({"type": "text", "text": prompt}) %}
+{% endif %}
+{% if image_files %}
+{% for _f in image_files %}
+{% set _fp = FileStorage().realPath(_f) %}
+{% if os.path.isfile(_fp) %}
+{% set _mime = file_mime(_fp) %}
+{% set _b64 = file_to_b64(_fp) %}
+{% set _ = _parts.append({"type": "image_url", "image_url": "data:" + _mime + ";base64," + _b64}) %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% if video_files %}
+{% for _f in video_files %}
+{% set _fp = FileStorage().realPath(_f) %}
+{% if os.path.isfile(_fp) %}
+{% set _mime = file_mime(_fp) %}
+{% set _b64 = file_to_b64(_fp) %}
+{% set _ = _parts.append({"type": "video_url", "video_url": "data:" + _mime + ";base64," + _b64}) %}
+{% endif %}
+{% endfor %}
+{% endif %}
+        {"role": "user", "content": {{json.dumps(_parts, ensure_ascii=False)}}}
     ],
 {% endif %}
 {% if stream %}
