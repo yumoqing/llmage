@@ -338,11 +338,10 @@ async def get_pricing_text(l):
 	except:
 		pass
 
-async def get_llms_by_catelog_to_customer(catelogid=None, orderby='providerid'):
+async def get_llms_by_catelog_to_customer(catelogid=None, orderby='providerid, name'):
 	# icon "{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}"
 	# pricing: llm.pricing_display
 	env = ServerEnv()
-	orderby = ['catelog_id', 'providerid', 'name']
 	async with get_sor_context(env, 'llmage') as sor:
 		today = curDateString()
 		# Join with llm_api_map to get catalog relationship
