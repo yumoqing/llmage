@@ -332,10 +332,12 @@ async def get_llmcatelogs():
 
 async def get_pricing_text(l):
 	try:
+		env = ServerEnv()
 		pd = await env.get_pricing_display(l.ppid, model=l.name)
 		if pd:
 			llm.pricing_display = pd.get('display_text', '')
-	except:
+	except Exception as e:
+		debug(f'{e}')
 		pass
 
 async def get_llms_by_catelog_to_customer(catelogid=None, orderby='providerid, name'):
