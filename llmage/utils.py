@@ -242,7 +242,7 @@ where a.enabled_date <= ${today}$
 	and a.expired_date > ${today}$
 	and a.status = 'published'
 	and a.providerid = b.id
-	order by a.providerid, a.id
+	order by a.providerid, a.name
 	"""													 
 		recs = await sor.sqlExe(sql, {'today': today})
 		# 批量查询所有模型的 ppid 映射
