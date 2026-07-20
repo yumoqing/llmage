@@ -335,7 +335,7 @@ async def get_pricing_text(l):
 		env = ServerEnv()
 		pd = await env.get_pricing_display(l.ppid, model=l.name)
 		if pd:
-			llm.pricing_display = pd.get('display_text', '')
+			l.pricing_display = pd.get('display_text', '')
 	except Exception as e:
 		debug(f'{e}')
 		pass
