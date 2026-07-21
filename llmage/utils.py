@@ -354,7 +354,7 @@ m.apiname,
 m.query_apiname,
 m.query_period,
 m.ppid,
-o.orgname
+o.orgname as provider_name
 			from llm a 
 			join llm_api_map m on a.id = m.llmid 
 			join llmcatelog b on m.llmcatelogid = b.id
