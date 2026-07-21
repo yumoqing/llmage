@@ -353,14 +353,17 @@ m.llmcatelogid as catelog_id,
 m.apiname,
 m.query_apiname,
 m.query_period,
-m.ppid
+m.ppid,
+o.orgname
 			from llm a 
 			join llm_api_map m on a.id = m.llmid 
 			join llmcatelog b on m.llmcatelogid = b.id
+			join organization o
 			where a.enabled_date <= ${today}$
 			and a.status = 'published'
 			and m.ppid is not null
 			and a.expired_date > ${today}$
+			and a.providerid = o.id
 			"""
 		params = {'today': today}
 		if catelogid:
