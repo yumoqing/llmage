@@ -362,10 +362,12 @@ m.ppid
 			and m.ppid is not null
 			and a.expired_date > ${today}$
 			"""
-		params = {'today': today, 'sort': ['catelog_id', 'providerid', 'name'] }
+		params = {'today': today}
 		if catelogid:
 			sql += " and m.llmcatelogid = ${catelogid}$"
 			params['catelogid'] = catelogid
+
+		sql += " order by m.llmcatelogid, a.providerid, a.name"
 			
 		debug(f'{sql=}')
 		recs = await sor.sqlExe(sql, params.copy())
