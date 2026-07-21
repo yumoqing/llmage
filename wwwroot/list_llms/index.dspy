@@ -3,5 +3,5 @@ orderby=params_kw.orderby or 'providerid'
 d = await get_llms_by_catelog_to_customer(catelogid=lctype, orderby=orderby)
 for x in d:
 	for l in x['llms']:
-	 l.provider_iconurl = entire_url('/appbase/show_icon.dspy') + '?id='+llm.iconid
+	 l.provider_iconurl = entire_url('/appbase/show_icon.dspy') + '?id='+l.iconid
 return d
