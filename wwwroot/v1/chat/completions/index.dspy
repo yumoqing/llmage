@@ -29,21 +29,11 @@ if not params_kw.prompt and not params_kw.messages:
 	d = return_error('Missing need data(prompt or messages)')
 	return json_response(d, status=400)
 env = request._run_ns
-async with get_sor_context(env, 'llmage') as sor:
-	sql = """select distinct a.* from llm a 
-join llm_api_map m on a.id = m.llmid
-join llmcatelog b on m.llmcatelogid = b.id
-where (b.id = ${catelogid}$ OR b.name = ${catelogid}$)
-	and a.name=${model}$
-	and a.status = 'published'"""
-	recs = await sor.sqlExe(sql, {
-		'catelogid': catelogid,
-		'model': params_kw.model or 'qwen3-max'
-	})
-	if len(recs) == 0:
-		debug(f'{params_kw.model=} not found')
-		return openai_400()
-	params_kw.llmid = recs[0].id
+llmid = await env.get_llmid_cached(env, params_kw.model or 'qwen3-max', catelogid)
+if not llmid:
+	debug(f'{params_kw.model=} not found for catelogid={catelogid}')
+	return openai_400()
+params_kw.llmid = llmid
 	params_kw.llmcatelogid = catelogid
 
 debug(f'{params_kw.llmid=}')

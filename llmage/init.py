@@ -23,6 +23,9 @@ from .utils import (
 	invalidate_uapi_cache,
 	get_llmusage_by_id,
 	read_ioinfo_content,
+	_warm_llmid_cache,
+	get_llmid_cached,
+	invalidate_llmid_cache,
 )
 
 from .llmclient import (
@@ -122,10 +125,11 @@ order by lc.name, a.name"""
 
 
 def _on_hot_reload(data=None):
-	"""Event handler for hot_reload — wraps invalidate_uapi_cache to accept dispatcher's data arg."""
+	"""Event handler for hot_reload — invalidate caches."""
 	from appPublic.log import debug
-	debug(f'[llmage] on_hot_reload called, invalidating uapi cache (data={data})')
+	debug(f'[llmage] on_hot_reload called, invalidating caches (data={data})')
 	invalidate_uapi_cache()
+	invalidate_llmid_cache()
 
 
 def load_llmage():
@@ -148,6 +152,10 @@ def load_llmage():
 	env.get_tpac_balance = get_tpac_balance
 	env.inference_generator = inference_generator
 	env.get_llms_by_catelog = get_llms_by_catelog
+	env.get_llmid_cached = get_llmid_cached
+	env.invalidate_llmid_cache = invalidate_llmid_cache
+	# 启动时预热 llmid 缓存
+	asyncio.ensure_future(_warm_llmid_cache(env))
 	env.get_llmcatelogs = get_llmcatelogs
 	env.checkCustomerBalance = checkCustomerBalance
 	env.get_llmproviders = get_llmproviders

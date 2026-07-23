@@ -63,6 +63,55 @@ def invalidate_uapi_cache(upappid=None, apiname=None):
         _uapiio_cache.clear()
 
 
+# =============================================================
+# Process-level cache for llmid lookup (model+catelogid -> llmid)
+# =============================================================
+_llmid_cache = {}  # key: "model_name:catelogid" -> llmid
+
+
+async def _warm_llmid_cache(env):
+    """启动时全量加载 model+catelogid -> llmid 映射"""
+    global _llmid_cache
+    try:
+        async with get_sor_context(env, 'llmage') as sor:
+            sql = """SELECT a.name, b.id as catelogid, m.llmid
+            FROM llm_api_map m
+            JOIN llm a ON a.id = m.llmid AND a.status = 'published'
+            JOIN llmcatelog b ON b.id = m.llmcatelogid"""
+            recs = await sor.sqlExe(sql, {})
+            for r in recs:
+                key = f"{r.name}:{r.catelogid}"
+                _llmid_cache[key] = r.llmid
+        debug(f'[llmage] llmid cache warmed: {len(_llmid_cache)} entries')
+    except Exception as e:
+        exception(f'[llmage] llmid cache warm failed: {e}')
+        _llmid_cache = {}
+
+
+async def get_llmid_cached(env, model_name, catelogid):
+    """从缓存获取 llmid，未命中则查 DB 并缓存"""
+    global _llmid_cache
+    key = f"{model_name}:{catelogid}"
+    if key in _llmid_cache:
+        return _llmid_cache[key]
+    # 缓存未命中，查 DB（兼容模型在缓存预热后新增的场景）
+    async with get_sor_context(env, 'llmage') as sor:
+        sql = """SELECT m.llmid
+        FROM llm_api_map m
+        JOIN llm a ON a.id = m.llmid AND a.name = ${model}$ AND a.status = 'published'
+        JOIN llmcatelog b ON b.id = m.llmcatelogid AND (b.id = ${catelogid}$ OR b.name = ${catelogid}$)"""
+        recs = await sor.sqlExe(sql, {'model': model_name, 'catelogid': catelogid})
+        llmid = recs[0].llmid if recs else None
+        if llmid:
+            _llmid_cache[key] = llmid
+        return llmid
+
+
+def invalidate_llmid_cache():
+    global _llmid_cache
+    _llmid_cache.clear()
+
+
 async def update_llmusage(ns):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
