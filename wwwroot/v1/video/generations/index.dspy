@@ -52,7 +52,7 @@ if not llmid:
 	debug(f'{params_kw.model=} not found for catalog {lctype}')
 	return openai_400()
 params_kw.llmid = llmid
-	params_kw.llmcatelogid = lctype
+params_kw.llmcatelogid = lctype
 
 debug(f'{params_kw.llmid=}')
 

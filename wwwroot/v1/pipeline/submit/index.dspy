@@ -1,64 +1,64 @@
-1|# KTV Pipeline / GPU Service Inference API
-2|# POST /v1/pipeline/submit
-3|# catelogid 固定为 ktv_pipeline，无需传 catelogid
-4|#
-5|# Required params:
-6|#   model: string - 模型名称，如 "ky-asr-transcribe"
-7|#
-8|# 各服务特定参数见 API 文档
-9|#
-10|# 同步服务直接返回结果：
-11|# {
-12|#   "taskid": "luid_xxx",
-13|#   "taskstatus": "SUCCEEDED",
-14|#   ...服务特定结果字段...,
-15|#   "usage": {...}
-16|# }
-17|#
-18|# 异步服务返回任务信息：
-19|# {
-20|#   "taskid": "luid_xxx",
-21|#   "taskstatus": "PENDING"
-22|# }
-23|# 异步结果通过 /v1/tasks?taskid=xxx 查询
-24|
-25|debug_params('params_kw', params_kw)
-26|
-27|userid = await get_user()
-28|userorgid = await get_userorgid()
-29|if userid is None:
-30|	debug('need login')
-31|	return openai_403()
-32|
-33|# Validate required parameters
-34|if not params_kw.model:
-35|	d = return_error('Missing required parameter: model')
-36|	return json_response(d, status=400)
-37|
-38|catelogid = 'ktv_pipeline'
-39|params_kw.catelogid = catelogid
-40|
-41|env = request._run_ns
-42|# llmid from cache (model+catelogid -> llmid)
-llmid = await env.get_llmid_cached(env, params_kw.model or 'qwen3-max', 'ktv_pipeline')
+# KTV Pipeline / GPU Service Inference API
+# POST /v1/pipeline/submit
+# catelogid 固定为 ktv_pipeline，无需传 catelogid
+#
+# Required params:
+#   model: string - 模型名称，如 "ky-asr-transcribe"
+#
+# 各服务特定参数见 API 文档
+#
+# 同步服务直接返回结果：
+# {
+#   "taskid": "luid_xxx",
+#   "taskstatus": "SUCCEEDED",
+#   ...服务特定结果字段...,
+#   "usage": {...}
+# }
+#
+# 异步服务返回任务信息：
+# {
+#   "taskid": "luid_xxx",
+#   "taskstatus": "PENDING"
+# }
+# 异步结果通过 /v1/tasks?taskid=xxx 查询
+
+debug_params('params_kw', params_kw)
+
+userid = await get_user()
+userorgid = await get_userorgid()
+if userid is None:
+	debug('need login')
+	return openai_403()
+
+# Validate required parameters
+if not params_kw.model:
+	d = return_error('Missing required parameter: model')
+	return json_response(d, status=400)
+
+catelogid = 'ktv_pipeline'
+params_kw.catelogid = catelogid
+
+env = request._run_ns
+# llmid from cache (model+catelogid -> llmid)
+llmid = await env.get_llmid_cached(env, params_kw.model, catelogid)
 if not llmid:
-	debug(f'model not found: params_kw.model')
-	return {{error_response}}
+	debug(f'{params_kw.model=} not found under ktv_pipeline catalog')
+	d = return_error(f'Model "{params_kw.model}" not found or not available')
+	return json_response(d, status=400)
 params_kw.llmid = llmid
-59|	params_kw.llmcatelogid = catelogid
-60|
-61|debug(f'{params_kw.llmid=}')
-62|
-63|# Check balance
-64|f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
-65|if not f:
-66|	debug(f'{userid=} balance not enough')
-67|	return openai_429()
-68|
-69|# Generate task ID
-70|if not params_kw.transno:
-71|	params_kw.transno = getID()
-72|
-73|# Call inference
-74|return await inference(request, env=env)
-75|
+params_kw.llmcatelogid = catelogid
+
+debug(f'{params_kw.llmid=}')
+
+# Check balance
+f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
+if not f:
+	debug(f'{userid=} balance not enough')
+	return openai_429()
+
+# Generate task ID
+if not params_kw.transno:
+	params_kw.transno = getID()
+
+# Call inference
+return await inference(request, env=env)
