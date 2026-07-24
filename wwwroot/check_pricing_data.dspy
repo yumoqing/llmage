@@ -1,3 +1,5 @@
+from pricing.pricing import get_pricing_display
+
 llmid = params_kw.get('llmid', '')
 
 if not llmid:
@@ -16,23 +18,18 @@ if not ppids:
 else:
     ppid = ppids[0]
     try:
-        async with get_sor_context(request._run_ns, 'pricing') as psor:
-            pregs = await psor.sqlExe(
-                "select * from pricing_program where id=${ppid}$", {'ppid': ppid})
-            if not pregs:
-                text = "❌ 定价数据: 依赖定价项目未通过"
-            else:
-                # 检查 pricing_program_timing 表
-                try:
-                    timings = await psor.sqlExe(
-                        "select count(*) as cnt from pricing_program_timing where ppid=${ppid}$", {'ppid': ppid})
-                    cnt = timings[0].cnt if timings else 0
-                    if cnt > 0:
-                        text = f"✅ 定价数据(pricing_program_timing): {cnt}条记录"
-                    else:
-                        text = "❌ 定价数据: pricing_program_timing 无记录"
-                except Exception as e:
-                    text = f"❌ 定价数据: {e}"
+        result = await get_pricing_display(ppid)
+        if not result:
+            text = "❌ 定价数据: 无当前生效的定价记录"
+        elif result.get('display_text'):
+            lines = [f"✅ 定价项目: {result.get('name', ppid)}"]
+            if result.get('pricing_type'):
+                lines.append(f"   类型: {result['pricing_type']}")
+            lines.append("")
+            lines.append(result['display_text'])
+            text = '\n'.join(lines)
+        else:
+            text = f"✅ 定价项目: {result.get('name', ppid)} (无定价明细)"
     except Exception as e:
         text = f"❌ 定价数据: {e}"
 
