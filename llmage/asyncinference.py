@@ -177,8 +177,8 @@ async def query_task_status(request, luid, onetime=False):
 		for apiname in apinames:
 			while True:
 				lastoutout = await get_lastoutput(llmusage.ioinfo)
-				if lastoutout['status'] in ['UNKNOWN', 'FAILED', 'SUCCEEDED']:
-					critical(f"{lastoutout['status']=}")
+				if lastoutout.get('status', '') in ['UNKNOWN', 'FAILED', 'SUCCEEDED']:
+					critical(f"{lastoutout.get('status', '')=}")
 					return
 				ns = {'taskid': taskid}
 				new_output = b = d = None
@@ -197,7 +197,7 @@ async def query_task_status(request, luid, onetime=False):
 					e = Exception(f"{new_output=} {upappid=}, {apiname=} has not status field")
 					critical(f'{e}')
 					raise e
-				if lastoutout['status'] != new_output.get('status'):
+				if lastoutout.get('status', '') != new_output.get('status'):
 					llmusage.status = new_output['status']
 					ns = {
 						'id': llmusage.id,
