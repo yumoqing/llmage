@@ -72,10 +72,13 @@ elif action == 'check_charging':
 			total = 0
 			for p in prices:
 				amount = getattr(p, 'amount', 0) or 0
-				name = getattr(p, 'timing_name', '') or ''
+				name = getattr(p, 'name', '') or getattr(p, 'timing_name', '') or getattr(p, 'item', '') or ''
+				# 显示所有可用字段
+				fields = [f'  {k}={getattr(p,k,"")}' for k in dir(p) if not k.startswith('_') and k not in ('jinja_pass_arg',)]
 				total += amount
-				lines.append(f'{name}: {amount}')
-			lines.append(f'合计: {total}')
+				lines.append(f'{name}: ¥{amount}' + ('\n' + '\n'.join(fields) if fields else ''))
+			lines.append(f'─────────────────')
+			lines.append(f'合计: ¥{total}')
 			return json.dumps({'widgettype':'Message','options':{'text':f'计费测试通过\n' + chr(10).join(lines)}}, ensure_ascii=False)
 		except Exception as e:
 			return json.dumps({'widgettype':'Error','options':{'text':f'计费测试失败: {e}'}}, ensure_ascii=False)
