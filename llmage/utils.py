@@ -364,7 +364,7 @@ where 1=1
 		elif catelogid:
 			sql += " and m.llmcatelogid = ${catelogid}$"
 			ns['catelogid'] = catelogid
-		sql += " order by m.llmcatelogid, a.id"
+		sql += " order by m.llmcatelogid, a.id, a.name"
 		recs = await sor.sqlExe(sql, ns)
 		if llmid:
 			return recs[0] if recs else None
@@ -458,8 +458,7 @@ async def get_llms_by_catelog(catelogid=None, orderby='providerid'):
 		if catelogid:
 			sql += " and m.llmcatelogid = ${catelogid}$"
 			params['catelogid'] = catelogid
-			
-		sql += " order by m.llmcatelogid, a.id"
+		sql += " order by m.llmcatelogid, a.id, a.name"
 		
 		recs = await sor.sqlExe(sql, params)
 		# 批量查询所有模型的 ppid 映射（避免 N+1 查询）
