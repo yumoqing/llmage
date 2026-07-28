@@ -1,122 +1,169 @@
+{% set active_provider = params_kw.get('providerid', '') %}
+{% set active_catelog = params_kw.get('catelogid', '') %}
+{% set active_search = params_kw.get('search', '') %}
 {% set catelogs = get_llmcatelogs() %}
-{% set providers = get_llms_sort_by_provider() %}
+{% set providers = get_llmproviders() %}
 {
-	"widgettype": "VBox",
-	"options": {
-		"css": "filler",
-		"width": "100%"
-	},
-	"subwidgets": [
-		{
-			"widgettype": "VBox",
-			"options": {
-				"css": "plaza-header",
-				"width": "100%"
-			},
-			"subwidgets": [
-				{
-					"widgettype": "Title2",
-					"options": {
-						"otext": "模型广场",
-						"i18n": true,
-						"halign": "left"
-					}
-				},
-				{
-					"widgettype": "Text",
-					"options": {
-						"otext": "探索和使用各类AI模型",
-						"i18n": true,
-						"halign": "left",
-						"wrap": true
-					}
-				},
-				{
-					"widgettype": "HBox",
-					"options": {
-						"css": "plaza-view-switcher",
-						"cheight": 3
-					},
-					"subwidgets": [
-						{
-							"widgettype": "Button",
-							"id": "btn_by_catelog",
-							"options": {
-								"label": "按分类",
-								"css": "plaza-view-btn plaza-view-active",
-								"cwidth": 15
-							},
-							"binds": [
-								{
-									"wid": "self",
-									"event": "click",
-									"actiontype": "script",
-									"target": "self",
-									"script": "document.getElementById('plaza_view_provider').style.display='none'; document.getElementById('plaza_view_catelog').style.display='flex'; var a=bricks.getWidgetById('btn_by_catelog',bricks.app); var b=bricks.getWidgetById('btn_by_provider',bricks.app); if(a)a.dom_element.classList.add('plaza-view-active'); if(b)b.dom_element.classList.remove('plaza-view-active');"
-								}
-							]
-						},
-						{
-							"widgettype": "Button",
-							"id": "btn_by_provider",
-							"options": {
-								"label": "按供应商",
-								"css": "plaza-view-btn",
-								"cwidth": 15
-							},
-							"binds": [
-								{
-									"wid": "self",
-									"event": "click",
-									"actiontype": "script",
-									"target": "self",
-									"script": "document.getElementById('plaza_view_catelog').style.display='none'; document.getElementById('plaza_view_provider').style.display='flex'; var a=bricks.getWidgetById('btn_by_catelog',bricks.app); var b=bricks.getWidgetById('btn_by_provider',bricks.app); if(a)a.dom_element.classList.remove('plaza-view-active'); if(b)b.dom_element.classList.add('plaza-view-active');"
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
-			"widgettype": "VBox",
-			"id": "plaza_view_catelog",
-			"options": {
-				"css": "filler",
-				"width": "100%",
-				"height": "100%"
-			},
-			"subwidgets": [
-				{
-					"widgettype": "urlwidget",
-					"options": {
-						"css": "filler",
-						"width": "100%",
-						"height": "100%",
-						"url": "{{entire_url('show_llms.ui')}}"
-					}
-				}
-			]
-		},
-		{
-			"widgettype": "VBox",
-			"id": "plaza_view_provider",
-			"options": {
-				"css": "filler",
-				"width": "100%",
-				"height": "100%"
-			},
-			"subwidgets": [
-				{
-					"widgettype": "urlwidget",
-					"options": {
-						"css": "filler",
-						"width": "100%",
-						"height": "100%",
-						"url": "{{entire_url('show_llms_by_providers.ui')}}"
-					}
-				}
-			]
-		}
-	]
+    "widgettype": "VBox",
+    "options": {"css": "filler", "width": "100%", "height": "100%", "gap": "8px"},
+    "subwidgets": [
+        {
+            "widgettype": "VBox",
+            "options": {"css": "plaza-header", "width": "100%"},
+            "subwidgets": [
+                {
+                    "widgettype": "Title2",
+                    "options": {"otext": "模型广场", "i18n": true, "halign": "left"}
+                },
+                {
+                    "widgettype": "HBox",
+                    "options": {"width": "100%", "cheight": 4, "gap": "6px", "alignItems": "center"},
+                    "subwidgets": [
+                        {
+                            "widgettype": "Input",
+                            "id": "plaza_search_input",
+                            "options": {
+                                "cwidth": 40,
+                                "cheight": 3,
+                                "placeholder": "搜索模型名称或描述...",
+                                "text": "{{active_search}}"
+                            }
+                        },
+                        {
+                            "widgettype": "Button",
+                            "id": "btn_search",
+                            "options": {"label": "搜索", "css": "plaza-search-btn", "cwidth": 8, "cheight": 3},
+                            "binds": [
+                                {
+                                    "wid": "self", "event": "click", "actiontype": "script", "target": "self",
+                                    "script": "var inp=bricks.getWidgetById('plaza_search_input',bricks.app);var q=inp?inp.dom_element.querySelector('input').value:'';var u='{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search='+encodeURIComponent(q);bricks.app.navigate_to(u);"
+                                }
+                            ]
+                        },
+{% if active_search %}
+                        {
+                            "widgettype": "Button",
+                            "options": {"label": "清除", "css": "plaza-clear-btn", "cwidth": 6, "cheight": 3},
+                            "binds": [
+                                {
+                                    "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "-@",
+                                    "options": {"url": "{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}"}
+                                }
+                            ]
+                        },
+{% endif %}
+                        {"widgettype": "Filler"}
+                    ]
+                }
+            ]
+        },
+        {
+            "widgettype": "VBox",
+            "options": {"width": "100%"},
+            "subwidgets": [
+                {
+                    "widgettype": "HBox",
+                    "options": {"css": "plaza-catelog-bar", "width": "100%", "wrap": true, "gap": "4px", "padding": "4px 0"},
+                    "binds": [],
+                    "subwidgets": [
+                        {
+                            "widgettype": "Button",
+                            "id": "cat_all",
+                            "options": {
+                                "label": "全部",
+                                "css": "{{'plaza-cat-btn selected' if not active_catelog else 'plaza-cat-btn'}}",
+                                "cwidth": 8, "cheight": 2
+                            },
+                            "binds": [{
+                                "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "-@",
+                                "options": {"url": "{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&search={{active_search}}"}
+                            }]
+                        }
+{% for c in catelogs %}
+                        ,{
+                            "widgettype": "Button",
+                            "id": "cat_{{c.id}}",
+                            "options": {
+                                "label": "{{c.name}}",
+                                "css": "{{'plaza-cat-btn selected' if active_catelog==c.id else 'plaza-cat-btn'}}",
+                                "cwidth": 10, "cheight": 2
+                            },
+                            "binds": [{
+                                "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "-@",
+                                "options": {"url": "{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&catelogid={{c.id}}&search={{active_search}}"}
+                            }]
+                        }
+{% endfor %}
+                    ]
+                }
+            ]
+        },
+        {
+            "widgettype": "HBox",
+            "options": {"width": "100%", "height": "100%", "flex": "1", "gap": "8px"},
+            "subwidgets": [
+                {
+                    "widgettype": "VBox",
+                    "options": {"css": "plaza-sidebar", "cwidth": 20},
+                    "subwidgets": [
+                        {
+                            "widgettype": "Title6",
+                            "options": {"otext": "供应商", "i18n": true, "marginBottom": "4px"}
+                        },
+                        {
+                            "widgettype": "VScrollPanel",
+                            "options": {"css": "filler", "flex": "1"},
+                            "subwidgets": [
+                                {
+                                    "widgettype": "VBox",
+                                    "options": {"gap": "2px"},
+                                    "subwidgets": [
+                                        {
+                                            "widgettype": "Button",
+                                            "id": "prov_all",
+                                            "options": {
+                                                "label": "全部供应商",
+                                                "css": "{{'plaza-prov-btn selected' if not active_provider else 'plaza-prov-btn'}}",
+                                                "cwidth": 18
+                                            },
+                                            "binds": [{
+                                                "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "-@",
+                                                "options": {"url": "{{entire_url('model_plaza.ui')}}?catelogid={{active_catelog}}&search={{active_search}}"}
+                                            }]
+                                        }
+{% for p in providers %}
+                                        ,{
+                                            "widgettype": "Button",
+                                            "id": "prov_{{p.providerid}}",
+                                            "options": {
+                                                "label": "{{p.orgname}}",
+                                                "css": "{{'plaza-prov-btn selected' if active_provider==p.providerid else 'plaza-prov-btn'}}",
+                                                "cwidth": 18
+                                            },
+                                            "binds": [{
+                                                "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "-@",
+                                                "options": {"url": "{{entire_url('model_plaza.ui')}}?providerid={{p.providerid}}&catelogid={{active_catelog}}&search={{active_search}}"}
+                                            }]
+                                        }
+{% endfor %}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "widgettype": "RefreshWidget",
+                    "id": "plaza_cards",
+                    "options": {
+                        "period_seconds": 0,
+                        "url": "{{entire_url('plaza_model_cards.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search={{active_search}}",
+                        "css": "filler",
+                        "width": "100%",
+                        "height": "100%"
+                    }
+                }
+            ]
+        }
+    ]
 }

@@ -581,6 +581,33 @@ def _file_mime(filepath):
 	mime, _ = _mimetypes.guess_type(filepath)
 	return mime or 'application/octet-stream'
 
+async def get_plaza_models(providerid='', catelogid='', search=''):
+	"""Flat model list for cockpit plaza: filterable by provider/catalog/search, sorted by name."""
+	env = ServerEnv()
+	data = await get_llms_by_catelog_to_customer(
+		catelogid=catelogid if catelogid else None,
+		orderby='a.name'
+	)
+	result = []
+	for cate in data:
+		for llm in cate.llms:
+			if providerid and llm.providerid != providerid:
+				continue
+			if search:
+				sl = search.lower()
+				if sl not in (llm.name or '').lower() and sl not in (llm.description or '').lower():
+					continue
+			result.append({
+				'id': llm.id, 'name': llm.name, 'model': llm.model,
+				'description': llm.description or '', 'iconid': llm.iconid,
+				'providerid': llm.providerid,
+				'provider_name': getattr(llm, 'provider_name', getattr(llm, 'orgname', '')),
+				'catelog_id': getattr(llm, 'catelog_id', ''),
+				'catelogname': getattr(llm, 'catelogname', ''),
+				'pricing_display': getattr(llm, 'pricing_display', []),
+			})
+	return result
+
 ServerEnv().base64 = _base64
 ServerEnv().mimetypes = _mimetypes
 ServerEnv().os = _os

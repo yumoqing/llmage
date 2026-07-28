@@ -1,0 +1,33 @@
+import json
+
+providerid = (params_kw or {}).get('providerid', '')
+catelogid = (params_kw or {}).get('catelogid', '')
+search = (params_kw or {}).get('search', '').strip()
+
+data = await request._run_ns.get_llms_by_catelog_to_customer(
+    catelogid=catelogid if catelogid else None,
+    orderby='a.name'
+)
+
+result = []
+for cate in data:
+    for llm in cate.llms:
+        if providerid and llm.providerid != providerid:
+            continue
+        if search and search.lower() not in (llm.name or '').lower():
+            if search.lower() not in (llm.description or '').lower():
+                continue
+        result.append({
+            'id': llm.id,
+            'name': llm.name,
+            'model': llm.model,
+            'description': llm.description or '',
+            'iconid': llm.iconid,
+            'providerid': llm.providerid,
+            'provider_name': getattr(llm, 'provider_name', getattr(llm, 'orgname', '')),
+            'catelog_id': getattr(llm, 'catelog_id', ''),
+            'catelogname': getattr(llm, 'catelogname', ''),
+            'pricing_display': getattr(llm, 'pricing_display', []),
+        })
+
+return json.dumps(result, ensure_ascii=False)

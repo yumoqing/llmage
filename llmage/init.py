@@ -26,6 +26,7 @@ from .utils import (
 	_warm_llmid_cache,
 	get_llmid_cached,
 	invalidate_llmid_cache,
+	get_plaza_models,
 )
 
 from .llmclient import (
@@ -163,6 +164,7 @@ def load_llmage():
 	env.keling_token = keling_token
 	env.llm_query_price = llm_query_price
 	env.get_llms_by_catelog_to_customer = get_llms_by_catelog_to_customer
+	env.get_plaza_models = get_plaza_models
 	env.backup_accounted_llmusage = backup_accounted_llmusage
 	env.read_ioinfo_content = read_ioinfo_content
 	env.get_llmusage_by_id = get_llmusage_by_id
