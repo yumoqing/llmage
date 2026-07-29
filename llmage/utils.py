@@ -274,11 +274,11 @@ def erase_apikey(e):
 async def get_llmproviders():
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
-		sql = """select a.providerid, a.iconid, b.orgname 
+		sql = """select a.providerid, b.orgname 
 from llm a, organization b
 where a.providerid = b.id
 	and a.status = 'published'
-group by a.providerid, a.iconid, b.orgname"""
+group by a.providerid, b.orgname"""
 		return await sor.sqlExe(sql, {})
 	return []
 
