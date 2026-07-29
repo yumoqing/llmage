@@ -9,7 +9,7 @@
 {% set start = (page - 1) * page_size %}
 {% set end = [start + page_size, total] | min %}
 {% set data = all_data[start:end] %}
-{% set base = entire_url('model_plaza.ui') %}
+{% set base = '/llmage/model_plaza.ui' %}
 {% set ns = namespace(first=true) %}
 {
     "widgettype": "VBox",

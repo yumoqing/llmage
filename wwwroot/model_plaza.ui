@@ -3,7 +3,7 @@
 {% set active_search = params_kw.get('search', '') %}
 {% set catelogs = get_llmcatelogs() %}
 {% set providers = get_llmproviders() %}
-{% set base = entire_url('model_plaza.ui') %}
+{% set base = '/llmage/model_plaza.ui' %}
 {
     "widgettype": "VBox",
     "options": {"css": "filler", "width": "100%", "height": "100%", "gap": "8px"},
