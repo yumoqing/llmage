@@ -23,11 +23,11 @@
 {% for llm in data %}
 {% if not ns.first %},{% endif %}
                 {
-                    "widgettype": "VScrollPanel",
+                    "widgettype": "VBox",
                     "options": {
                         "css": "card plaza-card",
-                        "cwidth": 25,
-                        "cheight": 16
+                        "cwidth": 15,
+                        "cheight": 12
                     },
                     "subwidgets": [
                         {
@@ -51,6 +51,7 @@
                                 {
                                     "widgettype": "Text",
                                     "options": {
+										"height": "auto",
                                         "text": {{json.dumps(llm.description, ensure_ascii=False)}},
                                         "wrap": true,
                                         "halign": "left"
@@ -60,8 +61,11 @@
                         },
                         {
                             "widgettype": "VBox",
-                            "options": {"css": "pricing-box", "cheight": 4},
+                            "options": {"css": "filler", "cheight": 4},
                             "subwidgets": [
+{% if isinstance(llm.pricing_display, str) %}
+{% set llm.pricing_display = [llm.pricing_display] %}
+{% endif %}
 {% for pt in llm.pricing_display %}
                                 {
                                     "widgettype": "Text",
