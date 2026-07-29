@@ -135,7 +135,7 @@
                     "id": "plaza_cards",
                     "options": {
                         "period_seconds": 0,
-                        "url": "{{entire_url('plaza_model_cards.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search={{active_search}}",
+                        "url": "{{entire_url('plaza_model_cards.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search={{active_search}}&page={{params_kw.get('page','1')}}",
                         "css": "filler",
                         "width": "100%",
                         "height": "100%"
