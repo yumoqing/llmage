@@ -120,7 +120,8 @@
                     ]
                 }
             ]
-        },
+        }{% if total_pages > 1 %},
+{% endif %}
 {% if total_pages > 1 %}
         {
             "widgettype": "HBox",
