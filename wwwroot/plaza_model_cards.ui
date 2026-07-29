@@ -32,7 +32,7 @@
                     "subwidgets": [
                         {
                             "widgettype": "HBox",
-                            "options": {"cheight": 2},
+                            "options": {"cheight": 2, "alignItems": "center", "gap": "4px"},
                             "subwidgets": [
                                 {
                                     "widgettype": "Svg",
@@ -46,38 +46,36 @@
                         },
                         {
                             "widgettype": "VScrollPanel",
-                            "options": {"css": "card-body-scroll", "flex": "1"},
+                            "options": {"css": "filler", "flex": "1"},
                             "subwidgets": [
                                 {
                                     "widgettype": "Text",
                                     "options": {
-										"height": "auto",
+                                        "height": "auto",
                                         "text": {{json.dumps(llm.description, ensure_ascii=False)}},
                                         "wrap": true,
                                         "halign": "left"
                                     }
                                 }
-                            ]
-                        },
-                        {
-                            "widgettype": "VBox",
-                            "options": {"css": "filler", "cheight": 4},
-                            "subwidgets": [
-{% set pricing_text = llm.pricing_display %}
-{% if type(pricing_text) == type("") %}
-{% set pricing_text = [pricing_text] %}
-{% endif %}
-{% for pt in pricing_text %}
-                                {
-                                    "widgettype": "Text",
-                                    "options": {
-                                        "text": {{json.dumps(pt, ensure_ascii=False)}},
-                                        "wrap": true,
-                                        "halign": "left",
-                                        "css": "pricing-text"
-                                    }
-                                }{% if not loop.last %},{% endif %}
+{% if llm.pricing_display %}
+                                ,{
+                                    "widgettype": "VBox",
+                                    "options": {"css": "filler"},
+                                    "subwidgets": [
+{% for pt in llm.pricing_display %}
+                                        {
+                                            "widgettype": "Text",
+                                            "options": {
+                                                "text": {{json.dumps(pt, ensure_ascii=False)}},
+                                                "wrap": true,
+                                                "halign": "left",
+                                                "css": "pricing-text"
+                                            }
+                                        }{% if not loop.last %},{% endif %}
 {% endfor %}
+                                    ]
+                                }
+{% endif %}
                             ]
                         }
                     ],
