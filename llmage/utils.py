@@ -11,6 +11,7 @@ from appPublic.uniqueID import getID
 from appPublic.dictObject import DictObject
 from appPublic.timeUtils import curDateString, timestampstr
 from uapi.appapi import UAPI, sor_get_callerid, sor_get_uapi, get_uapi
+from appPublic.share_cache import cache_get, cache_invalidate
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 from appPublic.jsonConfig import getConfig

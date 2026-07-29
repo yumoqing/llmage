@@ -4,113 +4,79 @@
 {% set all_data = get_plaza_models(providerid, catelogid, search) %}
 {% set ns = namespace(first=true) %}
 {
-    "widgettype": "VBox",
+    "widgettype": "VScrollPanel",
     "options": {"css": "filler", "width": "100%", "height": "100%"},
     "subwidgets": [
         {
-            "widgettype": "VScrollPanel",
-            "options": {"css": "filler", "flex": "1", "width": "100%"},
+            "widgettype": "DynamicColumn",
+            "options": {
+                "css": "plaza-grid",
+                "width": "100%",
+                "col_cwidth": 25,
+                "col_cgap": 1
+            },
             "subwidgets": [
-                {
-                    "widgettype": "DynamicColumn",
-                    "options": {
-                        "css": "plaza-grid",
-                        "width": "100%",
-                        "col_cwidth": 22,
-                        "col_cgap": 1
-                    },
-                    "subwidgets": [
 {% for llm in all_data %}
 {% if not ns.first %},{% endif %}
+                {
+                    "widgettype": "VBox",
+                    "options": {
+                        "css": "card plaza-card",
+                        "cwidth": 25,
+                        "cheight": 16
+                    },
+                    "subwidgets": [
                         {
-                            "widgettype": "VBox",
-                            "options": {
-                                "css": "card plaza-card",
-                                "width": "100%",
-                                "cheight": 14
-                            },
+                            "widgettype": "HBox",
+                            "options": {"cheight": 2, "alignItems": "center", "gap": "4px"},
+                            "subwidgets": [
+                                {"widgettype": "Svg", "options": {"rate": 1.5, "url": "{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}"}},
+                                {"widgettype": "Title6", "options": {"text": "{{llm.name}}"}}
+                            ]
+                        },
+                        {
+                            "widgettype": "VScrollPanel",
+                            "options": {"css": "card-body-scroll", "flex": "1"},
                             "subwidgets": [
                                 {
-                                    "widgettype": "HBox",
-                                    "options": {"cheight": 2, "alignItems": "center", "gap": "4px"},
-                                    "subwidgets": [
-                                        {
-                                            "widgettype": "Svg",
-                                            "options": {"rate": 1.5, "url": "{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}"}
-                                        },
-                                        {
-                                            "widgettype": "Title6",
-                                            "options": {"text": "{{llm.name}}"}
-                                        }
-                                    ]
-                                },
-                                {
-                                    "widgettype": "VScrollPanel",
-                                    "options": {"css": "filler", "flex": "1"},
-                                    "subwidgets": [
-                                        {
-                                            "widgettype": "Text",
-                                            "options": {
-                                                "height": "auto",
-                                                "text": {{json.dumps(llm.description, ensure_ascii=False)}},
-                                                "wrap": true,
-                                                "halign": "left"
-                                            }
-                                        }
-{% if llm.pricing_display %}
-{% if llm.pricing_display is string %}
-{% set pricing_items = [llm.pricing_display] %}
-{% else %}
-{% set pricing_items = llm.pricing_display %}
-{% endif %}
-                                        ,{
-                                            "widgettype": "VBox",
-                                            "options": {"css": "filler"},
-                                            "subwidgets": [
-{% for pt in pricing_items %}
-                                                {
-                                                    "widgettype": "Text",
-                                                    "options": {
-                                                        "text": {{json.dumps(pt, ensure_ascii=False)}},
-                                                        "wrap": true,
-                                                        "halign": "left",
-                                                        "css": "pricing-text"
-                                                    }
-                                                }{% if not loop.last %},{% endif %}
-{% endfor %}
-                                            ]
-                                        }
-{% endif %}
-                                    ]
-                                }
-                            ],
-                            "binds": [
-                                {
-                                    "wid": "self",
-                                    "event": "click",
-                                    "actiontype": "urlwidget",
-                                    "target": "PopupWindow",
-                                    "popup_options": {
-                                        "title": "{{llm.name}}",
-{% if int(params_kw._is_mobile or 0) %}
-                                        "width": "100%",
-                                        "height": "100%"
-{% else %}
-                                        "width": "40%",
-                                        "height": "85%"
-{% endif %}
-                                    },
+                                    "widgettype": "Text",
                                     "options": {
-                                        "params": {"id": "{{llm.id}}"},
-                                        "url": "{{entire_url('./llm_dialog.ui')}}"
+                                        "height": "auto",
+                                        "text": {{json.dumps(llm.description, ensure_ascii=False)}},
+                                        "wrap": true,
+                                        "halign": "left"
                                     }
                                 }
+{% if llm.pricing_display %}
+{% if llm.pricing_display is string %}{% set pricing_items = [llm.pricing_display] %}{% else %}{% set pricing_items = llm.pricing_display %}{% endif %}
+                                ,{
+                                    "widgettype": "VBox",
+                                    "options": {"css": "filler"},
+                                    "subwidgets": [
+{% for pt in pricing_items %}
+                                        {"widgettype": "Text", "options": {"text": {{json.dumps(pt, ensure_ascii=False)}}, "wrap": true, "halign": "left", "css": "pricing-text"}}{% if not loop.last %},{% endif %}
+{% endfor %}
+                                    ]
+                                }
+{% endif %}
                             ]
                         }
+                    ],
+                    "binds": [{
+                        "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "PopupWindow",
+                        "popup_options": {
+                            "title": "{{llm.name}}",
+{% if int(params_kw._is_mobile or 0) %}
+                            "width": "100%", "height": "100%"
+{% else %}
+                            "width": "40%", "height": "85%"
+{% endif %}
+                        },
+                        "options": {"params": {"id": "{{llm.id}}"}, "url": "{{entire_url('./llm_dialog.ui')}}"}
+                    }]
+                }
 {% set ns.first = false %}
 {% endfor %}
-                    ]
-                }
             ]
         }
     ]

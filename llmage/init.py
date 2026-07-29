@@ -3,6 +3,7 @@ from appPublic.registerfunction import RegisterFunction
 from sqlor.dbpools import DBPools, get_sor_context
 from ahserver.serverenv import ServerEnv
 from appPublic.log import debug
+from appPublic.share_cache import cache_start_listener
 from .keling import keling_token
 from .jimeng import jimeng_auth_headers
 from .utils import (
@@ -182,6 +183,7 @@ def load_llmage():
 		'load_product_category_product': load_product_category_product,
 	}
 	# Bind hot_reload event — module-level function, ref safe (module keeps it alive)
+	cache_start_listener()
 	if hasattr(env, 'event_dispatcher'):
 		env.event_dispatcher.bind('hot_reload', _on_hot_reload)
 	rf = RegisterFunction()
