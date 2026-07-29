@@ -23,7 +23,7 @@
                     "options": {
                         "css": "plaza-grid",
                         "width": "100%",
-                        "col_cwidth": 25,
+                        "col_cwidth": 22,
                         "col_cgap": 1
                     },
                     "subwidgets": [
@@ -33,7 +33,7 @@
                             "widgettype": "VBox",
                             "options": {
                                 "css": "card plaza-card",
-                                "cwidth": 25,
+                                "cwidth": 22,
                                 "cheight": 14
                             },
                             "subwidgets": [
@@ -123,7 +123,7 @@
 {% if total_pages > 1 %}
         {
             "widgettype": "HBox",
-            "options": {"width": "100%", "cheight": 3, "gap": "8px", "alignItems": "center", "justifyContent": "center", "padding": "8px 0"},
+            "options": {"cheight": 3, "gap": "8px", "alignItems": "center", "justifyContent": "center", "padding": "8px 0"},
             "subwidgets": [
 {% if page > 1 %}
                 {
@@ -131,21 +131,18 @@
                     "options": {"label": "上一页", "cwidth": 10},
                     "binds": [{
                         "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{entire_url('model_plaza.ui')}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}&page={{page - 1}}'}},t);}"
+                        "script": "var rw=bricks.getWidgetById('plaza_cards',bricks.app);if(rw){rw.opts.url='{{entire_url('plaza_model_cards.ui')}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}&page={{page - 1}}';rw.show_widget();}"
                     }]
                 },
 {% endif %}
-                {
-                    "widgettype": "Text",
-                    "options": {"text": "{{page}} / {{total_pages}} (共{{total}}个)"}
-                },
+                {"widgettype": "Text", "options": {"text": "{{page}}/{{total_pages}} ({{total}}个)"}},
 {% if page < total_pages %}
                 {
                     "widgettype": "Button",
                     "options": {"label": "下一页", "cwidth": 10},
                     "binds": [{
                         "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{entire_url('model_plaza.ui')}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}&page={{page + 1}}'}},t);}"
+                        "script": "var rw=bricks.getWidgetById('plaza_cards',bricks.app);if(rw){rw.opts.url='{{entire_url('plaza_model_cards.ui')}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}&page={{page + 1}}';rw.show_widget();}"
                     }]
                 }
 {% endif %}
