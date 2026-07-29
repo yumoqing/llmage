@@ -590,12 +590,14 @@ async def get_plaza_models(providerid='', catelogid='', search=''):
 	)
 	result = []
 	for cate in data:
-		for llm in cate.llms:
+		for llm in cate['llms']:
 			if providerid and llm.providerid != providerid:
 				continue
 			if search:
 				sl = search.lower()
-				if sl not in (llm.name or '').lower() and sl not in (llm.description or '').lower():
+				n = (llm.name or '').lower()
+				d = (llm.description or '').lower()
+				if sl not in n and sl not in d:
 					continue
 			result.append({
 				'id': llm.id, 'name': llm.name, 'model': llm.model,
