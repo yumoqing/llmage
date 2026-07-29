@@ -1,155 +1,75 @@
 {% set providerid = params_kw.get('providerid', '') %}
 {% set catelogid = params_kw.get('catelogid', '') %}
 {% set search = params_kw.get('search', '') %}
-{% set page = (params_kw.get('page', '1') | int) %}
-{% set page_size = 20 %}
-{% set all_data = get_plaza_models(providerid, catelogid, search) %}
-{% set total = all_data | length %}
-{% set total_pages = ((total + page_size - 1) / page_size) | int %}
-{% set start = (page - 1) * page_size %}
-{% set end = [start + page_size, total] | min %}
-{% set data = all_data[start:end] %}
-{% set base = '/llmage/model_plaza.ui' %}
-{% set ns = namespace(first=true) %}
 {
     "widgettype": "VBox",
     "options": {"css": "filler", "width": "100%", "height": "100%"},
     "subwidgets": [
         {
-            "widgettype": "VScrollPanel",
-            "options": {"css": "filler", "flex": "1", "width": "100%"},
-            "subwidgets": [
-                {
-                    "widgettype": "DynamicColumn",
+            "widgettype": "Tabular",
+            "options": {
+                "css": "filler",
+                "width": "100%",
+                "height": "100%",
+                "data_url": "{{entire_url('api/get_plaza_models.dspy')}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}",
+                "pagerows": 20,
+                "record_view": {
+                    "widgettype": "VBox",
                     "options": {
-                        "css": "plaza-grid",
+                        "css": "card plaza-card",
                         "width": "100%",
-                        "col_cwidth": 22,
-                        "col_cgap": 1
+                        "cheight": 10,
+                        "marginBottom": "8px"
                     },
                     "subwidgets": [
-{% for llm in data %}
-{% if not ns.first %},{% endif %}
                         {
-                            "widgettype": "VBox",
-                            "options": {
-                                "css": "card plaza-card",
-                                "width": "100%",
-                                "cheight": 14
-                            },
+                            "widgettype": "HBox",
+                            "options": {"cheight": 2, "alignItems": "center", "gap": "4px"},
                             "subwidgets": [
                                 {
-                                    "widgettype": "HBox",
-                                    "options": {"cheight": 2, "alignItems": "center", "gap": "4px"},
-                                    "subwidgets": [
-                                        {
-                                            "widgettype": "Svg",
-                                            "options": {"rate": 1.5, "url": "{{entire_url('/appbase/show_icon.dspy')}}?id={{llm.iconid}}"}
-                                        },
-                                        {
-                                            "widgettype": "Title6",
-                                            "options": {"text": "{{llm.name}}"}
-                                        }
-                                    ]
+                                    "widgettype": "Svg",
+                                    "options": {"rate": 1.5, "url": "{{entire_url('/appbase/show_icon.dspy')}}?id=${iconid}"}
                                 },
                                 {
-                                    "widgettype": "VScrollPanel",
-                                    "options": {"css": "filler", "flex": "1"},
-                                    "subwidgets": [
-                                        {
-                                            "widgettype": "Text",
-                                            "options": {
-                                                "height": "auto",
-                                                "text": {{json.dumps(llm.description, ensure_ascii=False)}},
-                                                "wrap": true,
-                                                "halign": "left"
-                                            }
-                                        }
-{% if llm.pricing_display %}
-{% if llm.pricing_display is string %}
-{% set pricing_items = [llm.pricing_display] %}
-{% else %}
-{% set pricing_items = llm.pricing_display %}
-{% endif %}
-                                        ,{
-                                            "widgettype": "VBox",
-                                            "options": {"css": "filler"},
-                                            "subwidgets": [
-{% for pt in pricing_items %}
-                                                {
-                                                    "widgettype": "Text",
-                                                    "options": {
-                                                        "text": {{json.dumps(pt, ensure_ascii=False)}},
-                                                        "wrap": true,
-                                                        "halign": "left",
-                                                        "css": "pricing-text"
-                                                    }
-                                                }{% if not loop.last %},{% endif %}
-{% endfor %}
-                                            ]
-                                        }
-{% endif %}
-                                    ]
-                                }
-                            ],
-                            "binds": [
-                                {
-                                    "wid": "self",
-                                    "event": "click",
-                                    "actiontype": "urlwidget",
-                                    "target": "PopupWindow",
-                                    "popup_options": {
-                                        "title": "{{llm.name}}",
-{% if int(params_kw._is_mobile or 0) %}
-                                        "width": "100%",
-                                        "height": "100%"
-{% else %}
-                                        "width": "40%",
-                                        "height": "85%"
-{% endif %}
-                                    },
-                                    "options": {
-                                        "params": {"id": "{{llm.id}}"},
-                                        "url": "{{entire_url('./llm_dialog.ui')}}"
-                                    }
+                                    "widgettype": "Title6",
+                                    "options": {"text": "${name}"}
                                 }
                             ]
+                        },
+                        {
+                            "widgettype": "Text",
+                            "options": {
+                                "height": "auto",
+                                "text": "${description}",
+                                "wrap": true,
+                                "halign": "left"
+                            }
                         }
-{% set ns.first = false %}
-{% endfor %}
+                    ],
+                    "binds": [
+                        {
+                            "wid": "self",
+                            "event": "click",
+                            "actiontype": "urlwidget",
+                            "target": "PopupWindow",
+                            "popup_options": {
+                                "title": "${name}",
+{% if int(params_kw._is_mobile or 0) %}
+                                "width": "100%",
+                                "height": "100%"
+{% else %}
+                                "width": "40%",
+                                "height": "85%"
+{% endif %}
+                            },
+                            "options": {
+                                "params": {"id": "${id}"},
+                                "url": "{{entire_url('./llm_dialog.ui')}}"
+                            }
+                        }
                     ]
                 }
-            ]
-        }{% if total_pages > 1 %},
-{% endif %}
-{% if total_pages > 1 %}
-        {
-            "widgettype": "HBox",
-            "options": {"cheight": 3, "gap": "8px", "alignItems": "center", "justifyContent": "center", "padding": "8px 0"},
-            "subwidgets": [
-{% if page > 1 %}
-                {
-                    "widgettype": "Button",
-                    "options": {"label": "上一页", "cwidth": 10},
-                    "binds": [{
-                        "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "location.href='{{base}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}&page={{page - 1}}';"
-                    }]
-                },
-{% endif %}
-                {"widgettype": "Text", "options": {"text": "{{page}}/{{total_pages}} ({{total}}个)"}},
-{% if page < total_pages %}
-                {
-                    "widgettype": "Button",
-                    "options": {"label": "下一页", "cwidth": 10},
-                    "binds": [{
-                        "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "location.href='{{base}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}&page={{page + 1}}';"
-                    }]
-                }
-{% endif %}
-            ]
+            }
         }
-{% endif %}
     ]
 }
