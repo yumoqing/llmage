@@ -63,10 +63,11 @@
                             "widgettype": "VBox",
                             "options": {"css": "filler", "cheight": 4},
                             "subwidgets": [
-{% if isinstance(llm.pricing_display, str) %}
-{% set llm.pricing_display = [llm.pricing_display] %}
+{% set pricing_text = llm.pricing_display %}
+{% if type(pricing_text) == type("") %}
+{% set pricing_text = [pricing_text] %}
 {% endif %}
-{% for pt in llm.pricing_display %}
+{% for pt in pricing_text %}
                                 {
                                     "widgettype": "Text",
                                     "options": {
