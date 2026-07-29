@@ -9,6 +9,7 @@
 {% set start = (page - 1) * page_size %}
 {% set end = [start + page_size, total] | min %}
 {% set data = all_data[start:end] %}
+{% set base = entire_url('model_plaza.ui') %}
 {% set ns = namespace(first=true) %}
 {
     "widgettype": "VBox",
@@ -33,7 +34,7 @@
                             "widgettype": "VBox",
                             "options": {
                                 "css": "card plaza-card",
-                                "cwidth": 22,
+                                "width": "100%",
                                 "cheight": 14
                             },
                             "subwidgets": [
@@ -131,7 +132,7 @@
                     "options": {"label": "上一页", "cwidth": 10},
                     "binds": [{
                         "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "var rw=bricks.getWidgetById('plaza_cards',bricks.app);if(rw){rw.opts.url='{{entire_url('plaza_model_cards.ui')}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}&page={{page - 1}}';rw.show_widget();}"
+                        "script": "location.href='{{base}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}&page={{page - 1}}';"
                     }]
                 },
 {% endif %}
@@ -142,7 +143,7 @@
                     "options": {"label": "下一页", "cwidth": 10},
                     "binds": [{
                         "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "var rw=bricks.getWidgetById('plaza_cards',bricks.app);if(rw){rw.opts.url='{{entire_url('plaza_model_cards.ui')}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}&page={{page + 1}}';rw.show_widget();}"
+                        "script": "location.href='{{base}}?providerid={{providerid}}&catelogid={{catelogid}}&search={{search}}&page={{page + 1}}';"
                     }]
                 }
 {% endif %}

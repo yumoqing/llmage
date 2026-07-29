@@ -3,9 +3,10 @@
 {% set active_search = params_kw.get('search', '') %}
 {% set catelogs = get_llmcatelogs() %}
 {% set providers = get_llmproviders() %}
+{% set base = entire_url('model_plaza.ui') %}
 {
-    "widgettype": "VScrollPanel",
-    "options": {"css": "filler", "width": "100%", "height": "100%"},
+    "widgettype": "VBox",
+    "options": {"css": "filler", "width": "100%", "height": "100%", "gap": "8px"},
     "subwidgets": [
         {
             "widgettype": "VBox",
@@ -22,12 +23,11 @@
                         "placeholder": "搜索模型名称或描述...",
                         "value": "{{active_search}}",
                         "search_label": "搜索",
-                        "clear_label": "清除",
-                        "width": "100%"
+                        "clear_label": "清除"
                     },
                     "binds": [{
                         "wid": "self", "event": "search", "actiontype": "script", "target": "self",
-                        "script": "var rw=bricks.getWidgetById('plaza_cards',bricks.app);if(rw){rw.opts.url='{{entire_url('plaza_model_cards.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search='+encodeURIComponent(event.keyword||'');rw.show_widget();}"
+                        "script": "location.href='{{base}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search='+encodeURIComponent(event.keyword||'');"
                     }]
                 }
             ]
@@ -45,7 +45,7 @@
                     },
                     "binds": [{
                         "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "var rw=bricks.getWidgetById('plaza_cards',bricks.app);if(rw){rw.opts.url='{{entire_url('plaza_model_cards.ui')}}?providerid={{active_provider}}&search={{active_search}}';rw.show_widget();}"
+                        "script": "location.href='{{base}}?providerid={{active_provider}}&search={{active_search}}';"
                     }]
                 }
 {% for c in catelogs %}
@@ -58,7 +58,7 @@
                     },
                     "binds": [{
                         "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "var rw=bricks.getWidgetById('plaza_cards',bricks.app);if(rw){rw.opts.url='{{entire_url('plaza_model_cards.ui')}}?providerid={{active_provider}}&catelogid={{c.id}}&search={{active_search}}';rw.show_widget();}"
+                        "script": "location.href='{{base}}?providerid={{active_provider}}&catelogid={{c.id}}&search={{active_search}}';"
                     }]
                 }
 {% endfor %}
@@ -93,7 +93,7 @@
                                             },
                                             "binds": [{
                                                 "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                                                "script": "var rw=bricks.getWidgetById('plaza_cards',bricks.app);if(rw){rw.opts.url='{{entire_url('plaza_model_cards.ui')}}?catelogid={{active_catelog}}&search={{active_search}}';rw.show_widget();}"
+                                                "script": "location.href='{{base}}?catelogid={{active_catelog}}&search={{active_search}}';"
                                             }]
                                         }
 {% for p in providers %}
@@ -106,7 +106,7 @@
                                             },
                                             "binds": [{
                                                 "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                                                "script": "var rw=bricks.getWidgetById('plaza_cards',bricks.app);if(rw){rw.opts.url='{{entire_url('plaza_model_cards.ui')}}?providerid={{p.providerid}}&catelogid={{active_catelog}}&search={{active_search}}';rw.show_widget();}"
+                                                "script": "location.href='{{base}}?providerid={{p.providerid}}&catelogid={{active_catelog}}&search={{active_search}}';"
                                             }]
                                         }
 {% endfor %}
