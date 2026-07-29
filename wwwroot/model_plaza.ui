@@ -20,36 +20,32 @@
                     "options": {"width": "100%", "cheight": 4, "gap": "6px", "alignItems": "center"},
                     "subwidgets": [
                         {
-                            "widgettype": "Input",
+                            "widgettype": "KeyinText",
                             "id": "plaza_search_input",
                             "options": {
                                 "cwidth": 40,
                                 "cheight": 3,
-                                "placeholder": "搜索模型名称或描述...",
-                                "text": "{{active_search}}"
+                                "name": "search",
+                                "css": "plaza-search-input"
                             }
                         },
                         {
                             "widgettype": "Button",
                             "id": "btn_search",
                             "options": {"label": "搜索", "css": "plaza-search-btn", "cwidth": 8, "cheight": 3},
-                            "binds": [
-                                {
-                                    "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                                    "script": "var inp=bricks.getWidgetById('plaza_search_input',bricks.app);var q=inp?inp.dom_element.querySelector('input').value:'';var u='{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search='+encodeURIComponent(q);bricks.app.navigate_to(u);"
-                                }
-                            ]
+                            "binds": [{
+                                "wid": "self", "event": "click", "actiontype": "script", "target": "self",
+                                "script": "var w=bricks.getWidgetById('plaza_search_input',bricks.app);var q=w?w.text:'';window.location.assign('{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search='+encodeURIComponent(q));"
+                            }]
                         },
 {% if active_search %}
                         {
                             "widgettype": "Button",
                             "options": {"label": "清除", "css": "plaza-clear-btn", "cwidth": 6, "cheight": 3},
-                            "binds": [
-                                {
-                                    "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "-@",
-                                    "options": {"url": "{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}"}
-                                }
-                            ]
+                            "binds": [{
+                                "wid": "self", "event": "click", "actiontype": "script", "target": "self",
+                                "script": "window.location.assign('{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}');"
+                            }]
                         },
 {% endif %}
                         {"widgettype": "Filler"}
@@ -64,7 +60,6 @@
                 {
                     "widgettype": "HBox",
                     "options": {"css": "plaza-catelog-bar", "width": "100%", "wrap": true, "gap": "4px", "padding": "4px 0"},
-                    "binds": [],
                     "subwidgets": [
                         {
                             "widgettype": "Button",
@@ -75,8 +70,8 @@
                                 "cwidth": 8, "cheight": 2
                             },
                             "binds": [{
-                                "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "-@",
-                                "options": {"url": "{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&search={{active_search}}"}
+                                "wid": "self", "event": "click", "actiontype": "script", "target": "self",
+                                "script": "window.location.assign('{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&search={{active_search}}');"
                             }]
                         }
 {% for c in catelogs %}
@@ -89,8 +84,8 @@
                                 "cwidth": 10, "cheight": 2
                             },
                             "binds": [{
-                                "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "-@",
-                                "options": {"url": "{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&catelogid={{c.id}}&search={{active_search}}"}
+                                "wid": "self", "event": "click", "actiontype": "script", "target": "self",
+                                "script": "window.location.assign('{{entire_url('model_plaza.ui')}}?providerid={{active_provider}}&catelogid={{c.id}}&search={{active_search}}');"
                             }]
                         }
 {% endfor %}
@@ -127,8 +122,8 @@
                                                 "cwidth": 18
                                             },
                                             "binds": [{
-                                                "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "-@",
-                                                "options": {"url": "{{entire_url('model_plaza.ui')}}?catelogid={{active_catelog}}&search={{active_search}}"}
+                                                "wid": "self", "event": "click", "actiontype": "script", "target": "self",
+                                                "script": "window.location.assign('{{entire_url('model_plaza.ui')}}?catelogid={{active_catelog}}&search={{active_search}}');"
                                             }]
                                         }
 {% for p in providers %}
@@ -141,8 +136,8 @@
                                                 "cwidth": 18
                                             },
                                             "binds": [{
-                                                "wid": "self", "event": "click", "actiontype": "urlwidget", "target": "-@",
-                                                "options": {"url": "{{entire_url('model_plaza.ui')}}?providerid={{p.providerid}}&catelogid={{active_catelog}}&search={{active_search}}"}
+                                                "wid": "self", "event": "click", "actiontype": "script", "target": "self",
+                                                "script": "window.location.assign('{{entire_url('model_plaza.ui')}}?providerid={{p.providerid}}&catelogid={{active_catelog}}&search={{active_search}}');"
                                             }]
                                         }
 {% endfor %}
