@@ -11,11 +11,14 @@ data = await request._run_ns.get_llms_by_catelog_to_customer(
 
 result = []
 for cate in data:
-    for llm in cate.llms:
+    for llm in cate['llms']:
         if providerid and llm.providerid != providerid:
             continue
-        if search and search.lower() not in (llm.name or '').lower():
-            if search.lower() not in (llm.description or '').lower():
+        if search:
+            sl = search.lower()
+            n = (llm.name or '').lower()
+            d = (llm.description or '').lower()
+            if sl not in n and sl not in d:
                 continue
         result.append({
             'id': llm.id,
@@ -30,4 +33,4 @@ for cate in data:
             'pricing_display': getattr(llm, 'pricing_display', []),
         })
 
-return json.dumps(result, ensure_ascii=False)
+return json.dumps({'total': len(result), 'data': result}, ensure_ascii=False)
