@@ -33,4 +33,4 @@ for cate in data:
             'pricing_display': getattr(llm, 'pricing_display', []),
         })
 
-return json.dumps({'total': len(result), 'data': result}, ensure_ascii=False)
+return json.dumps({'total': len(result), 'rows': result}, ensure_ascii=False)
