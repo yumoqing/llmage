@@ -27,6 +27,7 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 	outlines = []
 	txt = ''
 	luid = getID()
+	llmusage = None
 	try:
 		start_timestamp = time.time()
 		responsed_seconds = None
@@ -96,10 +97,18 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		estr = erase_apikey(e)
 		ed = {"error": f"ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid}
 		s = json.dumps(ed, ensure_ascii=False)
-		s = ''.join(s.split('\n'))
+		s = ''.join(s.split('\\n'))
 		outlines.append(ed)
-		yield f'{s}\n'
+		yield f'{s}\\n'
 		return
+	finally:
+		# GeneratorExit / client disconnect — flush partial usage
+		if llmusage and llmusage.get('id') == luid:
+			try:
+				llmusage.status = llmusage.status or 'UNKNOWN'
+				await write_llmusage(llmusage)
+			except:
+				pass
 
 async def inference_generator(request, *args, params_kw=None, **kw):
 	env = request._run_ns.copy()
