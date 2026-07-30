@@ -27,7 +27,7 @@
                     },
                     "binds": [{
                         "wid": "self", "event": "search", "actiontype": "script", "target": "self",
-                        "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:"{{base}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search='+encodeURIComponent((event.params&&event.params.keyword)||event.keyword||'')}},t);}"
+                        "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{base}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search='+encodeURIComponent((event.params&&event.params.keyword)||event.keyword||'')}},t);}"
                     }]
                 }
             ]
