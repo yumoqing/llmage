@@ -1,6 +1,6 @@
-{% set providerid = params_kw.get('providerid', '') %}
-{% set catelogid = params_kw.get('catelogid', '') %}
-{% set search = params_kw.get('search', '') %}
+{% set providerid = params_kw.get('v_id') or params_kw.get('providerid', '') %}
+{% set catelogid = params_kw.get('h_id') or params_kw.get('catelogid', '') %}
+{% set search = params_kw.get('keyword') or params_kw.get('search', '') %}
 {% set all_data = get_plaza_models(providerid, catelogid, search) %}
 {% set ns = namespace(first=true) %}
 {

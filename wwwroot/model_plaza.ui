@@ -1,138 +1,23 @@
-{% set active_provider = params_kw.get('providerid', '') %}
-{% set active_catelog = params_kw.get('catelogid', '') %}
-{% set active_search = params_kw.get('search', '') %}
-{% set catelogs = get_llmcatelogs() %}
-{% set providers = get_llmproviders() %}
-{% set base = '/llmage/model_plaza.ui' %}
 {
     "widgettype": "VBox",
-    "options": {"css": "filler", "width": "100%", "height": "100%", "gap": "8px"},
+    "options": {"css": "plaza-container", "width": "100%", "height": "100%", "gap": "8px"},
     "subwidgets": [
         {
-            "widgettype": "VBox",
-            "options": {"css": "plaza-header", "width": "100%"},
-            "subwidgets": [
-                {
-                    "widgettype": "Title2",
-                    "options": {"otext": "模型广场", "i18n": true, "halign": "left"}
-                },
-                {
-                    "widgettype": "SearchBar",
-                    "id": "plaza_search",
-                    "options": {
-                        "placeholder": "搜索模型名称或描述...",
-                        "value": "{{active_search}}",
-                        "search_label": "搜索",
-                        "clear_label": "清除"
-                    },
-                    "binds": [{
-                        "wid": "self", "event": "search", "actiontype": "script", "target": "self",
-                        "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{base}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search='+encodeURIComponent((event.params&&event.params.keyword)||event.keyword||'')}},t);}"
-                    }]
-                }
-            ]
+            "widgettype": "Title2",
+            "options": {"otext": "模型广场", "i18n": true, "halign": "left"}
         },
         {
-            "widgettype": "HBox",
-            "options": {"css": "plaza-catelog-bar", "width": "100%", "wrap": true, "gap": "4px", "padding": "4px 0"},
-            "subwidgets": [
-                {
-                    "widgettype": "Button",
-                    "options": {
-                        "label": "全部",
-                        "css": "{{'plaza-cat-btn selected' if not active_catelog else 'plaza-cat-btn'}}",
-                        "cwidth": 8, "cheight": 2
-                    },
-                    "binds": [{
-                        "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{base}}?providerid={{active_provider}}&search={{active_search}}'}},t);}"
-                    }]
-                }
-{% for c in catelogs %}
-                ,{
-                    "widgettype": "Button",
-                    "options": {
-                        "label": "{{c.name}}",
-                        "css": "{{'plaza-cat-btn selected' if active_catelog==c.id else 'plaza-cat-btn'}}",
-                        "cwidth": 10, "cheight": 2
-                    },
-                    "binds": [{
-                        "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{base}}?providerid={{active_provider}}&catelogid={{c.id}}&search={{active_search}}'}},t);}"
-                    }]
-                }
-{% endfor %}
-            ]
-        },
-        {
-            "widgettype": "HBox",
-            "options": {"width": "100%", "flex": "1", "gap": "8px"},
-            "subwidgets": [
-                {
-                    "widgettype": "VBox",
-                    "options": {"css": "plaza-sidebar", "cwidth": 20},
-                    "subwidgets": [
-                        {
-                            "widgettype": "Title6",
-                            "options": {"otext": "供应商", "i18n": true, "marginBottom": "4px"}
-                        },
-                        {
-                            "widgettype": "VScrollPanel",
-                            "options": {"css": "filler", "flex": "1"},
-                            "subwidgets": [
-                                {
-                                    "widgettype": "VBox",
-                                    "options": {"gap": "2px"},
-                                    "subwidgets": [
-                                        {
-                                            "widgettype": "Button",
-                                            "options": {
-                                                "label": "全部供应商",
-                                                "css": "{{'plaza-prov-btn selected' if not active_provider else 'plaza-prov-btn'}}",
-                                                "cwidth": 18
-                                            },
-                                            "binds": [{
-                                                "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                                                "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{base}}?catelogid={{active_catelog}}&search={{active_search}}'}},t);}"
-                                            }]
-                                        }
-{% for p in providers %}
-                                        ,{
-                                            "widgettype": "Button",
-                                            "options": {
-                                                "label": "{{p.orgname}}",
-                                                "css": "{{'plaza-prov-btn selected' if active_provider==p.providerid else 'plaza-prov-btn'}}",
-                                                "cwidth": 18
-                                            },
-                                            "binds": [{
-                                                "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                                                "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{base}}?providerid={{p.providerid}}&catelogid={{active_catelog}}&search={{active_search}}'}},t);}"
-                                            }]
-                                        }
-{% endfor %}
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "widgettype": "VBox",
-                    "options": {"css": "filler", "flex": "1", "width": "100%"},
-                    "subwidgets": [
-                        {
-                            "widgettype": "urlwidget",
-                            "id": "plaza_cards",
-                            "options": {
-                                "url": "{{entire_url('plaza_model_cards.ui')}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search={{active_search}}&page={{params_kw.get('page','1')}}",
-                                "css": "filler",
-                                "width": "100%",
-                                "height": "100%"
-                            }
-                        }
-                    ]
-                }
-            ]
+            "widgettype": "DimensionFilter",
+            "id": "plaza_dim_filter",
+            "options": {
+                "h_data_url": "{{entire_url('api/plaza_categories.dspy')}}",
+                "v_measure_url": "{{entire_url('api/plaza_providers.dspy')}}",
+                "show_data_url": "{{entire_url('plaza_model_cards.ui')}}",
+                "search_placeholder": "搜索模型名称或描述...",
+                "css": "filler",
+                "width": "100%",
+                "flex": "1"
+            }
         }
     ]
 }

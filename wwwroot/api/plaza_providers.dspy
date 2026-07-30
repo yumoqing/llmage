@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+
+import json
+from llmage.utils import get_llmproviders
+
+data = await get_llmproviders()
+rows = [{'id': p.providerid, 'name': p.orgname} for p in (data or [])]
+return json.dumps({'rows': rows}, ensure_ascii=False)
