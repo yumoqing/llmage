@@ -12,7 +12,7 @@
             "options": {
                 "css": "plaza-grid",
                 "width": "100%",
-                "col_cwidth": 25,
+                "col_cwidth": 20,
                 "col_cgap": 1
             },
             "subwidgets": [
@@ -22,7 +22,7 @@
                     "widgettype": "VBox",
                     "options": {
                         "css": "card plaza-card",
-                        "cwidth": 25,
+                        "cwidth": 20,
                         "cheight": 16
                     },
                     "subwidgets": [
