@@ -27,7 +27,7 @@
                     },
                     "binds": [{
                         "wid": "self", "event": "search", "actiontype": "script", "target": "self",
-                        "script": "var kw=(event.params&&event.params.keyword)||event.keyword||'';location.href='{{base}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search='+encodeURIComponent(kw);"
+                        "script": "var kw=(event.params&&event.params.keyword)||event.keyword||'';var u='{{base}}?providerid={{active_provider}}&catelogid={{active_catelog}}&search='+encodeURIComponent(kw);var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:u}},t);}"
                     }]
                 }
             ]
@@ -45,7 +45,7 @@
                     },
                     "binds": [{
                         "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "location.href='{{base}}?providerid={{active_provider}}&search={{active_search}}';"
+                        "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{base}}?providerid={{active_provider}}&search={{active_search}}'}},t);}"
                     }]
                 }
 {% for c in catelogs %}
@@ -58,7 +58,7 @@
                     },
                     "binds": [{
                         "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                        "script": "location.href='{{base}}?providerid={{active_provider}}&catelogid={{c.id}}&search={{active_search}}';"
+                        "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{base}}?providerid={{active_provider}}&catelogid={{c.id}}&search={{active_search}}'}},t);}"
                     }]
                 }
 {% endfor %}
@@ -93,7 +93,7 @@
                                             },
                                             "binds": [{
                                                 "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                                                "script": "location.href='{{base}}?catelogid={{active_catelog}}&search={{active_search}}';"
+                                                "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{base}}?catelogid={{active_catelog}}&search={{active_search}}'}},t);}"
                                             }]
                                         }
 {% for p in providers %}
@@ -106,7 +106,7 @@
                                             },
                                             "binds": [{
                                                 "wid": "self", "event": "click", "actiontype": "script", "target": "self",
-                                                "script": "location.href='{{base}}?providerid={{p.providerid}}&catelogid={{active_catelog}}&search={{active_search}}';"
+                                                "script": "var t=bricks.getWidgetById('sage_main_content',bricks.app);if(t){t.clear_widgets();bricks.widgetBuild({widgettype:'urlwidget',options:{url:'{{base}}?providerid={{p.providerid}}&catelogid={{active_catelog}}&search={{active_search}}'}},t);}"
                                             }]
                                         }
 {% endfor %}
