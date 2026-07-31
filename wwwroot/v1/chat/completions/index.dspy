@@ -40,7 +40,7 @@ if not llmid:
 	debug(f'{params_kw.model=} not found for catelogid={catelogid}')
 	return openai_400()
 params_kw.llmid = llmid
-	params_kw.llmcatelogid = catelogid
+params_kw.llmcatelogid = catelogid
 
 debug(f'{params_kw.llmid=}')
 luid = getID()
