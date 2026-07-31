@@ -617,3 +617,24 @@ ServerEnv().os = _os
 ServerEnv().file_to_b64 = _file_to_b64
 ServerEnv().file_mime = _file_mime
 
+async def get_model_max_cost(llmid):
+	"""Get historical max actual customer charge for a model from llmusage."""
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		sql = """SELECT MAX(amount) as max_cost
+FROM llmusage
+WHERE llmid = ${llmid}$
+  AND status = 'SUCCEEDED'
+  AND amount IS NOT NULL
+  AND amount > 0"""
+		recs = await sor.sqlExe(sql, {'llmid': llmid})
+		if recs and recs[0].max_cost:
+			return float(recs[0].max_cost)
+	return 0
+
+async def update_model_max_cost(llmid, new_max):
+	"""Persist updated max_cost to llm table."""
+	env = ServerEnv()
+	async with get_sor_context(env, 'llmage') as sor:
+		await sor.U('llm', {'id': llmid, 'max_cost': float(new_max)})
+

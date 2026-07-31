@@ -1,13 +1,19 @@
 async def gen():
 	env = request._run_ns.copy()
 	f = partial(inference_generator, request, params_kw=params_kw)
-	if params_kw.stream:
-		async for l in f():
-			yield f'data: {l}\n'
-		yield 'data: [DONE]\n\n'
-	else:
-		async for l in f():
-			yield l
+	try:
+		if params_kw.stream:
+			async for l in f():
+				yield f'data: {l}\n'
+			yield 'data: [DONE]\n\n'
+		else:
+			async for l in f():
+				yield l
+	except Exception as e:
+		luid = params_kw.get('_luid')
+		if luid:
+			await env.refund_balance(luid)
+		raise
 
 debug_params('params_kw', params_kw)
 catelogid = params_kw.catelogid or 't2t'
@@ -37,9 +43,16 @@ params_kw.llmid = llmid
 	params_kw.llmcatelogid = catelogid
 
 debug(f'{params_kw.llmid=}')
+luid = getID()
+reserved = await env.reserve_balance(params_kw.llmid, userorgid, luid)
+if not reserved.get('ok'):
+	debug(f'{userid=} balance not enough: {reserved}')
+	return openai_429()
+params_kw._luid = luid
+params_kw._reserved = reserved
 f = await checkCustomerBalance(params_kw.llmid, userid, userorgid)
-if not f:
-	debug(f'{userid=} balance not enough')
+if not f and reserved.get('no_redis'):
+	debug(f'{userid=} balance not enough (DB fallback)')
 	return openai_429()
 # debug(f'{tools=}, {request._run_ns.tools=}')
 return await env.stream_response(request, gen, content_type='application/json')

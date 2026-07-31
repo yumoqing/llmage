@@ -28,6 +28,10 @@ from .utils import (
 	get_llmid_cached,
 	invalidate_llmid_cache,
 	get_plaza_models,
+	# Redis balance reservation
+	reserve_balance,
+	finalize_balance,
+	refund_balance,
 )
 
 from .llmclient import (
@@ -166,6 +170,12 @@ def load_llmage():
 	env.llm_query_price = llm_query_price
 	env.get_llms_by_catelog_to_customer = get_llms_by_catelog_to_customer
 	env.get_plaza_models = get_plaza_models
+	env._reserve_balance = reserve_balance
+	env._finalize_balance = finalize_balance
+	env._refund_balance = refund_balance
+	env.reserve_balance = lambda llmid, userorgid, luid: reserve_balance(env, llmid, userorgid, luid)
+	env.finalize_balance = lambda luid, actual_cost: finalize_balance(env, luid, actual_cost)
+	env.refund_balance = lambda luid: refund_balance(env, luid)
 	env.backup_accounted_llmusage = backup_accounted_llmusage
 	env.read_ioinfo_content = read_ioinfo_content
 	env.get_llmusage_by_id = get_llmusage_by_id
