@@ -179,11 +179,12 @@ async def reserve_balance(env, llmid, userorgid, luid):
         return {'ok': True, 'max_cost': _from_cents(result[1])}
     
     except RuntimeError:
-        debug('reserve_balance: Redis unavailable, skip')
+        debug('reserve_balance: Redis not configured, skip')
         return {'ok': True, 'max_cost': 0, 'no_redis': True}
     except Exception as e:
-        exception(f'reserve_balance error: {e}')
-        return {'ok': False, 'reason': str(e)}
+        # Redis down or unreachable — fall back to DB check, don't block
+        debug(f'reserve_balance: Redis error, falling back to DB: {e}')
+        return {'ok': True, 'max_cost': 0, 'no_redis': True}
 
 
 async def finalize_balance(env, luid, actual_cost):
