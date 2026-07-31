@@ -43,7 +43,8 @@ params_kw.llmid = llmid
 params_kw.llmcatelogid = catelogid
 
 debug(f'{params_kw.llmid=}')
-luid = getID()
+import uuid
+luid = str(uuid.uuid4())
 reserved = await env.reserve_balance(params_kw.llmid, userorgid, luid)
 if not reserved.get('ok'):
 	debug(f'{userid=} balance not enough: {reserved}')
