@@ -93,6 +93,15 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		llmusage.accounting_status = 'created'
 		await write_llmusage(llmusage)
 	except Exception as e:
+		# Refund balance reservation on failure
+		try:
+			from .balance import refund_balance
+			from ahserver.serverenv import ServerEnv
+			reserve_luid = params_kw.get('_luid') if params_kw else None
+			if reserve_luid:
+				await refund_balance(ServerEnv(), reserve_luid)
+		except:
+			pass
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
 		ed = {"error": f"ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid}
