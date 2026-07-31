@@ -93,6 +93,18 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		llmusage.accounting_status = 'created'
 		await write_llmusage(llmusage)
 	except Exception as e:
+		# Retry on duplicate key: append *1, *2, ...
+		retry = 0
+		while 'Duplicate entry' in str(e) and retry < 3:
+			retry += 1
+			llmusage.id = f'{luid}*{retry}'
+			try:
+				await write_llmusage(llmusage)
+				exception(f'write_llmusage retry {retry} succeeded with id={llmusage.id}')
+				e = None
+				break
+			except Exception as e2:
+				e = e2
 		# Refund balance reservation on failure
 		try:
 			from .balance import refund_balance
