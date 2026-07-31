@@ -1,6 +1,6 @@
 {
     "widgettype": "VBox",
-    "options": {"css": "plaza-container", "width": "100%", "height": "100%", "gap": "8px"},
+    "options": {"css": "plaza-container", "display": "flex", "flexDirection": "column", "width": "100%", "height": "100%", "gap": "8px"},
     "subwidgets": [
         {
             "widgettype": "Title2",
