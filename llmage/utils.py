@@ -638,3 +638,6 @@ async def update_model_max_cost(llmid, new_max):
 	async with get_sor_context(env, 'llmage') as sor:
 		await sor.U('llm', {'id': llmid, 'max_cost': float(new_max)})
 
+
+# Redis balance reservation (implemented in balance.py)
+from .balance import reserve_balance, finalize_balance, refund_balance
