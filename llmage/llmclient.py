@@ -35,6 +35,7 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		finish_seconds = None
 		first = True
 		usage = None
+		last_choices = None
 		async for l in uapi.stream_linify(llm.upappid, llm.apiname, userid, 
 					params=params_kw):
 			if first:
@@ -57,6 +58,10 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 				if d.get('reasoning_content'):
 					txt += d.get('reasoning_content')
 					yield_it = True
+				if d.get('choices'):
+					last_choices = d['choices']
+				else if last_choices:
+					d['choices'] = last_choices
 				if d.get('content'):
 					txt = txt + d['content']
 					yield_it = True
@@ -67,6 +72,7 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 				yield json.dumps(d, ensure_ascii=False) + '\n'
 		if usage is None:
 			error(f'{llm=} response has not usage')
+	
 		finish_seconds = time.time() - start_timestamp
 		if responsed_seconds is None:
 			responsed_seconds = finish_seconds
