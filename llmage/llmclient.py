@@ -60,7 +60,7 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 					yield_it = True
 				if d.get('choices'):
 					last_choices = d['choices']
-				else if last_choices:
+				elif last_choices:
 					d['choices'] = last_choices
 				if d.get('content'):
 					txt = txt + d['content']
