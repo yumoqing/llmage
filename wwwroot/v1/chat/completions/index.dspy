@@ -4,8 +4,8 @@ async def gen():
 	try:
 		if params_kw.stream:
 			async for l in f():
-				yield f'data: {l}\\n'
-			yield 'data: [DONE]\\n\\n'
+				yield f'data: {l}\n'
+			yield 'data: [DONE]\n\n'
 		else:
 			async for l in f():
 				yield l
@@ -18,7 +18,7 @@ async def gen():
 				pass
 		import json as _json
 		err = _json.dumps({"error": str(e), "status": "FAILED"}, ensure_ascii=False)
-		yield f'data: {err}\\n' if params_kw.stream else err
+		yield f'data: {err}\n' if params_kw.stream else err
 
 debug_params('params_kw', params_kw)
 catelogid = params_kw.catelogid or 't2t'
