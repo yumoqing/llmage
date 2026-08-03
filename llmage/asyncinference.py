@@ -112,7 +112,7 @@ async def async_uapi_request(request, llm,
 		llmusage.accounting_status = 'created'
 		b = json.dumps(d, ensure_ascii=False)
 		yield b
-		await write_llmusage(llmusage)
+		# await write_llmusage(llmusage)
 		# if llm.callbackurl:
 		#	return
 		if d.status == 'FAILED':
@@ -128,7 +128,29 @@ async def async_uapi_request(request, llm,
 		s = ''.join(s.split('\n'))
 		exception(s)
 		yield f'{s}\n'
+		llmusage = DictObject()
+		llmusage.id = luid
+		llmusage.llmid = llm.id
+		llmusage.use_date = curDateString()
+		llmusage.use_time = timestampstr()
+		llmusage.userid = callerid
+		ioinfo = {
+			"input": params_kw,
+			'output': [ed]
+		}
+		webpath = await write_llmio(llmusage.id, ioinfo)
+		llmusage.ioinfo = webpath
+		llmusage.taskid = d.taskid
+		llmusage.transno = params_kw.transno
+		llmusage.responsed_seconds = responsed_seconds
+		llmusage.finish_seconds = finish_seconds
+		llmusage.status = 'FAILED'
+		llmusage.userorgid = callerorgid
+		llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
+		llmusage.ownerid = llm.ownerid
 		return
+	finally:
+		await write_llmusage(llmusage)
 
 async def modify_llmusage(ns):
 	env = ServerEnv()

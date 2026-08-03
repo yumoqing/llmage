@@ -61,33 +61,13 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 		llmusage.finish_seconds = finish_seconds
 		llmusage.status = 'SUCCEEDED'
 		llmusage.amount = 0.00
-		""" 联机不记账
-		if llm.ppid:
-			try:
-				charging = await llm_charging(llm.ppid, llmusage)
-				if charging:
-					llmusage.amount = charging.amount
-					llmusage.cost = charging.cost
-				else:
-					llmusage.amount = llmusage.cost = 0.0
-			except Exception as e:
-				e = Exception(f'{llm.pid} charging error{e}')
-				exception(f'{e}')
-		else:
-			llmusage.amount = 0
-			llmusage.cost = 0
-		"""
 		llmusage.userorgid = callerorgid
 		llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
 		llmusage.ownerid = llm.ownerid
 		llmusage.accounting_status = 'created'
 		b = json.dumps(d, ensure_ascii=False)
 		yield b
-		await write_llmusage(llmusage)
-		"""联机不记账
-		if llmusage.amount > 0.0001:
-			await llm_accounting(llmusage)
-		"""
+		# await write_llmusage(llmusage)
 	except Exception as e:
 		exception(f'{e=},{format_exc()}, {b=}')
 		estr = erase_apikey(e)
@@ -96,7 +76,29 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 		s = ''.join(s.split('\n'))
 		outlines.append(ed)
 		yield f'{s}\n'
-
+		llmusage = DictObject()
+		llmusage.id = luid
+		llmusage.llmid = llm.id
+		llmusage.use_date = curDateString()
+		llmusage.use_time = timestampstr()
+		llmusage.userid = callerid
+		llmusage.usages = None
+		ioinfo = {
+			"input": params_kw,
+			'output': [ed]
+		}
+		webpath = await write_llmio(llmusage.id, ioinfo)
+		llmusage.ioinfo = webpath
+		llmusage.transno = params_kw.transno
+		llmusage.responsed_seconds = responsed_seconds
+		llmusage.finish_seconds = finish_seconds
+		llmusage.status = 'FAILED'
+		llmusage.amount = 0.00
+		llmusage.userorgid = callerorgid
+		llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
+		llmusage.ownerid = llm.ownerid
+	finally:
+		await write_llmusage(llmusage)
 
 async def sync_uapi_request_product(llm, api_userid, user_id, user_org_id, params_kw, luid):
 	"""Product interface version: no HTTP request dependency. Returns dict."""

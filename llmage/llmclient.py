@@ -14,6 +14,7 @@ from ahserver.filestorage import FileStorage
 from .asyncinference import async_uapi_request
 from .syncinference import sync_uapi_request
 from .accounting import llm_accounting, llm_charging
+from .balance import refund_balance
 from .utils import *
 
 async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
@@ -91,28 +92,14 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
 		llmusage.ownerid = llm.ownerid
 		llmusage.accounting_status = 'created'
-		await write_llmusage(llmusage)
+		# await write_llmusage(llmusage)
 	except Exception as e:
-		# Retry on duplicate key: append *1, *2, ...
-		retry = 0
-		while 'Duplicate entry' in str(e) and retry < 3:
-			retry += 1
-			llmusage.id = f'{luid}*{retry}'
-			try:
-				await write_llmusage(llmusage)
-				exception(f'write_llmusage retry {retry} succeeded with id={llmusage.id}')
-				e = None
-				break
-			except Exception as e2:
-				e = e2
 		# Refund balance reservation on failure
 		try:
-			from .balance import refund_balance
-			from ahserver.serverenv import ServerEnv
-			reserve_luid = params_kw.get('_luid') if params_kw else None
-			if reserve_luid:
-				await refund_balance(ServerEnv(), reserve_luid)
+			if luid:
+				await refund_balance(ServerEnv(), luid)
 		except:
+			debug(f'refund_balance(ServerEnv(), {luid=}) errir')
 			pass
 		exception(f'{e=},{format_exc()}')
 		estr = erase_apikey(e)
@@ -121,15 +108,27 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 		s = ''.join(s.split('\\n'))
 		outlines.append(ed)
 		yield f'{s}\\n'
-		return
+		## except happand at call llm server
+		llmusage = DictObject()
+		llmusage.id = luid
+		llmusage.llmid = llm.id
+		llmusage.use_date = curDateString()
+		llmusage.use_time = timestampstr()
+		llmusage.userid = callerid
+		ioinfo = {
+			"input": params_kw,
+			'output': ed
+		}
+		webpath = await write_llmio(llmusage.id, ioinfo)
+		llmusage.ioinfo = webpath
+		llmusage.transno = params_kw.transno
+		llmusage.status = 'FAILED'
+		llmusage.userorgid = callerorgid
+		llmusage.tenantid = params_kw.get('tenantid', params_kw.get('tentantid'))
+		llmusage.ownerid = llm.ownerid
 	finally:
 		# GeneratorExit / client disconnect — flush partial usage
-		if llmusage and llmusage.get('id') == luid:
-			try:
-				llmusage.status = llmusage.status or 'UNKNOWN'
-				await write_llmusage(llmusage)
-			except:
-				pass
+		await write_llmusage(llmusage)
 
 async def inference_generator(request, *args, params_kw=None, **kw):
 	env = request._run_ns.copy()

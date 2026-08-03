@@ -556,6 +556,14 @@ async def get_llm(llmid, catelogid=None):
 async def write_llmusage(llmusage):
 	env = ServerEnv()
 	async with get_sor_context(env, 'llmage') as sor:
+		n = 0
+		part0 = llmusage.id
+		while True:
+			recs = await sor.R('llmusage', {'id': llmusage.id})
+			if len(recs) == 0:
+				break
+			n = n + 1
+			llmusage.id = f'{part0}*{n}'
 		await sor.C('llmusage', llmusage)
 
 async def llm_query_price(llmid, config_data):
