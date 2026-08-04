@@ -12,20 +12,21 @@ try:
             await sor.U('llm', {'id': record_id, 'status': action})
             result['success'] = True
             result['message'] = '上架成功' if action == 'published' else '下架成功'
-            if action == 'published':
-                env = request._run_ns
-                sync_fn = getattr(env, 'sync_llm_product', None)
-                if sync_fn:
-                    try:
-                        sync_result = await sync_fn(record_id)
-                    except Exception as sync_e:
-                        sync_result = {'success': False, 'error': str(sync_e)}
-                    if not sync_result:
-                        result['message'] += '，已同步为产品'
-                    elif sync_result.get('success'):
-                        result['message'] += '，已同步为产品'
-                    else:
-                        result['message'] += '，但产品同步失败: ' + str(sync_result.get('error', '未知错误'))
+        if action == 'published':
+            # 同步必须放在事务块外：块内未提交时另一连接读到旧状态
+            env = request._run_ns
+            sync_fn = getattr(env, 'sync_llm_product', None)
+            if sync_fn:
+                try:
+                    sync_result = await sync_fn(record_id)
+                except Exception as sync_e:
+                    sync_result = {'success': False, 'error': str(sync_e)}
+                if not sync_result:
+                    result['message'] += '，已同步为产品'
+                elif sync_result.get('success'):
+                    result['message'] += '，已同步为产品'
+                else:
+                    result['message'] += '，但产品同步失败: ' + str(sync_result.get('error', '未知错误'))
 except Exception as e:
     result['message'] = str(e)
 
