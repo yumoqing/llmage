@@ -173,8 +173,8 @@ def load_llmage():
 	env._reserve_balance = reserve_balance
 	env._finalize_balance = finalize_balance
 	env._refund_balance = refund_balance
-	env.reserve_balance = lambda llmid, userorgid, luid: reserve_balance(env, llmid, userorgid, luid)
-	env.finalize_balance = lambda luid, actual_cost: finalize_balance(env, luid, actual_cost)
+	env.reserve_balance = lambda llmid, userorgid, luid, ttl=600, userid=None: reserve_balance(env, llmid, userorgid, luid, ttl=ttl, userid=userid)
+	env.finalize_balance = lambda luid, actual_cost, llmid=None: finalize_balance(env, luid, actual_cost, llmid=llmid)
 	env.refund_balance = lambda luid: refund_balance(env, luid)
 	env.backup_accounted_llmusage = backup_accounted_llmusage
 	env.read_ioinfo_content = read_ioinfo_content

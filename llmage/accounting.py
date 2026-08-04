@@ -195,6 +195,13 @@ async def llm_accounting(llmusage):
 			'accounting_status': 'accounted'
 		}
 		await sor.U('llmusage', ns)
+	# Finalize Redis balance reservation (non-critical)
+	try:
+		from .balance import finalize_balance
+		await finalize_balance(env, llmusage.id, trans_amount,
+						llmid=llmusage.llmid)
+	except Exception as e:
+		exception(f'finalize_balance failed (non-critical): {e}')
 
 async def get_accounting_llmusages(luid=None):
 	env = ServerEnv()

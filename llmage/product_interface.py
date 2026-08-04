@@ -22,6 +22,7 @@ from .utils import (
     write_llmusage,
 )
 from .accounting import llm_charging
+from .balance import reserve_balance, refund_balance
 
 
 async def _resolve_llm(resource_ref_id):
@@ -219,24 +220,46 @@ async def execute_product_service(resource_ref_id, user_id, user_org_id, request
     if not params_kw.get('transno'):
         params_kw.transno = luid
 
+    # ── Balance reservation (product path) ─────────────────────────
+    # Same atomic pre-deduct as the direct dspy path; policy checks
+    # (self-org / tpac / no-ppid) live inside reserve_balance.
+    ttl = 3600 if full_llm.stream == 'async' else 600
+    reserved = await reserve_balance(env, full_llm.id, user_org_id, luid,
+                                     ttl=ttl, userid=user_id)
+    if not reserved.get('ok'):
+        return {'success': False,
+                'message': f'余额不足(balance reserve rejected): {reserved.get("reason")}',
+                'status': 'FAILED', 'task_id': luid}
+    params_kw._luid = luid
+
     try:
         if full_llm.stream == 'async':
             from .asyncinference import async_uapi_request_product
             result = await async_uapi_request_product(
                 full_llm, userid, user_id, user_org_id, params_kw, luid)
-            return result
-
         elif not full_llm.stream:
             from .syncinference import sync_uapi_request_product
             result = await sync_uapi_request_product(
                 full_llm, userid, user_id, user_org_id, params_kw, luid)
-            return result
         else:
             result = await _collect_stream(full_llm, userid, user_id,
                                            user_org_id, params_kw, luid)
-            return result
+
+        # Sub-callers swallow exceptions and return success=False —
+        # refund here too (refund is idempotent via GETDEL)
+        if not result.get('success'):
+            try:
+                await refund_balance(env, luid)
+            except Exception:
+                pass
+        return result
 
     except Exception as e:
+        # Refund balance reservation on failure
+        try:
+            await refund_balance(env, luid)
+        except Exception:
+            pass
         exception(f'execute_product_service error: {e}')
         return {'success': False, 'message': str(e), 'status': 'FAILED',
                 'task_id': luid}
@@ -349,6 +372,16 @@ async def execute_product_service_stream(resource_ref_id, user_id, user_org_id, 
     if not params_kw.get('transno'):
         params_kw.transno = luid
 
+    # ── Balance reservation (product stream path) ──────────────────
+    reserved = await reserve_balance(env, full_llm.id, user_org_id, luid,
+                                     ttl=600, userid=user_id)
+    if not reserved.get('ok'):
+        yield {'chunk': None, 'usage_data': None, 'done': True,
+               'error': f'余额不足(balance reserve rejected): {reserved.get("reason")}',
+               'task_id': luid, 'status': 'FAILED'}
+        return
+    params_kw._luid = luid
+
     outlines = []
     txt = ''
     usage = None
@@ -416,6 +449,11 @@ async def execute_product_service_stream(resource_ref_id, user_id, user_org_id, 
         }
 
     except Exception as e:
+        # Refund balance reservation on failure
+        try:
+            await refund_balance(env, luid)
+        except Exception:
+            pass
         exception(f'stream error: {e}')
         yield {'chunk': None, 'usage_data': None, 'done': True,
                'error': str(e), 'task_id': luid, 'status': 'FAILED'}

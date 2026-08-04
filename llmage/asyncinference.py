@@ -13,6 +13,7 @@ from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 from .accounting import llm_accounting, llm_charging
+from .balance import refund_balance
 from .utils import *
 
 # Global set to keep references to background tasks
@@ -67,7 +68,7 @@ async def async_uapi_request(request, llm,
 	uapi = env.UpAppApi(request)
 	userid = await env.uapi_data.get_calluserid(llm.upappid, orgid=llm.ownerid)
 	b = None
-	luid = getID()
+	luid = params_kw.get('_luid') or getID()
 	try:
 		start_timestamp = time.time()
 		if llm.callbackurl:
@@ -77,6 +78,12 @@ async def async_uapi_request(request, llm,
 		try:
 			b = await uapi.call(llm.upappid, llm.apiname, userid, params=params_kw)
 		except Exception as e:
+			# Refund balance reservation on submission failure
+			try:
+				if luid:
+					await refund_balance(ServerEnv(), luid)
+			except Exception:
+				pass
 			estr = erase_apikey(e)
 			ed = {"error": f"ERROR:{estr}", "status": "FAILED"}
 			exception(f'{ed}')
@@ -123,6 +130,12 @@ async def async_uapi_request(request, llm,
 		task.add_done_callback(_background_tasks.discard)
 
 	except Exception as e:
+		# Refund balance reservation on outer failure
+		try:
+			if luid:
+				await refund_balance(ServerEnv(), luid)
+		except Exception:
+			pass
 		ed = {"error": f"ERROR:{e}", "status": "FAILED"}
 		s = json.dumps(ed, ensure_ascii=False)
 		s = ''.join(s.split('\n'))
@@ -229,6 +242,12 @@ async def query_task_status(request, luid, onetime=False):
 						ns['usages'] = json.dumps(new_output['usage'])
 					await append_new_llmoutput(llmusage.ioinfo, new_output)
 					await modify_llmusage(ns)
+					if llmusage.status == 'FAILED':
+						# Async task failed — refund the balance reservation
+						try:
+							await refund_balance(ServerEnv(), luid)
+						except Exception:
+							pass
 				if  llmusage.status in ['UNKNOWN', 'FAILED', 'SUCCEEDED']:
 					critical(f'finished .. {llmusage.status=}')
 					return

@@ -14,7 +14,7 @@ from ahserver.filestorage import FileStorage
 from .asyncinference import async_uapi_request
 from .syncinference import sync_uapi_request
 from .accounting import llm_accounting, llm_charging
-from .balance import refund_balance
+from .balance import refund_balance, reserve_balance, extend_reserve
 from .utils import *
 
 async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
@@ -27,7 +27,7 @@ async def uapi_request(request, llm, callerid, callerorgid, params_kw=None):
 	userid = await env.uapi_data.get_calluserid(llm.upappid, orgid=llm.ownerid)
 	outlines = []
 	txt = ''
-	luid = getID()
+	luid = params_kw.get('_luid') or getID()
 	llmusage = None
 	try:
 		start_timestamp = time.time()
@@ -161,6 +161,29 @@ async def _inference_generator(request, callerid, callerorgid,
 		yield errmsg
 		return
 	params_kw.model = llm.model
+	# ── Unified balance reserve ────────────────────────────────────────
+	# Covers every entry that did not pre-reserve. v1/chat/completions
+	# reserves at dspy level and passes _luid; everyone else reserves here.
+	# Reusing _luid downstream also fixes the old mismatch where the
+	# reserve key could never equal the llmusage id used by finalize.
+	if params_kw.get('_luid'):
+		if llm.stream == 'async':
+			# Entry reserved with the short TTL; async tasks run longer
+			await extend_reserve(env, params_kw._luid, 3600)
+	else:
+		_luid = getID()
+		_ttl = 3600 if llm.stream == 'async' else 600
+		reserved = await reserve_balance(env, llm.id, callerorgid, _luid,
+							ttl=_ttl, userid=callerid)
+		if not reserved.get('ok'):
+			debug(f'balance reserve rejected: {reserved}')
+			errmsg = json.dumps({'status': 'FAILED',
+				'error': f'余额不足(balance reserve rejected): {reserved.get("reason")}'},
+				ensure_ascii=False) + '\n'
+			yield errmsg
+			return
+		params_kw._luid = _luid
+		params_kw._reserved = reserved
 	if llm.stream == 'async':
 		if llm.callbackurl:
 			cb_url = env.entire_url(llm.callbackurl)

@@ -49,7 +49,7 @@ params_kw.llmcatelogid = catelogid
 
 debug(f'{params_kw.llmid=}')
 luid = getID()
-reserved = await env.reserve_balance(params_kw.llmid, userorgid, luid)
+reserved = await env.reserve_balance(params_kw.llmid, userorgid, luid, userid=userid)
 if not reserved.get('ok'):
 	debug(f'{userid=} balance not enough: {reserved}')
 	return openai_429()

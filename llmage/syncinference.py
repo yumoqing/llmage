@@ -14,6 +14,7 @@ from appPublic.base64_to_file import base64_to_file, getFilenameFromBase64
 from ahserver.serverenv import get_serverenv, ServerEnv
 from ahserver.filestorage import FileStorage
 from .accounting import llm_accounting, llm_charging
+from .balance import refund_balance
 from .utils import *
 
 async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None):
@@ -28,7 +29,7 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 	outlines = []
 	b = None
 	d = None
-	luid = getID()
+	luid = params_kw.get('_luid') or getID()
 	try:
 		start_timestamp = time.time()
 		responsed_seconds = None
@@ -69,6 +70,12 @@ async def sync_uapi_request(request, llm, callerid, callerorgid, params_kw=None)
 		yield b
 		# await write_llmusage(llmusage)
 	except Exception as e:
+		# Refund balance reservation on failure
+		try:
+			if luid:
+				await refund_balance(ServerEnv(), luid)
+		except Exception:
+			pass
 		exception(f'{e=},{format_exc()}, {b=}')
 		estr = erase_apikey(e)
 		ed = {"error": f"ERROR:{estr}", "status": "FAILED" ,"llmusageid": luid}
