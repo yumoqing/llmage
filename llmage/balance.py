@@ -98,11 +98,12 @@ local cost_key = KEYS[1]
 local reserve_key = KEYS[2]
 local actual_cost = tonumber(ARGV[1])
 
--- Atomically pop reserve
-local reserve_val = redis.call('GETDEL', reserve_key)
+-- Atomically pop reserve (GET+DEL is atomic inside a Lua script; GETDEL needs Redis 6.2+)
+local reserve_val = redis.call('GET', reserve_key)
 if not reserve_val then
     return {0, 'no reserve'}
 end
+redis.call('DEL', reserve_key)
 
 -- Parse: userorgid|llmid|max_cost
 local i = 1
@@ -135,10 +136,11 @@ return {1, userorgid, max_cost, actual_cost, diff}
 REFUND_LUA = """
 local reserve_key = KEYS[1]
 
-local reserve_val = redis.call('GETDEL', reserve_key)
+local reserve_val = redis.call('GET', reserve_key)
 if not reserve_val then
     return {0, 'no reserve'}
 end
+redis.call('DEL', reserve_key)
 
 local i = 1
 local userorgid, llmid, max_cost
