@@ -88,7 +88,7 @@ async def load_product_category_product(parent_category_id):
 		if not catelogs:
 			return {'success': False, 'error': 'llmage中没有产品类别数据'}
 
-		llm_sql = """select a.id, a.name, a.model, a.description, a.status,
+		llm_sql = """select a.id, a.name, a.model, a.description, a.status, a.providerid,
 m.llmcatelogid, lc.name as catelogname
 from llm a
 join llm_api_map m on a.id = m.llmid
