@@ -27,6 +27,19 @@ try:
                     result['message'] += '，已同步为产品'
                 else:
                     result['message'] += '，但产品同步失败: ' + str(sync_result.get('error', '未知错误'))
+        elif action == 'unpublished':
+            # 下架时同步下架产品
+            product_dbname = get_serverenv('get_module_dbname')('product_management')
+            async with DBPools().sqlorContext(product_dbname) as sor:
+                products = await sor.sqlExe(
+                    "SELECT id FROM product WHERE resource_ref_id = ${ref_id}$ AND status = '1'",
+                    {'ref_id': record_id})
+                if products:
+                    for p in products:
+                        await sor.U('product', {'id': p.id, 'status': '0'})
+                    result['message'] += '，已同步下架' + str(len(products)) + '个产品'
+                else:
+                    result['message'] += '，未找到关联产品'
 except Exception as e:
     result['message'] = str(e)
 

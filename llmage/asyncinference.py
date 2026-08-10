@@ -69,6 +69,7 @@ async def async_uapi_request(request, llm,
 	userid = await env.uapi_data.get_calluserid(llm.upappid, orgid=llm.ownerid)
 	b = None
 	luid = params_kw.get('_luid') or getID()
+	llmusage = None
 	try:
 		start_timestamp = time.time()
 		if llm.callbackurl:
@@ -163,7 +164,8 @@ async def async_uapi_request(request, llm,
 		llmusage.ownerid = llm.ownerid
 		return
 	finally:
-		await write_llmusage(llmusage)
+		if llmusage is not None:
+			await write_llmusage(llmusage)
 
 async def modify_llmusage(ns):
 	env = ServerEnv()
