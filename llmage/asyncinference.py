@@ -166,6 +166,8 @@ async def async_uapi_request(request, llm,
 	finally:
 		if llmusage is not None:
 			await write_llmusage(llmusage)
+		else:
+			exception(f'llmusage is None in finally, luid={luid}, llmid={llm.id}')
 
 async def modify_llmusage(ns):
 	env = ServerEnv()
